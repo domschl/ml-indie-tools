@@ -1,6 +1,11 @@
 import tensorflow as tf
-import tensorflow.keras as keras
-from tensorflow.keras import layers
+try:
+    # the endless shuffle of keras modules
+    import tensorflow.keras as keras
+    from tensorflow.keras import layers
+except ImportError:
+    import keras
+    from keras import layers
 import numpy as np
 import math
 
