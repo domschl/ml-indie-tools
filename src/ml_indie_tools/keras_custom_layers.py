@@ -3,9 +3,11 @@ try:
     # the endless shuffle of keras modules
     import tensorflow.keras as keras
     from tensorflow.keras import layers
+    print("Using TF-Keras version:", keras.__version__)
 except ImportError:
     import keras
-    from keras import layers
+    import keras.layers as layers
+    print("Using Keras version:", keras.__version__)
 import numpy as np
 import math
 
