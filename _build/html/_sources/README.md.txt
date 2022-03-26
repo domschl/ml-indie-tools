@@ -80,11 +80,12 @@ Tesla K80
 Local project:
 
 ```python
-ml_env.init_paths("my_project", "my_model")  # -> ('.', '.', './model/my_model', './data', './logs')
+ml_env.init_paths("my_project", "my_model")  
+# -> ('.', '.', './model/my_model', './data', './logs')
 ```
 
-The list contains <root-path>, <project-path> (both are current directory for local projects), <model-path> to save model and weights, <data-path> for
-training data and <log-path> for logs.
+The list contains `<root-path>`, `<project-path>` (both are `.`, the current directory for local projects), `<model-path>` to save model and weights, `<data-path>` for
+training data and `<log-path>` for logs.
   
 Those paths (with exception of `./logs`) are moved to Google Drive for Colab instances: 
 

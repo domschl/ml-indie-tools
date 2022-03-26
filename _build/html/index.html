@@ -871,11 +871,12 @@ with Huggingface <a class="reference external" href="https://huggingface.co/docs
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">ml_env.init_paths('my_project',</span> <span class="pre">'my_model')</span></code> will give a list of paths that are adapted for local and colab usage</p>
 <p>Local project:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>  <span class="c1"># -&gt; (&#39;.&#39;, &#39;.&#39;, &#39;./model/my_model&#39;, &#39;./data&#39;, &#39;./logs&#39;)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
+<span class="c1"># -&gt; (&#39;.&#39;, &#39;.&#39;, &#39;./model/my_model&#39;, &#39;./data&#39;, &#39;./logs&#39;)</span>
 </pre></div>
 </div>
-<p>The list contains <span class="raw-html-m2r"><root-path></span>, <span class="raw-html-m2r"><project-path></span> (both are current directory for local projects), <span class="raw-html-m2r"><model-path></span> to save model and weights, <span class="raw-html-m2r"><data-path></span> for
-training data and <span class="raw-html-m2r"><log-path></span> for logs.</p>
+<p>The list contains <code class="docutils literal notranslate"><span class="pre">&lt;root-path&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;project-path&gt;</span></code> (both are <code class="docutils literal notranslate"><span class="pre">.</span></code>, the current directory for local projects), <code class="docutils literal notranslate"><span class="pre">&lt;model-path&gt;</span></code> to save model and weights, <code class="docutils literal notranslate"><span class="pre">&lt;data-path&gt;</span></code> for
+training data and <code class="docutils literal notranslate"><span class="pre">&lt;log-path&gt;</span></code> for logs.</p>
 <p>Those paths (with exception of <code class="docutils literal notranslate"><span class="pre">./logs</span></code>) are moved to Google Drive for Colab instances:</p>
 <p>On Google Colab:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># INFO:MLEnv:You will now be asked to authenticate Google Drive access in order to store training data (cache) and model state.</span>
