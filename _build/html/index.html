@@ -15,6 +15,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -749,26 +750,237 @@ the twelve supported ops:
 </dd></dl>
 
 </section>
-<section id="residualblock-object">
-<h2>ResidualBlock object<a class="headerlink" href="#residualblock-object" title="Permalink to this headline">¶</a></h2>
+<section id="module-keras_custom_layers">
+<span id="residualblock-object"></span><h2>ResidualBlock object<a class="headerlink" href="#module-keras_custom_layers" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.ResidualBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ResidualBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ResidualBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ResidualBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Residual Block layer for Keras</p>
+<p>The residual block consists of two fully connected layers with units neurons 
+followed by two BatchNorms and ReLUs:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#   ┌──────────────────────────────────────────────────┐
+#   │  ┌─────┐  ┌──┐  ┌────┐    ┌─────┐  ┌──┐  ┌────┐  ▼
+# ──┴─►│Dense│─►│BN│─►│ReLU│───►│Dense│─►│BN│─►│ReLU│─ + ─►    highway=True
+#      └─────┘  └──┘  └────┘    └─────┘  └──┘  └────┘
+#
+#   ┌──────────────────────────────────────────┐
+#   │  ┌─────┐  ┌──┐  ┌────┐    ┌─────┐  ┌──┐  ▼   ┌────┐
+# ──┴─►│Dense│─►│BN│─►│ReLU│───►│Dense│─►│BN│─ + ─►│ReLU│─►    highway=False
+#      └─────┘  └──┘  └────┘    └─────┘  └──┘      └────┘
+</pre></div>
+</div>
+<p>The additive residual connection either bridges all layers (highway), or 
+connects just before the last ReLU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
+<li><p><strong>highway</strong> – Boolean, whether to use highway connection or not.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="residualdense-object">
 <h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.ResidualDense">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ResidualDense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ResidualDense"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ResidualDense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Residual Dense layer for Keras</p>
+<p>The residual dense layer consists of a fully connected layer followed by BatchNorm and ReLU:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#   ┌─────────────────────────┐
+#   │  ┌─────┐  ┌──┐  ┌────┐  ▼
+# ──┴─►│Dense│─►│BN│─►│ReLU│─ + ─►
+#      └─────┘  └──┘  └────┘
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
+<li><p><strong>regularizer</strong> – Positive float, regularization strength for the Dense layer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="residualdensestack-object">
 <h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.ResidualDenseStack">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ResidualDenseStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ResidualDenseStack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ResidualDenseStack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Residual Dense layer for Keras</p>
+<p>The residual dense layer stack consists of <cite>layer_count</cite> <a class="reference internal" href="#keras_custom_layers.ResidualDense" title="keras_custom_layers.ResidualDense"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualDense</span></code></a> layers.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#  ┌─────────── n ─────────────┐   n = layer_count repetitions
+#   ┌─────────────────────────┐
+#   │  ┌─────┐  ┌──┐  ┌────┐  ▼
+# ──┴─►│Dense│─►│BN│─►│ReLU│─ + ─►
+#      └─────┘  └──┘  └────┘
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
+<li><p><strong>layer_count</strong> – Positive integer, number of layer-blocks, each a <cite>ResidualDense</cite> block.</p></li>
+<li><p><strong>regularizer</strong> – Positive float, regularization strength for the Dense layer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="parallelresidualdensestacks-object">
 <h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.ParallelResidualDenseStacks">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ParallelResidualDenseStacks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ParallelResidualDenseStacks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ParallelResidualDenseStacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Parallel Residual Dense Stacks layer for Keras</p>
+<p>The parallel residual dense layer stacks consist of <cite>stacks</cite> count parallel
+<a class="reference internal" href="#keras_custom_layers.ResidualDenseStack" title="keras_custom_layers.ResidualDenseStack"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualDenseStack</span></code></a>, each of which consists of  <cite>layer_count</cite> <a class="reference internal" href="#keras_custom_layers.ResidualDense" title="keras_custom_layers.ResidualDense"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualDense</span></code></a> 
+layers. The output of all parallel stacks is concatenated and scaled down to <cite>units</cite> units.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#        ┌─────────── n ─────────────┐   n = layer_count repetitions
+#         ┌─────────────────────────┐                               
+#         │  ┌─────┐  ┌──┐  ┌────┐  ▼    ┌──────┐                   
+#   ┌─────┴─►│Dense│─►│BN│─►│ReLU│─ + ─► │      │                   
+#   │        └─────┘  └──┘  └────┘       │      │                   
+#   │                                    │      │
+#   │    ┌─────────── n ─────────────┐   │      │
+#   │     ┌─────────────────────────┐    │      │                   
+#   │     │  ┌─────┐  ┌──┐  ┌────┐  ▼    │concat│   ┌─────┐  ┌────┐                   
+#   ├─────┴─►│Dense│─►│BN│─►│ReLU│─ + ─► │      │ ─►│Dense│─►│ReLU│─►                 
+# ──┤        └─────┘  └──┘  └────┘       │      │   └─────┘  └────┘                   
+#   │                .                   │      │    scale down to
+#   │                . `stacks` reps     │      │    `units`.
+#   │                .                   │      │
+#   │    ┌─────────── n ─────────────┐   │      │
+#   │     ┌─────────────────────────┐    │      │                   
+#   │     │  ┌─────┐  ┌──┐  ┌────┐  ▼    │      │                   
+#   └─────┴─►│Dense│─►│BN│─►│ReLU│─ + ─► │      │                   
+#            └─────┘  └──┘  └────┘       └──────┘                   
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
+<li><p><strong>layer_count</strong> – Positive integer, number of layer-blocks, each a <cite>ResidualDense</cite> block.</p></li>
+<li><p><strong>stacks</strong> – Positive integer, number of parallel stacks.</p></li>
+<li><p><strong>regularizer</strong> – Positive float, regularization strength for the Dense layer.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="selfattention-object">
 <h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.SelfAttention">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">SelfAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#SelfAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.SelfAttention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Self-attention layer for Keras</p>
+<p>The self-attention layer learns three matrices (key <span class="math notranslate nohighlight">\(W_k\)</span>, query <span class="math notranslate nohighlight">\(W_q\)</span>, value <span class="math notranslate nohighlight">\(W_v\)</span>)
+that provide context-information for the <span class="math notranslate nohighlight">\(input\)</span>.
+Input is mutiplied with all three matrices, then <span class="math notranslate nohighlight">\(W_k\)</span> and <span class="math notranslate nohighlight">\(W_q\)</span> are multiplied,
+scaled down by <span class="math notranslate nohighlight">\(\sqrt{\dim{input}[-1]}\)</span> and normalized, either by LayerNorm,
+BatchNorm or Softmax or not at all. The result is then multiplied with <span class="math notranslate nohighlight">\(W_v\)</span>, and, if hidden
+dimension of the <span class="math notranslate nohighlight">\(W_{x_i}\)</span> matrices is different from input units last dimension, 
+rescaled by a final dense matrix multiply. Output has same shape as input.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#                   
+#     ┌──┐   
+#  ┌► │Wk│───┐   ┌─────┐
+#  │  └──┘   │   │Scale│
+#  │  ┌──┐   × ─►│Norm │─┐   (opt.)
+# ─┼─►│Wq│───┘   └─────┘ │   ┌─────┐
+#  │  └──┘               │   │Scale│──►
+#  │  ┌──┐               × ─►│Dense│
+#  └► │Wv│───────────────┘   └─────┘
+#     └──┘
+#
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> – Positive integer, number of hidden units. The matrices <span class="math notranslate nohighlight">\(W_{x_i}\)</span> are of shape <span class="math notranslate nohighlight">\(hs \times hs\)</span>.</p></li>
+<li><p><strong>norm</strong> – either ‘batchnorm’, ‘layernorm’, ‘softmax’, or None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="multiheadselfattention-object">
 <h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.MultiHeadSelfAttention">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">MultiHeadSelfAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#MultiHeadSelfAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.MultiHeadSelfAttention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Multi-head self-attention layer for Keras</p>
+<p>The multi-head self-attention layer concatenates the output of <cite>heads</cite> <a class="reference internal" href="#keras_custom_layers.SelfAttention" title="keras_custom_layers.SelfAttention"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelfAttention</span></code></a>
+layers. Each of the self-attention layers has an additive residual connection.
+If <cite>mh_normalize</cite> is True, the concatenated output is normalized.
+After scaling down to the number of units, the output is then passed through a
+ReLU and Dense layer again with residual connection.
+Finally, optional normalization and a final optional ReLU is applied. 
+Output has same shape as input.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#    ┌──────────────┐
+#    │  ┌────────┐  ▼   ┌──────┐  ┌────┐
+#  ┌─┴─►│SelfAtt.│─ + ─►│      │  │    │
+#  │    └────────┘      │      │  │    │
+#  │ ┌──────────────┐   │      │  │    │          ┌───────────────────┐   ┌────┐  
+# ─┤ │  ┌────────┐  ▼   │      │  │Opt.│  ┌─────┐ │  ┌────┐  ┌─────┐  ▼   │Opt │  
+#  ├─┴─►│SelfAtt.│─ + ─►│      │─►│Norm│─►│Scale│─┴─►│ReLU│─►│Dense│─ + ─►│Norm│─►
+#  │    └────────┘      │concat│  │    │  └─────┘    └────┘  └─────┘      └────┘  
+#  │        .           │ or   │  │    │
+#  │        . head      │ relu │  │    │
+#  │        . reps      │ +add │  │    │
+#  │ ┌──────────────┐   │      │  │    │
+#  │ │  ┌────────┐  ▼   │      │  │    │
+#  └─┴─►│SelfAtt.│─ + ─►│      │  │    │
+#       └────────┘      └──────┘  └────┘
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>units</strong> – Positive integer <cite>hs</cite>, number of hidden units.</p></li>
+<li><p><strong>heads</strong> – Positive integer, number of self-attention heads.</p></li>
+<li><p><strong>mh_normalize</strong> – Boolean, whether to normalize the output of the multi-head self-attention.</p></li>
+<li><p><strong>norm</strong> – either ‘batchnorm’, ‘layernorm, or ‘softmax’, the normalization used within each self-attention head.</p></li>
+<li><p><strong>join_heads_by_add</strong> – on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="positionalencoding-object">
 <h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="keras_custom_layers.PositionalEncoding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">PositionalEncoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#PositionalEncoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.PositionalEncoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
+<p>Positional encoding layer.</p>
+<p>adds sinusoid of different frequencies to the input. Can be used to add sequence-information to input
+data for transformers or attention layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>amplitude</strong> – float, amplitude of the encoding, default=1.0.</p></li>
+<li><p><strong>trainable</strong> – boolean, whether the weights of the layer are trainable, default=False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="readme-file">
 <h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h2>
@@ -983,7 +1195,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><a class="reference internal" href="#module-Gutenberg_Dataset">Gutenberg_Dataset object</a></li>
 <li><a class="reference internal" href="#module-Text_Dataset">Text_Dataset object</a></li>
 <li><a class="reference internal" href="#module-ALU_Dataset">ALU_Dataset object</a></li>
-<li><a class="reference internal" href="#residualblock-object">ResidualBlock object</a></li>
+<li><a class="reference internal" href="#module-keras_custom_layers">ResidualBlock object</a></li>
 <li><a class="reference internal" href="#residualdense-object">ResidualDense object</a></li>
 <li><a class="reference internal" href="#residualdensestack-object">ResidualDenseStack object</a></li>
 <li><a class="reference internal" href="#parallelresidualdensestacks-object">ParallelResidualDenseStacks object</a></li>
