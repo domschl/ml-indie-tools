@@ -4,8 +4,6 @@
 [![Docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://domschl.github.io/ml-indie-tools/index.html)
 [![PyPI version fury.io](https://badge.fury.io/py/ml-indie-tools.svg)](https://pypi.python.org/pypi/ml-indie-tools/)
 
-**Note:** THIS LIBRARY IS UNFINISHED WORK-IN-PROGRESS
-
 ## Description
 
 ```bash
@@ -17,7 +15,7 @@ who change between laptop, Colab-instances and local workstations with a graphic
 
 `env_tools` checks the current environment, and populates a number of flags that allow identification of run-time
 environment and available accelerator hardware. For Colab instances, it provides tools to mount Google Drive for
-persistant data- and model-storage.
+persistent data- and model-storage.
 
 The usage scenarios are:
 
@@ -26,6 +24,8 @@ The usage scenarios are:
 | Colab                    | x              | x              | /           | x           | x       | x       |
 | Workstation with Nvidia  | /              | x              | /           | x           | /       | x       |
 | Apple Silicon            | /              | x              | /           | /           | /       | /       |
+
+(`x`: supported, `/`: not supported)
 
 `Gutenberg_Dataset` and `Text_Dataset` are NLP libraries that provide text data and can be used in conjuction
 with Huggingface [Datasets](https://huggingface.co/docs/datasets/) or directly with ML libraries.
@@ -80,11 +80,12 @@ Tesla K80
 Local project:
 
 ```python
-ml_env.init_paths("my_project", "my_model")  # -> ('.', '.', './model/my_model', './data', './logs')
+ml_env.init_paths("my_project", "my_model")  
+# -> ('.', '.', './model/my_model', './data', './logs')
 ```
 
-The list contains <root-path>, <project-path> (both are current directory for local projects), <model-path> to save model and weights, <data-path> for
-training data and <log-path> for logs.
+The list contains `<root-path>`, `<project-path>` (both are `.`, the current directory for local projects), `<model-path>` to save model and weights, `<data-path>` for
+training data and `<log-path>` for logs.
   
 Those paths (with exception of `./logs`) are moved to Google Drive for Colab instances: 
 
@@ -171,14 +172,29 @@ See the [Text_Dataset API documentation](https://domschl.github.io/ml-indie-tool
 ### ALU_Dataset
 
 See the [ALU_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset) for details.
-
+A sample project is at [ALU_Net](https://github.com/domschl/ALU_Net)
+  
 ### keras_custom_layers
 
 A collection of Keras residual- and self-attention layers
 
 See the [keras_custom_layers API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-keras_custom_layers) for details.
 
+## External projects
+
+Checkout the following jupyter notebook based projects for example-usage:
+
+### Text generation
+* [tensor-poet](https://github.com/domschl/tensor-poet)
+* [torch-poet](https://github.com/domschl/torch-poet)
+* [transformer-poet](https://github.com/domschl/transformer-poet)
+
+### Arithmetic and logic operations
+* [ALU_Net](https://github.com/domschl/ALU_Net)
+
 ## History
 
+* (2022-03-15, 0.1.2) `env_tools.init()` no longer uses `tf.compat.v1.disable_eager_executition()` since there are rumors about old code-paths being used. Use `tf.function()` instead, or call with `env_tools.init(..., old_disable_eager=True)` which continues to use the old v1 API.
+* (2022-03-12, 0.1.0) First version for external use.
 * (2021-12-26, 0.0.x) First pre-alpha versions published for testing purposes, not ready for use.
 

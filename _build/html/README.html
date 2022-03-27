@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>A collection of machine learning tools for low-resource research and experiments &#8212; ml-indie-tools 0.0.60 documentation</title>
+    <title>A collection of machine learning tools for low-resource research and experiments &#8212; ml-indie-tools 0.1.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to ml-indie-tools’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ml-indie-tools 0.0.60 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ml-indie-tools 0.1.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">A collection of machine learning tools for low-resource research and experiments</a></li> 
       </ul>
     </div>  
@@ -51,7 +51,6 @@
 <a class="reference external image-reference" href="LICENSE"><img alt="License" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" /></a>
 <a class="reference external image-reference" href="https://domschl.github.io/ml-indie-tools/index.html"><img alt="Docs" src="https://img.shields.io/badge/docs-stable-blue.svg" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
-<p><strong>Note:</strong> THIS LIBRARY IS UNFINISHED WORK-IN-PROGRESS</p>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install ml-indie-tools
@@ -61,7 +60,7 @@
 who change between laptop, Colab-instances and local workstations with a graphics card.</p>
 <p><code class="docutils literal notranslate"><span class="pre">env_tools</span></code> checks the current environment, and populates a number of flags that allow identification of run-time
 environment and available accelerator hardware. For Colab instances, it provides tools to mount Google Drive for
-persistant data- and model-storage.</p>
+persistent data- and model-storage.</p>
 <p>The usage scenarios are:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -110,6 +109,7 @@ persistant data- and model-storage.</p>
 </tr>
 </tbody>
 </table>
+<p>(<cite>x</cite>: supported, <cite>/</cite>: not supported)</p>
 <p><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">Text_Dataset</span></code> are NLP libraries that provide text data and can be used in conjuction
 with Huggingface <a class="reference external" href="https://huggingface.co/docs/datasets/">Datasets</a> or directly with ML libraries.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ALU_Dataset</span></code> is a toy-dataset that allows training of integer arithmetic and logical (ALU) operations.</p>
@@ -152,11 +152,12 @@ with Huggingface <a class="reference external" href="https://huggingface.co/docs
 <h4>Project paths<a class="headerlink" href="#project-paths" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">ml_env.init_paths('my_project',</span> <span class="pre">'my_model')</span></code> will give a list of paths that are adapted for local and colab usage</p>
 <p>Local project:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>  <span class="c1"># -&gt; (&#39;.&#39;, &#39;.&#39;, &#39;./model/my_model&#39;, &#39;./data&#39;, &#39;./logs&#39;)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
+<span class="c1"># -&gt; (&#39;.&#39;, &#39;.&#39;, &#39;./model/my_model&#39;, &#39;./data&#39;, &#39;./logs&#39;)</span>
 </pre></div>
 </div>
-<p>The list contains <span class="raw-html-m2r"><root-path></span>, <span class="raw-html-m2r"><project-path></span> (both are current directory for local projects), <span class="raw-html-m2r"><model-path></span> to save model and weights, <span class="raw-html-m2r"><data-path></span> for
-training data and <span class="raw-html-m2r"><log-path></span> for logs.</p>
+<p>The list contains <code class="docutils literal notranslate"><span class="pre">&lt;root-path&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;project-path&gt;</span></code> (both are <code class="docutils literal notranslate"><span class="pre">.</span></code>, the current directory for local projects), <code class="docutils literal notranslate"><span class="pre">&lt;model-path&gt;</span></code> to save model and weights, <code class="docutils literal notranslate"><span class="pre">&lt;data-path&gt;</span></code> for
+training data and <code class="docutils literal notranslate"><span class="pre">&lt;log-path&gt;</span></code> for logs.</p>
 <p>Those paths (with exception of <code class="docutils literal notranslate"><span class="pre">./logs</span></code>) are moved to Google Drive for Colab instances:</p>
 <p>On Google Colab:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># INFO:MLEnv:You will now be asked to authenticate Google Drive access in order to store training data (cache) and model state.</span>
@@ -227,7 +228,8 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 </section>
 <section id="alu-dataset">
 <h3>ALU_Dataset<a class="headerlink" href="#alu-dataset" title="Permalink to this headline">¶</a></h3>
-<p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset">ALU_Dataset API documentation</a> for details.</p>
+<p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset">ALU_Dataset API documentation</a> for details.
+A sample project is at <a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p>
 </section>
 <section id="keras-custom-layers">
 <h3>keras_custom_layers<a class="headerlink" href="#keras-custom-layers" title="Permalink to this headline">¶</a></h3>
@@ -235,9 +237,29 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-keras_custom_layers">keras_custom_layers API documentation</a> for details.</p>
 </section>
 </section>
+<section id="external-projects">
+<h2>External projects<a class="headerlink" href="#external-projects" title="Permalink to this headline">¶</a></h2>
+<p>Checkout the following jupyter notebook based projects for example-usage:</p>
+<section id="text-generation">
+<h3>Text generation<a class="headerlink" href="#text-generation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/domschl/tensor-poet">tensor-poet</a></p></li>
+<li><p><a class="reference external" href="https://github.com/domschl/torch-poet">torch-poet</a></p></li>
+<li><p><a class="reference external" href="https://github.com/domschl/transformer-poet">transformer-poet</a></p></li>
+</ul>
+</section>
+<section id="arithmetic-and-logic-operations">
+<h3>Arithmetic and logic operations<a class="headerlink" href="#arithmetic-and-logic-operations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
+</ul>
+</section>
+</section>
 <section id="history">
 <h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>(2022-03-15, 0.1.2) <code class="docutils literal notranslate"><span class="pre">env_tools.init()</span></code> no longer uses <code class="docutils literal notranslate"><span class="pre">tf.compat.v1.disable_eager_executition()</span></code> since there are rumors about old code-paths being used. Use <code class="docutils literal notranslate"><span class="pre">tf.function()</span></code> instead, or call with <code class="docutils literal notranslate"><span class="pre">env_tools.init(...,</span> <span class="pre">old_disable_eager=True)</span></code> which continues to use the old v1 API.</p></li>
+<li><p>(2022-03-12, 0.1.0) First version for external use.</p></li>
 <li><p>(2021-12-26, 0.0.x) First pre-alpha versions published for testing purposes, not ready for use.</p></li>
 </ul>
 </section>
@@ -269,6 +291,11 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 <li><a class="reference internal" href="#text-dataset">Text_Dataset</a></li>
 <li><a class="reference internal" href="#alu-dataset">ALU_Dataset</a></li>
 <li><a class="reference internal" href="#keras-custom-layers">keras_custom_layers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external-projects">External projects</a><ul>
+<li><a class="reference internal" href="#text-generation">Text generation</a></li>
+<li><a class="reference internal" href="#arithmetic-and-logic-operations">Arithmetic and logic operations</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#history">History</a></li>
@@ -315,12 +342,12 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
         <li class="right" >
           <a href="index.html" title="Welcome to ml-indie-tools’s documentation!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ml-indie-tools 0.0.60 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ml-indie-tools 0.1.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">A collection of machine learning tools for low-resource research and experiments</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021-2022, dsc.
+        &#169; Copyright 2022, dsc.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>

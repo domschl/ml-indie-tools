@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>env_tools &#8212; ml-indie-tools 0.0.58 documentation</title>
+    <title>env_tools &#8212; ml-indie-tools 0.1.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.0.58 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">env_tools</a></li> 
       </ul>
@@ -65,9 +65,10 @@
 
 <span class="sd">    :param platform: Known platforms are: `&#39;tf&#39;` (tensorflow), `&#39;pt&#39;` (pytorch), and `&#39;jax&#39;`</span>
 <span class="sd">    :param accelerator: known accelerators are: `&#39;fastest&#39;` (pick best available hardware), `&#39;cpu&#39;`, `&#39;gpu&#39;`, `&#39;tpu&#39;`.</span>
+<span class="sd">    :param old_disable_eager: default &#39;False&#39;, on True, old v1 compatibility layer is used to disable eager mode. According to rumors that might in resulting old codepaths being used?</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s1">&#39;tf&#39;</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s1">&#39;fastest&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s1">&#39;tf&#39;</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s1">&#39;fastest&#39;</span><span class="p">,</span> <span class="n">old_disable_eager</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;MLEnv&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">known_platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tf&#39;</span><span class="p">,</span> <span class="s1">&#39;pt&#39;</span><span class="p">,</span> <span class="s1">&#39;jax&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">known_accelerators</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="s1">&#39;tpu&#39;</span><span class="p">,</span> <span class="s1">&#39;fastest&#39;</span><span class="p">]</span>
@@ -137,8 +138,10 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;You got old TPU v2 which is limited to 8GB Ram.&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">tpu_type</span> <span class="o">=</span> <span class="n">tpu_type</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TPU strategy available&quot;</span><span class="p">)</span>
-                    <span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">disable_eager_execution</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TPU: eager execution disabled!&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">old_disable_eager</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Switching to non-eager mode&quot;</span><span class="p">)</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">disable_eager_execution</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TPU: eager execution disabled using old compat.v1 API!&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tpu</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s1">&#39;fastest&#39;</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
@@ -462,14 +465,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.0.58 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">env_tools</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+        &#169; Copyright 2022, dsc.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

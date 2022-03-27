@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Welcome to ml-indie-tools’s documentation! &#8212; ml-indie-tools 0.0.60 documentation</title>
+    <title>Welcome to ml-indie-tools’s documentation! &#8212; ml-indie-tools 0.1.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="README.html" title="A collection of machine learning tools for low-resource research and experiments"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">ml-indie-tools 0.0.60 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">ml-indie-tools 0.1.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to ml-indie-tools’s documentation!</a></li> 
       </ul>
     </div>  
@@ -57,7 +57,7 @@
 optional notebook/colab environment</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="env_tools.MLEnv">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">env_tools.</span></span><span class="sig-name descname"><span class="pre">MLEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/env_tools.html#MLEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#env_tools.MLEnv" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">env_tools.</span></span><span class="sig-name descname"><span class="pre">MLEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accelerator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_disable_eager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/env_tools.html#MLEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#env_tools.MLEnv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Initialize platform and accelerator.</p>
 <p>This checks initialization and available accelerator hardware for different ml platforms.
@@ -72,6 +72,7 @@ environment is a TPU environment, and <cite>self.is_cpu</cite> that no accelerat
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>platform</strong> – Known platforms are: <cite>‘tf’</cite> (tensorflow), <cite>‘pt’</cite> (pytorch), and <cite>‘jax’</cite></p></li>
 <li><p><strong>accelerator</strong> – known accelerators are: <cite>‘fastest’</cite> (pick best available hardware), <cite>‘cpu’</cite>, <cite>‘gpu’</cite>, <cite>‘tpu’</cite>.</p></li>
+<li><p><strong>old_disable_eager</strong> – default ‘False’, on True, old v1 compatibility layer is used to disable eager mode. According to rumors that might in resulting old codepaths being used?</p></li>
 </ul>
 </dd>
 </dl>
@@ -990,7 +991,6 @@ data for transformers or attention layers.</p>
 <a class="reference external image-reference" href="LICENSE"><img alt="License" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" /></a>
 <a class="reference external image-reference" href="https://domschl.github.io/ml-indie-tools/index.html"><img alt="Docs" src="https://img.shields.io/badge/docs-stable-blue.svg" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
-<p><strong>Note:</strong> THIS LIBRARY IS UNFINISHED WORK-IN-PROGRESS</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install ml-indie-tools
 </pre></div>
 </div>
@@ -998,7 +998,7 @@ data for transformers or attention layers.</p>
 who change between laptop, Colab-instances and local workstations with a graphics card.</p>
 <p><code class="docutils literal notranslate"><span class="pre">env_tools</span></code> checks the current environment, and populates a number of flags that allow identification of run-time
 environment and available accelerator hardware. For Colab instances, it provides tools to mount Google Drive for
-persistant data- and model-storage.</p>
+persistent data- and model-storage.</p>
 <p>The usage scenarios are:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -1047,6 +1047,7 @@ persistant data- and model-storage.</p>
 </tr>
 </tbody>
 </table>
+<p>(<cite>x</cite>: supported, <cite>/</cite>: not supported)</p>
 <p><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">Text_Dataset</span></code> are NLP libraries that provide text data and can be used in conjuction
 with Huggingface <a class="reference external" href="https://huggingface.co/docs/datasets/">Datasets</a> or directly with ML libraries.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ALU_Dataset</span></code> is a toy-dataset that allows training of integer arithmetic and logical (ALU) operations.</p>
@@ -1082,11 +1083,12 @@ with Huggingface <a class="reference external" href="https://huggingface.co/docs
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">ml_env.init_paths('my_project',</span> <span class="pre">'my_model')</span></code> will give a list of paths that are adapted for local and colab usage</p>
 <p>Local project:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>  <span class="c1"># -&gt; (&#39;.&#39;, &#39;.&#39;, &#39;./model/my_model&#39;, &#39;./data&#39;, &#39;./logs&#39;)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
+<span class="c1"># -&gt; (&#39;.&#39;, &#39;.&#39;, &#39;./model/my_model&#39;, &#39;./data&#39;, &#39;./logs&#39;)</span>
 </pre></div>
 </div>
-<p>The list contains <span class="raw-html-m2r"><root-path></span>, <span class="raw-html-m2r"><project-path></span> (both are current directory for local projects), <span class="raw-html-m2r"><model-path></span> to save model and weights, <span class="raw-html-m2r"><data-path></span> for
-training data and <span class="raw-html-m2r"><log-path></span> for logs.</p>
+<p>The list contains <code class="docutils literal notranslate"><span class="pre">&lt;root-path&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;project-path&gt;</span></code> (both are <code class="docutils literal notranslate"><span class="pre">.</span></code>, the current directory for local projects), <code class="docutils literal notranslate"><span class="pre">&lt;model-path&gt;</span></code> to save model and weights, <code class="docutils literal notranslate"><span class="pre">&lt;data-path&gt;</span></code> for
+training data and <code class="docutils literal notranslate"><span class="pre">&lt;log-path&gt;</span></code> for logs.</p>
 <p>Those paths (with exception of <code class="docutils literal notranslate"><span class="pre">./logs</span></code>) are moved to Google Drive for Colab instances:</p>
 <p>On Google Colab:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># INFO:MLEnv:You will now be asked to authenticate Google Drive access in order to store training data (cache) and model state.</span>
@@ -1138,10 +1140,22 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 </div>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Gutenberg_Dataset">Gutenberg_Dataset API documentation</a> for details.</p>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset">Text_Dataset API documentation</a> for details.</p>
-<p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset">ALU_Dataset API documentation</a> for details.</p>
+<p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset">ALU_Dataset API documentation</a> for details.
+A sample project is at <a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p>
 <p>A collection of Keras residual- and self-attention layers</p>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-keras_custom_layers">keras_custom_layers API documentation</a> for details.</p>
+<p>Checkout the following jupyter notebook based projects for example-usage:</p>
 <ul class="simple">
+<li><p><a class="reference external" href="https://github.com/domschl/tensor-poet">tensor-poet</a></p></li>
+<li><p><a class="reference external" href="https://github.com/domschl/torch-poet">torch-poet</a></p></li>
+<li><p><a class="reference external" href="https://github.com/domschl/transformer-poet">transformer-poet</a></p></li>
+</ul>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
+</ul>
+<ul class="simple">
+<li><p>(2022-03-15, 0.1.2) <code class="docutils literal notranslate"><span class="pre">env_tools.init()</span></code> no longer uses <code class="docutils literal notranslate"><span class="pre">tf.compat.v1.disable_eager_executition()</span></code> since there are rumors about old code-paths being used. Use <code class="docutils literal notranslate"><span class="pre">tf.function()</span></code> instead, or call with <code class="docutils literal notranslate"><span class="pre">env_tools.init(...,</span> <span class="pre">old_disable_eager=True)</span></code> which continues to use the old v1 API.</p></li>
+<li><p>(2022-03-12, 0.1.0) First version for external use.</p></li>
 <li><p>(2021-12-26, 0.0.x) First pre-alpha versions published for testing purposes, not ready for use.</p></li>
 </ul>
 <div class="toctree-wrapper compound">
@@ -1149,6 +1163,7 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="README.html">A collection of machine learning tools for low-resource research and experiments</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="README.html#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="README.html#external-projects">External projects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#history">History</a></li>
 </ul>
 </li>
@@ -1233,12 +1248,12 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
         <li class="right" >
           <a href="README.html" title="A collection of machine learning tools for low-resource research and experiments"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">ml-indie-tools 0.0.60 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">ml-indie-tools 0.1.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to ml-indie-tools’s documentation!</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021-2022, dsc.
+        &#169; Copyright 2022, dsc.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>

@@ -18,12 +18,12 @@ sys.path.insert(0, os.path.abspath('src/ml_indie_tools'))
 # -- Project information -----------------------------------------------------
 
 project = 'ml-indie-tools'
-copyright = '2021-2022, dsc'
+copyright = '2022, dsc'
 author = 'dsc'
 
 # The full version, including alpha/beta/rc tags
 # sync with setup.py
-release = '0.0.60'
+release = '0.1.2'
 
 
 # -- General configuration ---------------------------------------------------
