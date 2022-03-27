@@ -634,7 +634,11 @@ class Gutenberg_Dataset():
         """
         for rec in self.records:
             if rec["ebook_id"]==ebook_id:
-                rec['text']=self.filter_text(self.load_book(ebook_id))
+                text, _, valid = self._load_book_ex(ebook_id)
+                if text is None or valid is False:
+                    self.log.Error(f"Download of book {ebook_id} failed!")
+                    return None
+                rec['text']=self.filter_text(text)
                 return rec
         return None
 
