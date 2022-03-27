@@ -314,7 +314,7 @@ class Gutenberg_Dataset():
         :param ebook_id: Gutenberg id (Note: string, since this sometimes contains a character!)
         :returns: book text as string, unfiltered. Can be filtered with :func:`~Gutenberg_Dataset.Gutenberg_Dataset.filter_text`
         """
-        txt, dl, val = self._load_book_ex(ebook_id)[0]
+        txt, dl, val = self._load_book_ex(ebook_id)
         if val is True:
             return txt, dl
         else:
@@ -380,7 +380,8 @@ class Gutenberg_Dataset():
         :returns: tuple: book text as string, unfiltered, and a flag indicating with 'True' if book was downloaded from remote, validity flag, 'True' indicates valid text. 
         """
         if ebook_id is None or len(ebook_id)==0:
-            return None
+            self.log.error("No ebook_id given.")
+            return None, None, None
         if ebook_id[-1]=='C':
             ebook_id=ebook_id[:-1]
         path_stub=""
