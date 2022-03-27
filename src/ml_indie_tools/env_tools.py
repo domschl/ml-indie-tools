@@ -20,9 +20,10 @@ class MLEnv():
 
     :param platform: Known platforms are: `'tf'` (tensorflow), `'pt'` (pytorch), and `'jax'`
     :param accelerator: known accelerators are: `'fastest'` (pick best available hardware), `'cpu'`, `'gpu'`, `'tpu'`.
+    :param old_disable_eager: default 'False', on True, old v1 compatibility layer is used to disable eager mode. According to rumors that might in resulting old codepaths being used?
     """
 
-    def __init__(self, platform='tf', accelerator='fastest'):
+    def __init__(self, platform='tf', accelerator='fastest', old_disable_eager=False):
         self.log = logging.getLogger('MLEnv')
         self.known_platforms = ['tf', 'pt', 'jax']
         self.known_accelerators = ['cpu', 'gpu', 'tpu', 'fastest']
@@ -92,8 +93,10 @@ class MLEnv():
                             self.log.info("You got old TPU v2 which is limited to 8GB Ram.")
                     self.tpu_type = tpu_type
                     self.log.debug("TPU strategy available")
-                    tf.compat.v1.disable_eager_execution()
-                    self.log.debug("TPU: eager execution disabled!")
+                    if old_disable_eager is True:
+                        self.log.debug("Switching to non-eager mode")
+                        tf.compat.v1.disable_eager_execution()
+                        self.log.debug("TPU: eager execution disabled using old compat.v1 API!")
             if self.is_tpu is False:
                 if accelerator == 'gpu' or accelerator == 'fastest':
                     try:
