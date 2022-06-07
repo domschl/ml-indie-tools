@@ -21,11 +21,11 @@ The usage scenarios are:
 
 | Env                      | Tensorflow TPU | Tensorflow GPU | Pytorch TPU | Pytorch GPU | Jax TPU | Jax GPU |
 | ------------------------ | :------------: | :------------: | :---------: | :---------: | :-----: | :-----: |
-| Colab                    | x              | x              | /           | x           | x       | x       |
-| Workstation with Nvidia  | /              | x              | /           | x           | /       | x       |
-| Apple Silicon            | /              | x              | /           | /           | /       | /       |
+| Colab                    | +              | +              | /           | +           | +       | +       |
+| Workstation with Nvidia  | /              | +              | /           | +           | /       | +       |
+| Apple Silicon            | /              | +              | /           | +           | /       | /       |
 
-(`x`: supported, `/`: not supported)
+(`+`: supported, `/`: not supported)
 
 `Gutenberg_Dataset` and `Text_Dataset` are NLP libraries that provide text data and can be used in conjuction
 with Huggingface [Datasets](https://huggingface.co/docs/datasets/) or directly with ML libraries.
@@ -194,6 +194,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.
 * (2022-03-27, 0.1.4) Bugfixes to Gutenberg `search` and `load_book` and `get_book`.
 * (2022-03-15, 0.1.2) `env_tools.init()` no longer uses `tf.compat.v1.disable_eager_executition()` since there are rumors about old code-paths being used. Use `tf.function()` instead, or call with `env_tools.init(..., old_disable_eager=True)` which continues to use the old v1 API.
 * (2022-03-12, 0.1.0) First version for external use.
