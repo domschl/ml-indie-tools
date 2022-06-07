@@ -211,6 +211,17 @@ class MLEnv():
                             if accelerator != 'fastest':
                                 return
                 if accelerator == 'gpu' or accelerator == 'fastest':
+                    if 'darwin' in sys.platform:
+                        try:
+                            if torch.has_mps:
+                                self.is_gpu = True
+                                self.log.debug("Pytorch MPS acceleration detected.")
+                                self.gpu_type="MPS Metal accelerator"
+                                self.gpu_memory="system memory"
+                                self.log.debug(f"Pytorch MPS acceleration detected: MPS={torch.has_mps}")
+                                return
+                        except:
+                            pass
                     try:
                         import torch.cuda
                         if torch.cuda.is_available():
