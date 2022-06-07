@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>env_tools &#8212; ml-indie-tools 0.1.2 documentation</title>
+    <title>env_tools &#8212; ml-indie-tools 0.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">env_tools</a></li> 
       </ul>
@@ -256,6 +256,17 @@
                             <span class="k">if</span> <span class="n">accelerator</span> <span class="o">!=</span> <span class="s1">&#39;fastest&#39;</span><span class="p">:</span>
                                 <span class="k">return</span>
                 <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s1">&#39;fastest&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;darwin&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">has_mps</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">True</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Pytorch MPS acceleration detected.&quot;</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">gpu_type</span><span class="o">=</span><span class="s2">&quot;MPS Metal accelerator&quot;</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">gpu_memory</span><span class="o">=</span><span class="s2">&quot;system memory&quot;</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pytorch MPS acceleration detected: MPS=</span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">has_mps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="k">return</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="k">pass</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="kn">import</span> <span class="nn">torch.cuda</span>
                         <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
@@ -465,14 +476,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">env_tools</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>

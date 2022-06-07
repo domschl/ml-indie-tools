@@ -84,32 +84,62 @@ persistent data- and model-storage.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Colab</p></td>
-<td><p>x</p></td>
-<td><p>x</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 <td><p>/</p></td>
-<td><p>x</p></td>
-<td><p>x</p></td>
-<td><p>x</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 </tr>
 <tr class="row-odd"><td><p>Workstation with Nvidia</p></td>
 <td><p>/</p></td>
-<td><p>x</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 <td><p>/</p></td>
-<td><p>x</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 <td><p>/</p></td>
-<td><p>x</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 </tr>
 <tr class="row-even"><td><p>Apple Silicon</p></td>
 <td><p>/</p></td>
-<td><p>x</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 <td><p>/</p></td>
-<td><p>/</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
 <td><p>/</p></td>
 <td><p>/</p></td>
 </tr>
 </tbody>
 </table>
-<p>(<cite>x</cite>: supported, <cite>/</cite>: not supported)</p>
+<p>(<cite>+</cite>: supported, <cite>/</cite>: not supported)</p>
 <p><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset</span></code> and <code class="docutils literal notranslate"><span class="pre">Text_Dataset</span></code> are NLP libraries that provide text data and can be used in conjuction
 with Huggingface <a class="reference external" href="https://huggingface.co/docs/datasets/">Datasets</a> or directly with ML libraries.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ALU_Dataset</span></code> is a toy-dataset that allows training of integer arithmetic and logical (ALU) operations.</p>
@@ -258,6 +288,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <section id="history">
 <h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>(2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.</p></li>
 <li><p>(2022-03-27, 0.1.4) Bugfixes to Gutenberg <code class="docutils literal notranslate"><span class="pre">search</span></code> and <code class="docutils literal notranslate"><span class="pre">load_book</span></code> and <code class="docutils literal notranslate"><span class="pre">get_book</span></code>.</p></li>
 <li><p>(2022-03-15, 0.1.2) <code class="docutils literal notranslate"><span class="pre">env_tools.init()</span></code> no longer uses <code class="docutils literal notranslate"><span class="pre">tf.compat.v1.disable_eager_executition()</span></code> since there are rumors about old code-paths being used. Use <code class="docutils literal notranslate"><span class="pre">tf.function()</span></code> instead, or call with <code class="docutils literal notranslate"><span class="pre">env_tools.init(...,</span> <span class="pre">old_disable_eager=True)</span></code> which continues to use the old v1 API.</p></li>
 <li><p>(2022-03-12, 0.1.0) First version for external use.</p></li>
@@ -349,7 +380,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
