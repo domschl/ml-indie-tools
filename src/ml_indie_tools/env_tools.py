@@ -100,25 +100,35 @@ class MLEnv():
             if self.is_tpu is False:
                 if accelerator == 'gpu' or accelerator == 'fastest':
                     try:
-                        tf.config.experimental.list_physical_devices('GPU')
-                        self.is_gpu = True
+                        dev_list=tf.config.experimental.list_physical_devices('GPU')
+                        if dev_list is not None and len(dev_list)>0:
+                            self.is_gpu = True
+                        else:
+                            self.log.debug("GPU not available")
+                            self.is_gpu = False
                     except RuntimeError as e:
                         self.log.debug(f"GPU not available: {e}")
                         self.is_gpu = False
                     if self.is_gpu is True:
                         try:
-                            self.gpu_type=tf.config.experimental.get_device_details(tf.config.list_physical_devices('GPU')[0])['device_name']
+                            dev_list=tf.config.list_physical_devices('GPU')
+                            if dev_list is not None and len(dev_list)>0:
+                                self.gpu_type=tf.config.experimental.get_device_details(dev_list[0])['device_name']
+                            else:
+                                self.is_gpu=False
                         except Exception as e:
                             self.log.warning(f"Could not get GPU type: {e}")
-                        try: 
-                            card = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
-                            if len(card)>=8:
-                                self.gpu_memory=card[9][33:54].strip()
-                            else:
-                                self.log.warning(f"Could not get GPU type, unexpected output from nvidia-smi, lines={len(card)}, content={card}")
-                        except Exception as e:
-                            self.log.debug(f"Failed to determine GPU memory {e}")
-                        self.log.debug("GPU available")
+                            self.is_gpu=False
+                        if self.is_gpu is True:
+                            try: 
+                                card = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
+                                if len(card)>=8:
+                                    self.gpu_memory=card[9][33:54].strip()
+                                else:
+                                    self.log.warning(f"Could not get GPU type, unexpected output from nvidia-smi, lines={len(card)}, content={card}")
+                            except Exception as e:
+                                self.log.debug(f"Failed to determine GPU memory {e}")
+                            self.log.debug("GPU available")
             if self.is_gpu is False: 
                 self.log.info("No GPU or TPU available, this is going to be very slow!")
         if platform == 'jax':
