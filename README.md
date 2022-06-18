@@ -151,7 +151,7 @@ Then get a list of books (array). Each entry is a dict with meta-data:
 `search_result` is a list of dictionaries containing meta-data without the actual book-text.
 
 ```python
-search_result = gd.search({'author': ['kant', 'goethe'], language=['german', 'english']})
+search_result = gd.search({'author': ['kant', 'goethe'], 'language': ['german', 'english']})
 ```
 
 Insert the actual book text into the dictionaries. Note that download count is [limited](https://domschl.github.io/ml-indie-tools/_build/html/index.html#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts) if using a remote server.
