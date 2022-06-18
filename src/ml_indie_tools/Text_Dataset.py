@@ -1,5 +1,6 @@
 import random
 import logging
+from itertools import Counter
 try:
    from IPython.core.display import display, HTML
 except:
@@ -138,14 +139,25 @@ class Text_Dataset:
             sample = text[pos:pos+length]
         return (idx, sample)
 
-    def _word_splitter(self, text):
-        tokens=text.split()
+    def _word_splitter(self, text, word_separator=' '):
+        tokens=text.split(word_separator)
         return tokens
 
-    def init_tokenizer(self, tokenizer='word'):
+    def _every_ngram(self, text, n):
+        ngrams = [text[i:i+j+1] for i in range(len(text)) for j in range(0, min(len(text)-i,m))]
+        return ngrams
+
+    def _weight_grams(self, ngrams, max_weight=1e12):
+        eg_dict=Counter(ngrams)
+        return sorted([(''.join(l), 1e12 if len(l)==1 else len(l)*eg_dict[l]) for l in eg_dict.keys()], key=lambda x: x[1], reverse=True) 
+
+    def init_tokenizer(self, tokenizer='word', max_ngrams=5, word_separator=' ', max_tokens=5000):
         """ Initialize the tokenizer with the text_list.
         
-        :param tokenizer: 'word' or 'char'
+        :param tokenizer: 'word', 'char', or 'ngram'
+        :param max_ngrams: (ngram only) maximum n-gram length
+        :param word_separator: (word, ngram) character used to separate words, None for languages with no word separator
+        :param max_tokens: (ngram only) maximum number of tokens to use
         """
         if tokenizer == 'word':
             self.tokenizer_type = 'word'
@@ -160,7 +172,7 @@ class Text_Dataset:
             self.w2i['<sos>'] = 3
             self.i2w[3] = '<sos>'
             for text in self.text_list:
-                tokens = self._word_splitter(text['text'])
+                tokens = self._word_splitter(text['text'], word_separator=word_separator)
                 for token in tokens:
                     if token not in self.w2i:
                         self.w2i[token] = len(self.w2i)
@@ -187,6 +199,29 @@ class Text_Dataset:
                         self.c2i[c] = ind
                         self.i2c[ind] = c
             self.char_tokenizer_init=True
+        elif tokenizer == 'ngram':
+            self.tokenizer_type = 'ngram'
+            self.word_separator = word_separator
+            self.max_ngrams = max_ngrams
+            corpus=""
+            for text in self.text_list:
+                corpus+=text['text']
+            if word_separator is not None:
+                self.word_list=self.corpus.split(word_separator)
+            else:
+                self.word_list=None
+            if self.word_list is None:
+                ngrams=self._every_ngram(corpus,max_len=max_ngrams)
+                self.ngrams_list = self.weight_grams(ngrams)
+            else:
+                ngrams=[]
+                for word in self.word_list:
+                    ngrams += self._every_ngrams(word, max_len=max_ngrams)
+                self.ngrams_list = self.weight_ngrams(ngrams)
+            if max_tokens is not None:
+                if len(self.grams_list)>max_tokens:
+                    self.grams_list=self.grams_list[:max_tokens]
+            self.t2i={t[1][0]: t[0] for t in enumerate(self.grams_list)}
         else:
             self.log.error(f"Unknown tokenizer {tokenizer}")
             raise ValueError(f"Unknown tokenizer {tokenizer}")
@@ -205,6 +240,31 @@ class Text_Dataset:
             if self.char_tokenizer_init is False:
                 self.init_tokenizer(tokenizer)
             tokens = list(text)
+        elif self.tokenizer_type == 'ngram':
+            if self.ngram_tokenizer_init is False:
+                self.init_tokenizer(tokenizer)
+            if self.word_separator is not None:
+                wrd_list=text.split(self.word_separator)
+                for word in wrd_list:
+                    while len(word)>0:
+                        mx = min(self.max_ngrams,len(word))            
+                        for si in range(mx,0,-1):
+                            tk=word[:si]
+                            if tk in self.t2i:
+                                ind = self.t2i[tk]
+                                word = word[si:]
+                                tokens.append(ind)
+                                break
+                        if len(word)>0:
+                            if word[0] not in self.t2i:
+                                tokens.append(-2)  # unknown encounter
+                                word=word[1:]  # throw away one char
+                    tokens.append(-1)  # separator
+                if len(wrd_list)>1:
+                    tokens=tokens[:-1]  # remove last seperator
+            else:
+                self.log.error("not implemented")
+                print("Not yet implemented")
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
