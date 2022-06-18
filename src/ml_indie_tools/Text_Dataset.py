@@ -144,7 +144,7 @@ class Text_Dataset:
         return tokens
 
     def _every_ngram(self, text, n):
-        ngrams = [text[i:i+j+1] for i in range(len(text)) for j in range(0, min(len(text)-i,m))]
+        ngrams = [text[i:i+j+1] for i in range(len(text)) for j in range(0, min(len(text)-i,n))]
         return ngrams
 
     def _weight_grams(self, ngrams, max_weight=1e12):
@@ -234,15 +234,15 @@ class Text_Dataset:
         tokens = []
         if self.tokenizer_type == 'word':
             if self.word_tokenizer_init is False:
-                self.init_tokenizer(tokenizer)
+                self.init_tokenizer(tokenizer='word')
             tokens = self._word_splitter(text)
         elif self.tokenizer_type == 'char':
             if self.char_tokenizer_init is False:
-                self.init_tokenizer(tokenizer)
+                self.init_tokenizer(tokenizer='char')
             tokens = list(text)
         elif self.tokenizer_type == 'ngram':
             if self.ngram_tokenizer_init is False:
-                self.init_tokenizer(tokenizer)
+                self.init_tokenizer(tokenizer='ngram')
             if self.word_separator is not None:
                 wrd_list=text.split(self.word_separator)
                 for word in wrd_list:
@@ -280,15 +280,18 @@ class Text_Dataset:
             encoded = [self.w2i[token] if token in self.w2i else self.w2i['<unk>'] for token in tokens]
         elif self.tokenizer_type == 'char':
             encoded = [self.c2i[token] if token in self.c2i else self.c2i['␚'] for token in tokens]
+        elif self.tokenizer_type == 'ngram':
+            encoded = tokens
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return encoded
 
-    def decode(self, encoded):
+    def decode(self, encoded, mark_separator=False):
         """ Decode a list of encoded tokens.
         
         :param encoded: list of encoded tokens
+        :param mark_separator: (ngram only) if True, add a separator between tokens for debug
         :return: text """
         if self.tokenizer_type == 'word':
             decoded = [self.i2w[token]+'' if token in self.i2w else '<unk>' for token in encoded]
@@ -296,6 +299,18 @@ class Text_Dataset:
         elif self.tokenizer_type == 'char':
             decoded = [self.i2c[token] if token in self.i2c else '␚' for token in encoded]
             decoded_text = ''.join(decoded)
+        elif self.tokenizer_type == 'ngram':
+            dec=""
+            for ind in encoded:
+                if ind==-1:  # Separator
+                    dec+=self.word_separator
+                elif ind==-2:  # Unk
+                    dec+="(?)"
+                else:
+                    dec+=self.grams_list[ind][0]
+                    if mark_separator is True:
+                        dec+='_'
+            decoded_text = dec
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
