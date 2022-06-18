@@ -160,7 +160,8 @@ Insert the actual book text into the dictionaries. Note that download count is [
 search_result = gd.insert_book_texts(search_result)
 # search_result entries now contain an additional field `text` with the filtered text of the book.
 import pandas as pd
-df = DataFrame(search_result)  # Display results as Pandas DataFrame
+df = pd.DataFrame(search_result)  # Display results as Pandas DataFrame
+df
 ```
   
 See the [Gutenberg_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Gutenberg_Dataset) for details.
