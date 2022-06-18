@@ -1,6 +1,6 @@
 import random
 import logging
-from itertools import Counter
+from collections import Counter
 try:
    from IPython.core.display import display, HTML
 except:
@@ -33,6 +33,7 @@ class Text_Dataset:
         self.index = 1
         self.word_tokenizer_init = False
         self.char_tokenizer_init = False
+        self.ngram_tokenizer_init = False
         self.getitem_init = False
         self.tokenizer_type = None
         
@@ -143,11 +144,11 @@ class Text_Dataset:
         tokens=text.split(word_separator)
         return tokens
 
-    def _every_ngram(self, text, n):
-        ngrams = [text[i:i+j+1] for i in range(len(text)) for j in range(0, min(len(text)-i,n))]
+    def _every_ngram(self, text, max_len):
+        ngrams = [text[i:i+j+1] for i in range(len(text)) for j in range(0, min(len(text)-i,max_len))]
         return ngrams
 
-    def _weight_grams(self, ngrams, max_weight=1e12):
+    def _weight_ngrams(self, ngrams, max_weight=1e12):
         eg_dict=Counter(ngrams)
         return sorted([(''.join(l), 1e12 if len(l)==1 else len(l)*eg_dict[l]) for l in eg_dict.keys()], key=lambda x: x[1], reverse=True) 
 
@@ -207,21 +208,22 @@ class Text_Dataset:
             for text in self.text_list:
                 corpus+=text['text']
             if word_separator is not None:
-                self.word_list=self.corpus.split(word_separator)
+                self.word_list=corpus.split(word_separator)
             else:
                 self.word_list=None
             if self.word_list is None:
                 ngrams=self._every_ngram(corpus,max_len=max_ngrams)
-                self.ngrams_list = self.weight_grams(ngrams)
+                self.ngrams_list = self._weight_ngrams(ngrams)
             else:
                 ngrams=[]
                 for word in self.word_list:
-                    ngrams += self._every_ngrams(word, max_len=max_ngrams)
-                self.ngrams_list = self.weight_ngrams(ngrams)
+                    ngrams += self._every_ngram(word, max_len=max_ngrams)
+                self.ngrams_list = self._weight_ngrams(ngrams)
             if max_tokens is not None:
-                if len(self.grams_list)>max_tokens:
-                    self.grams_list=self.grams_list[:max_tokens]
-            self.t2i={t[1][0]: t[0] for t in enumerate(self.grams_list)}
+                if len(self.ngrams_list)>max_tokens:
+                    self.ngrams_list=self.ngrams_list[:max_tokens]
+            self.t2i={t[1][0]: t[0] for t in enumerate(self.ngrams_list)}
+            self.ngram_tokenizer_init=True
         else:
             self.log.error(f"Unknown tokenizer {tokenizer}")
             raise ValueError(f"Unknown tokenizer {tokenizer}")
@@ -307,7 +309,7 @@ class Text_Dataset:
                 elif ind==-2:  # Unk
                     dec+="(?)"
                 else:
-                    dec+=self.grams_list[ind][0]
+                    dec+=self.ngrams_list[ind][0]
                     if mark_separator is True:
                         dec+='_'
             decoded_text = dec
