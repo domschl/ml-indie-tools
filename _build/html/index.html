@@ -555,35 +555,12 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.get_random_char_tokenized_sample_pair">
-<span class="sig-name descname"><span class="pre">get_random_char_tokenized_sample_pair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_random_char_tokenized_sample_pair"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_random_char_tokenized_sample_pair" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a random tokenized sample of the dataset.</p>
+<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.get_random_item">
+<span class="sig-name descname"><span class="pre">get_random_item</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_random_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_random_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a random sample from the dataset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>length</strong> – length of the sample</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>tuple (X, y) encoded sample</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.get_random_sample">
-<span class="sig-name descname"><span class="pre">get_random_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_random_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_random_sample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return index idx and random sample of <cite>length</cite> chars from text[idx] the Text_Dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>length</strong> – number of characters to return</p></li>
-<li><p><strong>sanitize_white_space</strong> – If True, white space is replaced by a single space.</p></li>
-<li><p><strong>separate_punctuation</strong> – If True, punctuation is separated from words.</p></li>
-<li><p><strong>preserve_case</strong> – If True, the case of the text is preserved.</p></li>
-<li><p><strong>weighted</strong> – If True, the probability of a text is weighted by its calculated ‘probability_weight’ attribute.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>tuple (idx of text used for sampling, string of length <cite>length</cite> sampled from the Text_Dataset)</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1262,6 +1239,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2022-06-19, 0.3.1) get_random_item(index) that works with all tokenization strategies, get_unique_token_count() added.</p></li>
 <li><p>(2022-06-19, 0.3.0) Breaking change in Text_Dataset <strong>get_item</strong>() behavior, old API didn’t fit with tokenization.</p></li>
 <li><p>(2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.</p></li>
 <li><p>(2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.</p></li>

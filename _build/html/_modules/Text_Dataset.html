@@ -81,7 +81,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;sos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;wsep&gt;&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;sos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;wsep&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;subst&gt;&#39;</span><span class="p">]</span>
         
         <span class="n">req_attrs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">text_list</span><span class="p">)):</span>
@@ -164,27 +164,6 @@
                 <span class="n">to</span> <span class="o">=</span> <span class="n">text</span>
                 <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;  &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">text</span></div>
-
-<div class="viewcode-block" id="Text_Dataset.get_random_sample"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_sample">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return index idx and random sample of `length` chars from text[idx] the Text_Dataset.</span>
-<span class="sd">        </span>
-<span class="sd">        :param length: number of characters to return</span>
-<span class="sd">        :param sanitize_white_space: If True, white space is replaced by a single space.</span>
-<span class="sd">        :param separate_punctuation: If True, punctuation is separated from words.</span>
-<span class="sd">        :param preserve_case: If True, the case of the text is preserved.</span>
-<span class="sd">        :param weighted: If True, the probability of a text is weighted by its calculated &#39;probability_weight&#39; attribute.</span>
-<span class="sd">        :return: tuple (idx of text used for sampling, string of length `length` sampled from the Text_Dataset)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_text_index</span><span class="p">(</span><span class="n">weighted</span><span class="p">)</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
-            <span class="n">sample</span> <span class="o">=</span> <span class="n">text</span>
-            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">:</span>
-                <span class="n">sample</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pos</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="n">length</span><span class="p">)</span>
-            <span class="n">sample</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="n">length</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_word_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
         <span class="n">tokens</span><span class="o">=</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">word_separator</span><span class="p">)</span>
@@ -424,18 +403,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.get_random_char_tokenized_sample_pair"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_char_tokenized_sample_pair">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_char_tokenized_sample_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a random tokenized sample of the dataset.</span>
-<span class="sd">        </span>
-<span class="sd">        :param length: length of the sample</span>
-<span class="sd">        :return: tuple (X, y) encoded sample</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_sample</span><span class="p">(</span><span class="n">length</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">e_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">e_sample</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">e_sample</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
-
 <div class="viewcode-block" id="Text_Dataset.init_getitem"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the __getitem__ and __len__ methods.</span>
 
@@ -559,6 +526,17 @@
             <span class="n">cur_rec</span> <span class="o">+=</span> <span class="n">rec</span>        
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Text_Dataset.get_random_item"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a random sample from the dataset.</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before get_random_item&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before get_random_item&quot;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_display_colored_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">textlist</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Internal function to display text and citation references in HTML. &quot;&quot;&quot;</span>
