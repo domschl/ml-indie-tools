@@ -466,11 +466,11 @@ class Text_Dataset:
                     sample = text['text_encoded'][pos:pos+self.getitem_sample_length+1]
                     while len(sample) < self.getitem_sample_length+1:
                         if self.tokenizer_type=='char':
-                            sample += self.c2i['␠']  # pad with ␠ character
+                            sample += [self.c2i['␠']]  # pad with ␠ character
                         elif self.tokenizer_type=='ngram':
-                            sample += self.t2i['<unk>']
+                            sample += [self.t2i['<unk>']]
                         elif self.tokenizer_type=='word':
-                            sample += self.w2i['<unk>']
+                            sample += [self.w2i['<unk>']]
                         else:
                             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
                             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
