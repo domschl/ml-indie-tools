@@ -264,6 +264,15 @@ class Text_Dataset:
                 wrd_list=text.split(self.word_separator)
                 for word in wrd_list:
                     while len(word)>0:
+                        is_special=False
+                        for st in self.special_words:
+                            if word.startswith(st):
+                                tokens.append(self.t2i[st])
+                                word = word[len(st):]
+                                is_special=True
+                                break
+                        if is_special is True:
+                            continue
                         mx = min(self.max_ngrams,len(word))            
                         for si in range(mx,0,-1):
                             tk=word[:si]
@@ -274,13 +283,22 @@ class Text_Dataset:
                                 break
                         if len(word)>0:
                             if word[0] not in self.t2i:
-                                tokens.append('<unk>')  # unknown encounter
+                                tokens.append(self.t2i['<unk>'])  # unknown encounter
                                 word=word[1:]  # throw away one char
-                    tokens.append('<wsep>')  # word separator
+                    tokens.append(self.t2i['<wsep>'])  # word separator
                 if len(wrd_list)>1:
                     tokens=tokens[:-1]  # remove last seperator
             else:
                 while len(text)>0:
+                    is_special=False
+                    for st in self.special_words:
+                        if word.startswith(st):
+                            tokens.append(self.t2i[st])
+                            word = word[len(st):]
+                            is_special=True
+                            break
+                    if is_special is True:
+                        continue
                     mx = min(self.max_ngrams,len(text))            
                     for si in range(mx,0,-1):
                         tk=text[:si]
@@ -291,7 +309,7 @@ class Text_Dataset:
                             break
                     if len(text)>0:
                         if text[0] not in self.t2i:
-                            tokens.append('<unk>')
+                            tokens.append(self.t2i['<unk>'])
                             text=text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
