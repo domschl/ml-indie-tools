@@ -365,6 +365,20 @@ class Text_Dataset:
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return decoded_text
 
+    def get_unique_token_count(self):
+        """ Get the number of unique tokens.
+        
+        :return: number of unique tokens """
+        if self.tokenizer_type == 'word':
+            return len(self.w2i)
+        elif self.tokenizer_type == 'char':
+            return len(self.c2i)
+        elif self.tokenizer_type == 'ngram':
+            return len(self.t2i)
+        else:
+            self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
+            raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
+
     def get_random_char_tokenized_sample_pair(self, length):
         """ Get a random tokenized sample of the dataset.
         
