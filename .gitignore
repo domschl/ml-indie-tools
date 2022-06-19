@@ -3,3 +3,6 @@ __pycache__/
 .ipynb_checkpoints/
 gutenberg/
 *.egg-info
+.vscode/
+.DS_Store
+
