@@ -506,11 +506,14 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.decode" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode a list of encoded tokens.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>encoded</strong> – list of encoded tokens</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoded</strong> – list of encoded tokens</p></li>
+<li><p><strong>mark_separator</strong> – (ngram only) if True, add a separator between tokens for debug</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>text</p>
@@ -618,11 +621,31 @@ of encoding is returned on index-access.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.init_tokenizer">
-<span class="sig-name descname"><span class="pre">init_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'word'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_tokenizer" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">init_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'word'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ngrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_tokenizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the tokenizer with the text_list.</p>
+<p>The character tokenizer simply splits any language text into glyphs.</p>
+<p>A word tokenizer works for languages that have the concept of word separators (as in English, 
+‘ ‘ space). Word tokenizers are English-centric algorithms, since many other languages either
+can compose words into larger words with no separators, words being more similar to English
+syllables in that case, or have no word separators at all (as in Chinese), or have syllable
+separators (as in Tibetan, which has also a second kind of separators for sentence-fragments). For multi-language applications, use ngram tokenizers or character
+tokenizers.</p>
+<p>The ngram tokenizer can either first split text into words using a word_speparator 
+and then extracting all possible ngrams, or it can extract all possible ngrams directly 
+without any word-splitting, which is the default behavior with word_separator=None since it 
+works for all languages classes.</p>
+<p>For ngrams, the tokenizer can extract ngrams of length 1..max_ngrams, and selects the top most
+used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually around 3-6, and
+max_tokens should be significantly higher than the number of unique glyphs in the text_list.
+Using word_separator=None is usually significantly better than using a word_separator for ngrams.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>tokenizer</strong> – ‘word’ or ‘char’</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokenizer</strong> – ‘word’, ‘char’, or ‘ngram’</p></li>
+<li><p><strong>max_ngrams</strong> – (ngram only) maximum n-gram length</p></li>
+<li><p><strong>word_separator</strong> – (word, ngram) character used to separate words, default None, which amounts to ‘ ‘ (space) for word and no word-splitting for ngram.</p></li>
+<li><p><strong>max_tokens</strong> – (ngram only) maximum number of tokens to use</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1158,17 +1181,62 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 </div>
 <p>Then get a list of books (array). Each entry is a dict with meta-data:
 <code class="docutils literal notranslate"><span class="pre">search_result</span></code> is a list of dictionaries containing meta-data without the actual book-text.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">search</span><span class="p">({</span><span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;kant&#39;</span><span class="p">,</span> <span class="s1">&#39;goethe&#39;</span><span class="p">],</span> <span class="n">language</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;german&#39;</span><span class="p">,</span> <span class="s1">&#39;english&#39;</span><span class="p">]})</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">search</span><span class="p">({</span><span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;kant&#39;</span><span class="p">,</span> <span class="s1">&#39;goethe&#39;</span><span class="p">],</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;german&#39;</span><span class="p">,</span> <span class="s1">&#39;english&#39;</span><span class="p">]})</span>
 </pre></div>
 </div>
 <p>Insert the actual book text into the dictionaries. Note that download count is <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts">limited</a> if using a remote server.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">insert_book_texts</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>
 <span class="c1"># search_result entries now contain an additional field `text` with the filtered text of the book.</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  <span class="c1"># Display results as Pandas DataFrame</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  <span class="c1"># Display results as Pandas DataFrame</span>
+<span class="n">df</span>
 </pre></div>
 </div>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Gutenberg_Dataset">Gutenberg_Dataset API documentation</a> for details.</p>
+<p>A library for character, word, or dynamical ngram tokenization.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ml_indie_tools.Gutenberg_Dataset</span> <span class="kn">import</span> <span class="n">Gutenberg_Dataset</span>
+<span class="kn">from</span> <span class="nn">ml_indie_tools.Text_Dataset</span> <span class="kn">import</span> <span class="n">Text_Dataset</span>
+
+<span class="n">gd</span><span class="o">=</span><span class="n">Gutenberg_Dataset</span><span class="p">()</span>
+<span class="n">gd</span><span class="o">.</span><span class="n">load_index</span><span class="p">()</span>
+<span class="n">bl</span><span class="o">=</span><span class="n">gd</span><span class="o">.</span><span class="n">search</span><span class="p">({</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;proleg&#39;</span><span class="p">,</span> <span class="s1">&#39;hermen&#39;</span><span class="p">],</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;english&#39;</span><span class="p">]})</span>
+<span class="n">bl</span><span class="o">=</span><span class="n">gd</span><span class="o">.</span><span class="n">insert_book_texts</span><span class="p">(</span><span class="n">bl</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bl</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">bl</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Prolegomena to the Study of Hegel’s Philosophy<span class="raw-html-m2r"><br></span>
+Kant’s Prolegomena<span class="raw-html-m2r"><br></span>
+The Cornish Fishermen’s Watch Night and Other Stories<span class="raw-html-m2r"><br></span>
+Prolegomena to the History of Israel<span class="raw-html-m2r"><br></span>
+Legge Prolegomena<span class="raw-html-m2r"><br></span></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tl</span> <span class="o">=</span> <span class="n">Text_Dataset</span><span class="p">(</span><span class="n">bl</span><span class="p">)</span>  <span class="c1"># bl contains a list of texts (books from Gutenberg)</span>
+<span class="n">tl</span><span class="o">.</span><span class="n">source_highlight</span><span class="p">(</span><span class="s2">&quot;If we write anything that contains parts of the sources, like: that is their motto, then a highlight will be applied.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">INFO:Datasets:Loaded</span> <span class="pre">5</span> <span class="pre">texts</span></code><span class="raw-html-m2r"><br></span>
+If we writ<strong>e anything t</strong>[4]<strong>hat contains</strong>[1] <strong>parts of the s</strong>[4]ources, like: <strong>that is t</strong>[1]<strong>heir motto</strong>[4], then a highligh<strong>t will be a</strong>[1]pplied.<span class="raw-html-m2r"><br></span>
+Sources: Julius Wellhausen: Prolegomena to the History of Israel[4], William Wallace and G. W. F. Hegel: Prolegomena to the Study of Hegel’s Philosophy[1]</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test_text</span><span class="o">=</span><span class="s2">&quot;That would be a valid argument if we hadn&#39;t defeated it&#39;s assumptions way before.&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Text length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">test_text</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">test_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;ngram&#39;</span>
+<span class="n">tl</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">)</span>
+<span class="n">st</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">test_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token-count: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">st</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">st</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Text</span> <span class="pre">length</span> <span class="pre">81,</span> <span class="pre">That</span> <span class="pre">would</span> <span class="pre">be</span> <span class="pre">a</span> <span class="pre">valid</span> <span class="pre">argument</span> <span class="pre">if</span> <span class="pre">we</span> <span class="pre">hadn't</span> <span class="pre">defeated</span> <span class="pre">it's</span> <span class="pre">assumptions</span> <span class="pre">way</span> <span class="pre">before.</span>
+<span class="pre">Token-count:</span> <span class="pre">27,</span> <span class="pre">[1447,</span> <span class="pre">3688,</span> <span class="pre">1722,</span> <span class="pre">4711,</span> <span class="pre">4880,</span> <span class="pre">1210,</span> <span class="pre">1393,</span> <span class="pre">4393,</span> <span class="pre">2382,</span> <span class="pre">1352,</span> <span class="pre">3655,</span> <span class="pre">1972,</span> <span class="pre">1939,</span> <span class="pre">44,</span> <span class="pre">23,</span> <span class="pre">3333,</span> <span class="pre">1871,</span> <span class="pre">4975,</span> <span class="pre">2967,</span> <span class="pre">2884,</span> <span class="pre">2216,</span> <span class="pre">2382,</span> <span class="pre">3048,</span> <span class="pre">1546,</span> <span class="pre">4589,</span> <span class="pre">2272,</span> <span class="pre">30]</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test2</span><span class="o">=</span><span class="s2">&quot;ðƒ &quot;</span><span class="o">+</span><span class="n">test_text</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Text length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">test2</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">test2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">el</span><span class="o">=</span><span class="n">tl</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">test2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token-count: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">el</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">el</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Text</span> <span class="pre">length</span> <span class="pre">84,</span> <span class="pre">ðƒ</span> <span class="pre">That</span> <span class="pre">would</span> <span class="pre">be</span> <span class="pre">a</span> <span class="pre">valid</span> <span class="pre">argument</span> <span class="pre">if</span> <span class="pre">we</span> <span class="pre">hadn't</span> <span class="pre">defeated</span> <span class="pre">it's</span> <span class="pre">assumptions</span> <span class="pre">way</span> <span class="pre">before.</span>
+<span class="pre">Token-count:</span> <span class="pre">29,</span> <span class="pre">['&lt;unk&gt;',</span> <span class="pre">'&lt;unk&gt;',</span> <span class="pre">1397,</span> <span class="pre">3688,</span> <span class="pre">1722,</span> <span class="pre">4711,</span> <span class="pre">4880,</span> <span class="pre">1210,</span> <span class="pre">1393,</span> <span class="pre">4393,</span> <span class="pre">2382,</span> <span class="pre">1352,</span> <span class="pre">3655,</span> <span class="pre">1972,</span> <span class="pre">1939,</span> <span class="pre">44,</span> <span class="pre">23,</span> <span class="pre">3333,</span> <span class="pre">1871,</span> <span class="pre">4975,</span> <span class="pre">2967,</span> <span class="pre">2884,</span> <span class="pre">2216,</span> <span class="pre">2382,</span> <span class="pre">3048,</span> <span class="pre">1546,</span> <span class="pre">4589,</span> <span class="pre">2272,</span> <span class="pre">30]</span></code></p>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset">Text_Dataset API documentation</a> for details.</p>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset">ALU_Dataset API documentation</a> for details.
 A sample project is at <a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p>
@@ -1184,6 +1252,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.</p></li>
 <li><p>(2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.</p></li>
 <li><p>(2022-03-27, 0.1.4) Bugfixes to Gutenberg <code class="docutils literal notranslate"><span class="pre">search</span></code> and <code class="docutils literal notranslate"><span class="pre">load_book</span></code> and <code class="docutils literal notranslate"><span class="pre">get_book</span></code>.</p></li>
 <li><p>(2022-03-15, 0.1.2) <code class="docutils literal notranslate"><span class="pre">env_tools.init()</span></code> no longer uses <code class="docutils literal notranslate"><span class="pre">tf.compat.v1.disable_eager_executition()</span></code> since there are rumors about old code-paths being used. Use <code class="docutils literal notranslate"><span class="pre">tf.function()</span></code> instead, or call with <code class="docutils literal notranslate"><span class="pre">env_tools.init(...,</span> <span class="pre">old_disable_eager=True)</span></code> which continues to use the old v1 API.</p></li>

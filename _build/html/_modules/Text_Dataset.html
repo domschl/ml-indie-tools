@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Text_Dataset &#8212; ml-indie-tools 0.0.57 documentation</title>
+    <title>Text_Dataset &#8212; ml-indie-tools 0.1.4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.0.57 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Text_Dataset</a></li> 
       </ul>
@@ -45,6 +45,7 @@
   <h1>Source code for Text_Dataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="k">try</span><span class="p">:</span>
    <span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
 <span class="k">except</span><span class="p">:</span>
@@ -77,8 +78,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;sos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;wsep&gt;&#39;</span><span class="p">]</span>
         
         <span class="n">req_attrs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">text_list</span><span class="p">)):</span>
@@ -183,29 +186,66 @@
             <span class="n">sample</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="n">length</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_word_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-        <span class="n">tokens</span><span class="o">=</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_word_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+        <span class="n">tokens</span><span class="o">=</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">word_separator</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tokens</span>
 
-<div class="viewcode-block" id="Text_Dataset.init_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">init_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;word&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Initialize the tokenizer with the text_list.</span>
+    <span class="k">def</span> <span class="nf">_every_ngram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">add_special_words</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return all ngrams of length 1..max_len from text.</span>
 <span class="sd">        </span>
-<span class="sd">        :param tokenizer: &#39;word&#39; or &#39;char&#39;</span>
+<span class="sd">        :param text: text to extract ngrams from</span>
+<span class="sd">        :param max_len: maximum length of ngrams to extract</span>
+<span class="sd">        :param add_special_words: If True, special words (&#39;&lt;unk&gt;&#39; etc.) are added to the ngrams.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ngrams</span> <span class="o">=</span> <span class="p">[</span><span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">-</span><span class="n">i</span><span class="p">,</span><span class="n">max_len</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">add_special_words</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ngrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span> <span class="o">+</span> <span class="n">ngrams</span>            
+        <span class="k">return</span> <span class="n">ngrams</span>
+
+    <span class="k">def</span> <span class="nf">_weight_ngrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ngrams</span><span class="p">,</span> <span class="n">max_weight</span><span class="o">=</span><span class="mf">1e12</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Weight ngrams by their length. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are </span>
+<span class="sd">        weigted by max_weight, since we need the full character set and the special words to be </span>
+<span class="sd">        included in the ngram collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">eg_dict</span><span class="o">=</span><span class="n">Counter</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">([(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">max_weight</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">*</span><span class="n">eg_dict</span><span class="p">[</span><span class="n">l</span><span class="p">])</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">eg_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+
+<div class="viewcode-block" id="Text_Dataset.init_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">init_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;word&#39;</span><span class="p">,</span> <span class="n">max_ngrams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the tokenizer with the text_list.</span>
+
+<span class="sd">        The character tokenizer simply splits any language text into glyphs. </span>
+<span class="sd">        </span>
+<span class="sd">        A word tokenizer works for languages that have the concept of word separators (as in English, </span>
+<span class="sd">        &#39; &#39; space). Word tokenizers are English-centric algorithms, since many other languages either</span>
+<span class="sd">        can compose words into larger words with no separators, words being more similar to English</span>
+<span class="sd">        syllables in that case, or have no word separators at all (as in Chinese), or have syllable</span>
+<span class="sd">        separators (as in Tibetan, which has also a second kind of separators for sentence-fragments). For multi-language applications, use ngram tokenizers or character</span>
+<span class="sd">        tokenizers.</span>
+<span class="sd">        </span>
+<span class="sd">        The ngram tokenizer can either first split text into words using a word_speparator </span>
+<span class="sd">        and then extracting all possible ngrams, or it can extract all possible ngrams directly </span>
+<span class="sd">        without any word-splitting, which is the default behavior with word_separator=None since it </span>
+<span class="sd">        works for all languages classes.</span>
+
+<span class="sd">        For ngrams, the tokenizer can extract ngrams of length 1..max_ngrams, and selects the top most</span>
+<span class="sd">        used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually around 3-6, and</span>
+<span class="sd">        max_tokens should be significantly higher than the number of unique glyphs in the text_list.</span>
+<span class="sd">        Using word_separator=None is usually significantly better than using a word_separator for ngrams.</span>
+
+<span class="sd">        :param tokenizer: &#39;word&#39;, &#39;char&#39;, or &#39;ngram&#39;</span>
+<span class="sd">        :param max_ngrams: (ngram only) maximum n-gram length</span>
+<span class="sd">        :param word_separator: (word, ngram) character used to separate words, default None, which amounts to &#39; &#39; (space) for word and no word-splitting for ngram.</span>
+<span class="sd">        :param max_tokens: (ngram only) maximum number of tokens to use</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tokenizer</span> <span class="o">==</span> <span class="s1">&#39;word&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="s1">&#39;word&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s1">&#39;&lt;sos&gt;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;sos&gt;&#39;</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">tok</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="n">tok</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">tok</span>
             <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
-                <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_word_splitter</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_word_splitter</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">word_separator</span><span class="o">=</span><span class="n">word_separator</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">token</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">)</span>
@@ -232,6 +272,32 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">tokenizer</span> <span class="o">==</span> <span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="o">=</span><span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span><span class="o">=</span><span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="s1">&#39;ngram&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span> <span class="o">=</span> <span class="n">word_separator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span> <span class="o">=</span> <span class="n">max_ngrams</span>
+            <span class="n">corpus</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
+                <span class="n">corpus</span><span class="o">+=</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>   <span class="c1"># TODO: This generates ngrams across text-bordes, should be changed at some point.</span>
+            <span class="k">if</span> <span class="n">word_separator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span><span class="o">=</span><span class="n">corpus</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">word_separator</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span><span class="o">=</span><span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ngrams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_every_ngram</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span><span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_ngrams</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ngrams</span><span class="o">=</span><span class="p">[]</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span><span class="p">:</span>
+                    <span class="n">ngrams</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_ngram</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_ngrams</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">max_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span><span class="p">)</span><span class="o">&gt;</span><span class="n">max_tokens</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span><span class="p">[:</span><span class="n">max_tokens</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="o">=</span><span class="p">{</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span><span class="p">)}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span><span class="o">=</span><span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
@@ -244,12 +310,48 @@
         <span class="n">tokens</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;word&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;word&#39;</span><span class="p">)</span>
             <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_word_splitter</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;char&#39;</span><span class="p">)</span>
             <span class="n">tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="s1">&#39;ngram&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">wrd_list</span><span class="o">=</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">wrd_list</span><span class="p">:</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">mx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">))</span>            
+                        <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                            <span class="n">tk</span><span class="o">=</span><span class="n">word</span><span class="p">[:</span><span class="n">si</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">tk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">:</span>
+                                <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="n">tk</span><span class="p">]</span>
+                                <span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="p">[</span><span class="n">si</span><span class="p">:]</span>
+                                <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+                                <span class="k">break</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">:</span>
+                                <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">)</span>  <span class="c1"># unknown encounter</span>
+                                <span class="n">word</span><span class="o">=</span><span class="n">word</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># throw away one char</span>
+                    <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&lt;wsep&gt;&#39;</span><span class="p">)</span>  <span class="c1"># word separator</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrd_list</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">tokens</span><span class="o">=</span><span class="n">tokens</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># remove last seperator</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">mx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>            
+                    <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="n">tk</span><span class="o">=</span><span class="n">text</span><span class="p">[:</span><span class="n">si</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">tk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">:</span>
+                            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="n">tk</span><span class="p">]</span>
+                            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">si</span><span class="p">:]</span>
+                            <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">:</span>
+                            <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">)</span>
+                            <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -265,15 +367,18 @@
             <span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span>
             <span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">[</span><span class="s1">&#39;␚&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+            <span class="n">encoded</span> <span class="o">=</span> <span class="n">tokens</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">encoded</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.decode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">):</span>
+<div class="viewcode-block" id="Text_Dataset.decode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">mark_separator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Decode a list of encoded tokens.</span>
 <span class="sd">        </span>
 <span class="sd">        :param encoded: list of encoded tokens</span>
+<span class="sd">        :param mark_separator: (ngram only) if True, add a separator between tokens for debug</span>
 <span class="sd">        :return: text &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;word&#39;</span><span class="p">:</span>
             <span class="n">decoded</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">[</span><span class="n">token</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span> <span class="k">else</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">encoded</span><span class="p">]</span>
@@ -281,6 +386,18 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span>
             <span class="n">decoded</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i2c</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span> <span class="k">else</span> <span class="s1">&#39;␚&#39;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">encoded</span><span class="p">]</span>
             <span class="n">decoded_text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+            <span class="n">dec</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">encoded</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ind</span><span class="o">==</span><span class="s1">&#39;&lt;wsep&gt;&#39;</span><span class="p">:</span>  <span class="c1"># Separator</span>
+                    <span class="n">dec</span><span class="o">+=</span><span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span>
+                <span class="k">elif</span> <span class="n">ind</span><span class="o">==</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">:</span>  <span class="c1"># Unknown token</span>
+                    <span class="n">dec</span><span class="o">+=</span><span class="s2">&quot;&lt;unk&gt;&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dec</span><span class="o">+=</span><span class="bp">self</span><span class="o">.</span><span class="n">ngrams_list</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">mark_separator</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">dec</span><span class="o">+=</span><span class="s1">&#39;_&#39;</span>
+            <span class="n">decoded_text</span> <span class="o">=</span> <span class="n">dec</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -527,14 +644,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.0.57 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.1.4 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Text_Dataset</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+        &#169; Copyright 2022, dsc.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
