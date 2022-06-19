@@ -36,7 +36,7 @@ class Text_Dataset:
         self.ngram_tokenizer_init = False
         self.getitem_init = False
         self.tokenizer_type = None
-        self.special_words=['<unk>', '<pad>', '<sos>', '<eos>', '<wsep>']
+        self.special_words=['<unk>', '<pad>', '<sos>', '<eos>', '<wsep>', '<subst>']
         
         req_attrs=['title', 'author', 'language', 'text']
         for ind in range(0,len(text_list)):
@@ -119,27 +119,6 @@ class Text_Dataset:
                 to = text
                 text = text.replace('  ', ' ')
         return text
-
-    def get_random_sample(self, length, weighted=True):
-        """ Return index idx and random sample of `length` chars from text[idx] the Text_Dataset.
-        
-        :param length: number of characters to return
-        :param sanitize_white_space: If True, white space is replaced by a single space.
-        :param separate_punctuation: If True, punctuation is separated from words.
-        :param preserve_case: If True, the case of the text is preserved.
-        :param weighted: If True, the probability of a text is weighted by its calculated 'probability_weight' attribute.
-        :return: tuple (idx of text used for sampling, string of length `length` sampled from the Text_Dataset)
-        """
-        idx = self._get_random_text_index(weighted)
-        text = self.text_list[idx]['text']
-        if len(text) < length:
-            sample = text
-            while len(sample) < length:
-                sample += ' '
-        else:
-            pos = random.randint(0, len(text) - length)
-            sample = text[pos:pos+length]
-        return (idx, sample)
 
     def _word_splitter(self, text, word_separator=' '):
         tokens=text.split(word_separator)
@@ -379,18 +358,6 @@ class Text_Dataset:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
 
-    def get_random_char_tokenized_sample_pair(self, length):
-        """ Get a random tokenized sample of the dataset.
-        
-        :param length: length of the sample
-        :return: tuple (X, y) encoded sample
-        """
-        _, sample = self.get_random_sample(length+1)
-        e_sample = self.encode(sample)
-        X = e_sample[:-1]
-        y = e_sample[1:]
-        return X, y
-
     def init_getitem(self, sample_type='text', sample_length=80, content_stepping=10):
         """ Initialize the __getitem__ and __len__ methods.
 
@@ -514,6 +481,17 @@ class Text_Dataset:
             cur_rec += rec        
         print("Internal error in __getitem__")
         raise ValueError("Internal error in __getitem__")
+
+    def get_random_item(self):
+        """ Get a random sample from the dataset.
+
+        :return:
+        """
+        if self.getitem_init is False:
+            print("init_getitem must be called before get_random_item")
+            raise ValueError("init_getitem must be called before get_random_item")
+        index = random.randint(0, self.getitem_records-1)
+        return self.__getitem__(index)
 
     def _display_colored_html(self, textlist, dark_mode=False, display_ref_anchor=True, pre='', post=''):
         """ Internal function to display text and citation references in HTML. """
