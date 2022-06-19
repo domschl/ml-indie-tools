@@ -292,9 +292,9 @@ class Text_Dataset:
                 while len(text)>0:
                     is_special=False
                     for st in self.special_words:
-                        if word.startswith(st):
+                        if text.startswith(st):
                             tokens.append(self.t2i[st])
-                            word = word[len(st):]
+                            text = text[len(st):]
                             is_special=True
                             break
                     if is_special is True:
