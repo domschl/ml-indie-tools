@@ -233,6 +233,7 @@ class Text_Dataset:
             self.tokenizer_type = 'ngram'
             self.word_separator = word_separator
             self.max_ngrams = max_ngrams
+            self.log.info(f"Extracting ngrams of length 1..{max_ngrams} from text_list, selecting {max_tokens} most used ngrams.")
             corpus=""
             for text in self.text_list:
                 corpus+=text['text']   # TODO: This generates ngrams across text-bordes, should be changed at some point.
@@ -256,6 +257,12 @@ class Text_Dataset:
         else:
             self.log.error(f"Unknown tokenizer {tokenizer}")
             raise ValueError(f"Unknown tokenizer {tokenizer}")
+            return
+        self.log.info("Encoding text corpora as ngrams.")
+        for text in self.text_list:
+            self.log.info(f"Encoding text {text['title']}...")
+            text['text_encoded']=self.encode(text['text'])
+        self.log.info("Encoding text corpora as ngrams done.")
 
     def tokenize(self, text):
         """ Tokenize a text.
@@ -358,6 +365,20 @@ class Text_Dataset:
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return decoded_text
 
+    def get_unique_token_count(self):
+        """ Get the number of unique tokens.
+        
+        :return: number of unique tokens """
+        if self.tokenizer_type == 'word':
+            return len(self.w2i)
+        elif self.tokenizer_type == 'char':
+            return len(self.c2i)
+        elif self.tokenizer_type == 'ngram':
+            return len(self.t2i)
+        else:
+            self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
+            raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
+
     def get_random_char_tokenized_sample_pair(self, length):
         """ Get a random tokenized sample of the dataset.
         
@@ -370,7 +391,7 @@ class Text_Dataset:
         y = e_sample[1:]
         return X, y
 
-    def init_getitem(self, sample_type='chargen', sample_length=80, content_stepping=10):
+    def init_getitem(self, sample_type='text', sample_length=80, content_stepping=10):
         """ Initialize the __getitem__ and __len__ methods.
 
         This method needs to be called before using len() or index-access of the dataset.
@@ -384,36 +405,46 @@ class Text_Dataset:
             tl = [{'author':'nobody', 'title':'some title', 'language':'english', 'text':'some text'},
                   {'author':'nobody', 'title':'some title 2', 'language':'english', 'text':'some more text'}]
             td = Text_Dataset(tl)
-            td.init_getitem(sample_type='chargen', sample_length=4, content_stepping=2)
+            td.init_getitem(sample_type='text', sample_length=4, content_stepping=2)
             print(len(td))
             print(td[0])
             # Output: 12 and ('some', 'ome ')
 
-        :param sample_type: 'chargen': generate a pair of text or length sample_length, shifted by one letter, or 'chargen_encoded', same but encoded. 'chargen_single_encoded' just returns a single encoded string X.
-        :param sample_length: length of a sample
-        :param content_stepping: number of characters to skip between each sample
-        :return: on 'chargen[_encoded]': X, y [encoded] strings of sample_length, y shifted by one letter; for 'chargin_single_encoded' just encoded X.
+        The method of tokenization (char, word, ngram) for 'encoded' sample_type is determined by 
+        the tokenizer_type in call to init_tokenizer().
+
+        :param sample_type: 'text' (text-string of length sample_length), 'encoded' (encoded sample_length tokens) 
+        :param sample_length: length of a sample (either character count (type text) or token count (type encoded))
+        :param content_stepping: number of characters/tokens to skip between each sample
         """
 
         self.getitem_sample_type = sample_type
         self.getitem_sample_length = sample_length
         self.getitem_content_stepping = content_stepping
-        leng=0
-        rec=0
-        if sample_type=='chargen' or sample_type=='chargen_encoded' or sample_type=='chargen_single_encoded':
-            for ind in range(0, len(self.text_list)):
-                len_text = len(self.text_list[ind]['text'])
-                rec_text = (len_text-content_stepping+1)//content_stepping + 1
-                self.text_list[ind]['records']=rec_text
-                leng += len_text
-                rec += rec_text
-            self.getitem_length = leng
-            self.getitem_records = rec
-            self.getitem_init = True
-        else:
+        len_tot=0
+        rec_tot=0
+        if sample_type not in ['text','encoded']:
+            self.log.error(f"Unknown sample type {sample_type}")
             self.getitem_length = 0
             self.getitem_records = 0
-            print(f"init_getitem: unknown sample_type {sample_type}")
+            return None
+        for ind in range(0, len(self.text_list)):
+            if sample_type == 'text':
+                leni = len(self.text_list[ind]['text'])
+            elif sample_type == 'encoded':
+                leni = len(self.text_list[ind]['text_encoded'])
+            else:
+                self.log.error(f"Unknown sample type {sample_type}")
+                self.getitem_length = 0
+                self.getitem_records = 0
+                return None
+            recs = (leni-content_stepping+1)//content_stepping + 1
+            self.text_list[ind]['records']=recs
+            len_tot += leni
+            rec_tot += recs
+        self.getitem_length = len_tot
+        self.getitem_records = rec_tot
+        self.getitem_init = True
 
     def __len__(self):
         """ Get the length of the dataset.
@@ -423,11 +454,21 @@ class Text_Dataset:
         :return: length of the dataset (mode dependent) 
         """
         if self.getitem_init is False:
-            print("init_getitem must be called before __len__")
+            self.log.error("init_getitem must be called before __len__")
             return None
         return self.getitem_records
 
-    def _getitem_chargen(self, index):
+    def __getitem__(self, index):
+        """ Get a sample from the dataset.
+
+        Format of the returned sample depends on :ref:`~Text_Dataset.Text_Dataset.init_getitem`.
+
+        :param index: index of the sample
+        :return:
+        """
+        if self.getitem_init is False:
+            print("init_getitem must be called before __getitem__")
+            raise ValueError("init_getitem must be called before __getitem__")
         if index<0:
             if index<(-self.getitem_records):
                 raise IndexError(f"index {index} out of range")
@@ -441,52 +482,38 @@ class Text_Dataset:
             if cur_rec+rec > index:
                 rel_rec = index - cur_rec
                 pos = rel_rec*self.getitem_content_stepping
-                if self.getitem_sample_type=='chargen_encoded' or self.getitem_sample_type=='chargen':
+                if self.getitem_sample_type == 'text':
                     sample = text['text'][pos:pos+self.getitem_sample_length+1]
                     while len(sample) < self.getitem_sample_length+1:
-                        sample += ' '
-                    X_text = sample[:-1]
-                    y_text = sample[1:]
-                    return X_text, y_text
-                elif self.getitem_sample_type=='chargen_single_encoded':
-                    sample = text['text'][pos:pos+self.getitem_sample_length]
-                    while len(sample) < self.getitem_sample_length:
-                        sample += ' '
-                    X_text = sample
-                    return X_text
+                        if self.tokenizer_type=='char':
+                            sample += '␠'  # pad with ␠ character
+                        elif self.tokenizer_type=='ngram':
+                            sample += '<unk>'
+                        elif self.tokenizer_type=='word':
+                            sample += '<unk>'
+                        else:
+                            self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
+                            raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
+                    return sample
+                elif self.getitem_sample_type == 'encoded':
+                    sample = text['text_encoded'][pos:pos+self.getitem_sample_length+1]
+                    while len(sample) < self.getitem_sample_length+1:
+                        if self.tokenizer_type=='char':
+                            sample += self.c2i['␠']  # pad with ␠ character
+                        elif self.tokenizer_type=='ngram':
+                            sample += self.t2i['<unk>']
+                        elif self.tokenizer_type=='word':
+                            sample += self.w2i['<unk>']
+                        else:
+                            self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
+                            raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
+                    return sample
                 else:
-                    print(f"_getitem_chargen: unknown sample_type {self.getitem_sample_type}")
+                    self.log.error(f"Unknown sample type {self.getitem_sample_type}")
                     return None
-            cur_rec += rec
-            
+            cur_rec += rec        
         print("Internal error in __getitem__")
         raise ValueError("Internal error in __getitem__")
-
-    def __getitem__(self, index):
-        """ Get a sample from the dataset.
-
-        Format of the returned sample depends on :ref:`~Text_Dataset.Text_Dataset.init_getitem`.
-
-        :param index: index of the sample
-        :return:
-        """
-        if self.getitem_init is False:
-            print("init_getitem must be called before __getitem__")
-            raise ValueError("init_getitem must be called before __getitem__")
-        if self.getitem_sample_type == 'chargen':
-            return self._getitem_chargen(index)
-        elif self.getitem_sample_type == 'chargen_encoded':
-            X, y = self._getitem_chargen(index)
-            X = self.encode(X)
-            y = self.encode(y)
-            return X, y
-        elif self.getitem_sample_type == 'chargen_single_encoded':
-            X = self._getitem_chargen(index)
-            X = self.encode(X)
-            return X
-        else:
-            self.log.error(f"Unknown getitem sample_type {self.getitem_sample_type}")
-            raise ValueError(f"Unknown getitem sample_type {self.getitem_sample_type}")
 
     def _display_colored_html(self, textlist, dark_mode=False, display_ref_anchor=True, pre='', post=''):
         """ Internal function to display text and citation references in HTML. """
