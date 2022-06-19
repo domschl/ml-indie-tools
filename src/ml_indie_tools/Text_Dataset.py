@@ -165,12 +165,31 @@ class Text_Dataset:
         eg_dict=Counter(ngrams)
         return sorted([(''.join(l), max_weight if len(l)==1 or l in self.special_words else len(l)*eg_dict[l]) for l in eg_dict.keys()], key=lambda x: x[1], reverse=True) 
 
-    def init_tokenizer(self, tokenizer='word', max_ngrams=5, word_separator=' ', max_tokens=5000):
+    def init_tokenizer(self, tokenizer='word', max_ngrams=5, word_separator=None, max_tokens=5000):
         """ Initialize the tokenizer with the text_list.
+
+        The character tokenizer simply splits any language text into glyphs. 
         
+        A word tokenizer works for languages that have the concept of word separators (as in English, 
+        ' ' space). Word tokenizers are English-centric algorithms, since many other languages either
+        can compose words into larger words with no separators, words being more similar to English
+        syllables in that case, or have no word separators at all (as in Chinese), or have syllable
+        separators (as in Tibetan, which has also a second kind of separators for sentence-fragments). For multi-language applications, use ngram tokenizers or character
+        tokenizers.
+        
+        The ngram tokenizer can either first split text into words using a word_speparator 
+        and then extracting all possible ngrams, or it can extract all possible ngrams directly 
+        without any word-splitting, which is the default behavior with word_separator=None since it 
+        works for all languages classes.
+
+        For ngrams, the tokenizer can extract ngrams of length 1..max_ngrams, and selects the top most
+        used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually around 3-6, and
+        max_tokens should be significantly higher than the number of unique glyphs in the text_list.
+        Using word_separator=None is usually significantly better than using a word_separator for ngrams.
+
         :param tokenizer: 'word', 'char', or 'ngram'
         :param max_ngrams: (ngram only) maximum n-gram length
-        :param word_separator: (word, ngram) character used to separate words, None for languages with no word separator
+        :param word_separator: (word, ngram) character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
         :param max_tokens: (ngram only) maximum number of tokens to use
         """
         if tokenizer == 'word':
@@ -275,8 +294,19 @@ class Text_Dataset:
                 if len(wrd_list)>1:
                     tokens=tokens[:-1]  # remove last seperator
             else:
-                self.log.error("not implemented")
-                print("Not yet implemented")
+                while len(text)>0:
+                    mx = min(self.max_ngrams,len(text))            
+                    for si in range(mx,0,-1):
+                        tk=text[:si]
+                        if tk in self.t2i:
+                            ind = self.t2i[tk]
+                            text = text[si:]
+                            tokens.append(ind)
+                            break
+                    if len(text)>0:
+                        if text[0] not in self.t2i:
+                            tokens.append('<unk>')
+                            text=text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")

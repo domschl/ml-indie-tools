@@ -168,8 +168,9 @@ See the [Gutenberg_Dataset API documentation](https://domschl.github.io/ml-indie
 
 ### Text_Dataset
 
-See the [Text_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset) for details.
+A library for character, word, or dynamical ngram tokenization.
 
+See the [Text_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset) for details.
 ### ALU_Dataset
 
 See the [ALU_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset) for details.
@@ -195,6 +196,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.
 * (2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.
 * (2022-03-27, 0.1.4) Bugfixes to Gutenberg `search` and `load_book` and `get_book`.
 * (2022-03-15, 0.1.2) `env_tools.init()` no longer uses `tf.compat.v1.disable_eager_executition()` since there are rumors about old code-paths being used. Use `tf.function()` instead, or call with `env_tools.init(..., old_disable_eager=True)` which continues to use the old v1 API.
