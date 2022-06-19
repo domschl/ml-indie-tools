@@ -450,7 +450,7 @@ class Text_Dataset:
                 rel_rec = index - cur_rec
                 pos = rel_rec*self.getitem_content_stepping
                 if self.getitem_sample_type == 'text':
-                    sample = text['text'][pos:pos+self.getitem_sample_length+1]
+                    sample = text['text'][pos:pos+self.getitem_sample_length]
                     while len(sample) < self.getitem_sample_length:
                         if self.tokenizer_type=='char':
                             sample += '␠'  # pad with ␠ character
@@ -463,7 +463,7 @@ class Text_Dataset:
                             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
                     return sample
                 elif self.getitem_sample_type == 'encoded':
-                    sample = text['text_encoded'][pos:pos+self.getitem_sample_length+1]
+                    sample = text['text_encoded'][pos:pos+self.getitem_sample_length
                     while len(sample) < self.getitem_sample_length:
                         if self.tokenizer_type=='char':
                             sample += [self.c2i['␠']]  # pad with ␠ character
