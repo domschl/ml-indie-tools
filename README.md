@@ -240,6 +240,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2022-06-19, 0.3.0) Breaking change in Text_Dataset __get_item__() behavior, old API didn't fit with tokenization.
 * (2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.
 * (2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.
 * (2022-03-27, 0.1.4) Bugfixes to Gutenberg `search` and `load_book` and `get_book`.

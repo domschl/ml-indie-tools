@@ -396,6 +396,9 @@ class Text_Dataset:
             print(td[0])
             # Output: 12 and ('some', 'ome ')
 
+        The method of tokenization (char, word, ngram) for 'encoded' sample_type is determined by 
+        the tokenizer_type in call to init_tokenizer().
+
         :param sample_type: 'text' (text-string of length sample_length), 'encoded' (encoded sample_length tokens) 
         :param sample_length: length of a sample (either character count (type text) or token count (type encoded))
         :param content_stepping: number of characters/tokens to skip between each sample
