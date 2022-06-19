@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="ml-indie-tools",
-    version="0.3.2",
+    version="0.3.3",
     author="Dominik Schlösser",
     author_email="dsc@dosc.net",
     description="A collection of tools for low-resource indie machine learning development",

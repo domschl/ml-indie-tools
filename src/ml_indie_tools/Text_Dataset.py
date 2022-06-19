@@ -451,7 +451,7 @@ class Text_Dataset:
                 pos = rel_rec*self.getitem_content_stepping
                 if self.getitem_sample_type == 'text':
                     sample = text['text'][pos:pos+self.getitem_sample_length+1]
-                    while len(sample) < self.getitem_sample_length+1:
+                    while len(sample) < self.getitem_sample_length:
                         if self.tokenizer_type=='char':
                             sample += '␠'  # pad with ␠ character
                         elif self.tokenizer_type=='ngram':
@@ -464,7 +464,7 @@ class Text_Dataset:
                     return sample
                 elif self.getitem_sample_type == 'encoded':
                     sample = text['text_encoded'][pos:pos+self.getitem_sample_length+1]
-                    while len(sample) < self.getitem_sample_length+1:
+                    while len(sample) < self.getitem_sample_length:
                         if self.tokenizer_type=='char':
                             sample += [self.c2i['␠']]  # pad with ␠ character
                         elif self.tokenizer_type=='ngram':
