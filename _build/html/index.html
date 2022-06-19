@@ -589,8 +589,19 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.get_unique_token_count">
+<span class="sig-name descname"><span class="pre">get_unique_token_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_unique_token_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_unique_token_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of unique tokens.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>number of unique tokens</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.init_getitem">
-<span class="sig-name descname"><span class="pre">init_getitem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'chargen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_stepping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_getitem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_getitem" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">init_getitem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_stepping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_getitem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_getitem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the __getitem__ and __len__ methods.</p>
 <p>This method needs to be called before using len() or index-access of the dataset.</p>
 <p>This method determines how the dataset is partitioned into records, and what kind
@@ -599,22 +610,21 @@ of encoding is returned on index-access.</p>
 <span class="n">tl</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;author&#39;</span><span class="p">:</span><span class="s1">&#39;nobody&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;some title&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span><span class="s1">&#39;some text&#39;</span><span class="p">},</span>
       <span class="p">{</span><span class="s1">&#39;author&#39;</span><span class="p">:</span><span class="s1">&#39;nobody&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;some title 2&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span><span class="s1">&#39;some more text&#39;</span><span class="p">}]</span>
 <span class="n">td</span> <span class="o">=</span> <span class="n">Text_Dataset</span><span class="p">(</span><span class="n">tl</span><span class="p">)</span>
-<span class="n">td</span><span class="o">.</span><span class="n">init_getitem</span><span class="p">(</span><span class="n">sample_type</span><span class="o">=</span><span class="s1">&#39;chargen&#39;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">td</span><span class="o">.</span><span class="n">init_getitem</span><span class="p">(</span><span class="n">sample_type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">td</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="c1"># Output: 12 and (&#39;some&#39;, &#39;ome &#39;)</span>
 </pre></div>
 </div>
+<p>The method of tokenization (char, word, ngram) for ‘encoded’ sample_type is determined by 
+the tokenizer_type in call to init_tokenizer().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_type</strong> – ‘chargen’: generate a pair of text or length sample_length, shifted by one letter, or ‘chargen_encoded’, same but encoded. ‘chargen_single_encoded’ just returns a single encoded string X.</p></li>
-<li><p><strong>sample_length</strong> – length of a sample</p></li>
-<li><p><strong>content_stepping</strong> – number of characters to skip between each sample</p></li>
+<li><p><strong>sample_type</strong> – ‘text’ (text-string of length sample_length), ‘encoded’ (encoded sample_length tokens)</p></li>
+<li><p><strong>sample_length</strong> – length of a sample (either character count (type text) or token count (type encoded))</p></li>
+<li><p><strong>content_stepping</strong> – number of characters/tokens to skip between each sample</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>on ‘chargen[_encoded]’: X, y [encoded] strings of sample_length, y shifted by one letter; for ‘chargin_single_encoded’ just encoded X.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1252,6 +1262,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2022-06-19, 0.3.0) Breaking change in Text_Dataset <strong>get_item</strong>() behavior, old API didn’t fit with tokenization.</p></li>
 <li><p>(2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.</p></li>
 <li><p>(2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.</p></li>
 <li><p>(2022-03-27, 0.1.4) Bugfixes to Gutenberg <code class="docutils literal notranslate"><span class="pre">search</span></code> and <code class="docutils literal notranslate"><span class="pre">load_book</span></code> and <code class="docutils literal notranslate"><span class="pre">get_book</span></code>.</p></li>

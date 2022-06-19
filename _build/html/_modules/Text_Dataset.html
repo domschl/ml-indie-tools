@@ -278,6 +278,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="s1">&#39;ngram&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span> <span class="o">=</span> <span class="n">word_separator</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span> <span class="o">=</span> <span class="n">max_ngrams</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracting ngrams of length 1..</span><span class="si">{</span><span class="n">max_ngrams</span><span class="si">}</span><span class="s2"> from text_list, selecting </span><span class="si">{</span><span class="n">max_tokens</span><span class="si">}</span><span class="s2"> most used ngrams.&quot;</span><span class="p">)</span>
             <span class="n">corpus</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
             <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
                 <span class="n">corpus</span><span class="o">+=</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>   <span class="c1"># TODO: This generates ngrams across text-bordes, should be changed at some point.</span>
@@ -300,7 +301,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span><span class="o">=</span><span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora as ngrams.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Encoding text </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="n">text</span><span class="p">[</span><span class="s1">&#39;text_encoded&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora as ngrams done.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.tokenize"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.tokenize">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Tokenize a text.</span>
@@ -403,6 +410,20 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decoded_text</span></div>
 
+<div class="viewcode-block" id="Text_Dataset.get_unique_token_count"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_unique_token_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_token_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the number of unique tokens.</span>
+<span class="sd">        </span>
+<span class="sd">        :return: number of unique tokens &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;word&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;char&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Text_Dataset.get_random_char_tokenized_sample_pair"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_char_tokenized_sample_pair">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_char_tokenized_sample_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a random tokenized sample of the dataset.</span>
 <span class="sd">        </span>
@@ -415,7 +436,7 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">e_sample</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.init_getitem"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s1">&#39;chargen&#39;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="Text_Dataset.init_getitem"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the __getitem__ and __len__ methods.</span>
 
 <span class="sd">        This method needs to be called before using len() or index-access of the dataset.</span>
@@ -429,36 +450,46 @@
 <span class="sd">            tl = [{&#39;author&#39;:&#39;nobody&#39;, &#39;title&#39;:&#39;some title&#39;, &#39;language&#39;:&#39;english&#39;, &#39;text&#39;:&#39;some text&#39;},</span>
 <span class="sd">                  {&#39;author&#39;:&#39;nobody&#39;, &#39;title&#39;:&#39;some title 2&#39;, &#39;language&#39;:&#39;english&#39;, &#39;text&#39;:&#39;some more text&#39;}]</span>
 <span class="sd">            td = Text_Dataset(tl)</span>
-<span class="sd">            td.init_getitem(sample_type=&#39;chargen&#39;, sample_length=4, content_stepping=2)</span>
+<span class="sd">            td.init_getitem(sample_type=&#39;text&#39;, sample_length=4, content_stepping=2)</span>
 <span class="sd">            print(len(td))</span>
 <span class="sd">            print(td[0])</span>
 <span class="sd">            # Output: 12 and (&#39;some&#39;, &#39;ome &#39;)</span>
 
-<span class="sd">        :param sample_type: &#39;chargen&#39;: generate a pair of text or length sample_length, shifted by one letter, or &#39;chargen_encoded&#39;, same but encoded. &#39;chargen_single_encoded&#39; just returns a single encoded string X.</span>
-<span class="sd">        :param sample_length: length of a sample</span>
-<span class="sd">        :param content_stepping: number of characters to skip between each sample</span>
-<span class="sd">        :return: on &#39;chargen[_encoded]&#39;: X, y [encoded] strings of sample_length, y shifted by one letter; for &#39;chargin_single_encoded&#39; just encoded X.</span>
+<span class="sd">        The method of tokenization (char, word, ngram) for &#39;encoded&#39; sample_type is determined by </span>
+<span class="sd">        the tokenizer_type in call to init_tokenizer().</span>
+
+<span class="sd">        :param sample_type: &#39;text&#39; (text-string of length sample_length), &#39;encoded&#39; (encoded sample_length tokens) </span>
+<span class="sd">        :param sample_length: length of a sample (either character count (type text) or token count (type encoded))</span>
+<span class="sd">        :param content_stepping: number of characters/tokens to skip between each sample</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span> <span class="o">=</span> <span class="n">sample_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span> <span class="o">=</span> <span class="n">sample_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_content_stepping</span> <span class="o">=</span> <span class="n">content_stepping</span>
-        <span class="n">leng</span><span class="o">=</span><span class="mi">0</span>
-        <span class="n">rec</span><span class="o">=</span><span class="mi">0</span>
-        <span class="k">if</span> <span class="n">sample_type</span><span class="o">==</span><span class="s1">&#39;chargen&#39;</span> <span class="ow">or</span> <span class="n">sample_type</span><span class="o">==</span><span class="s1">&#39;chargen_encoded&#39;</span> <span class="ow">or</span> <span class="n">sample_type</span><span class="o">==</span><span class="s1">&#39;chargen_single_encoded&#39;</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">)):</span>
-                <span class="n">len_text</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
-                <span class="n">rec_text</span> <span class="o">=</span> <span class="p">(</span><span class="n">len_text</span><span class="o">-</span><span class="n">content_stepping</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">content_stepping</span> <span class="o">+</span> <span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s1">&#39;records&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">rec_text</span>
-                <span class="n">leng</span> <span class="o">+=</span> <span class="n">len_text</span>
-                <span class="n">rec</span> <span class="o">+=</span> <span class="n">rec_text</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">getitem_length</span> <span class="o">=</span> <span class="n">leng</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span> <span class="o">=</span> <span class="n">rec</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="n">len_tot</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">rec_tot</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">if</span> <span class="n">sample_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">,</span><span class="s1">&#39;encoded&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown sample type </span><span class="si">{</span><span class="n">sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">getitem_length</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;init_getitem: unknown sample_type </span><span class="si">{</span><span class="n">sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">sample_type</span> <span class="o">==</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span>
+                <span class="n">leni</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">sample_type</span> <span class="o">==</span> <span class="s1">&#39;encoded&#39;</span><span class="p">:</span>
+                <span class="n">leni</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s1">&#39;text_encoded&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown sample type </span><span class="si">{</span><span class="n">sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">getitem_length</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">recs</span> <span class="o">=</span> <span class="p">(</span><span class="n">leni</span><span class="o">-</span><span class="n">content_stepping</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">content_stepping</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s1">&#39;records&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">recs</span>
+            <span class="n">len_tot</span> <span class="o">+=</span> <span class="n">leni</span>
+            <span class="n">rec_tot</span> <span class="o">+=</span> <span class="n">recs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getitem_length</span> <span class="o">=</span> <span class="n">len_tot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span> <span class="o">=</span> <span class="n">rec_tot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the length of the dataset.</span>
@@ -468,11 +499,21 @@
 <span class="sd">        :return: length of the dataset (mode dependent) </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before __len__&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before __len__&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span>
 
-    <span class="k">def</span> <span class="nf">_getitem_chargen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a sample from the dataset.</span>
+
+<span class="sd">        Format of the returned sample depends on :ref:`~Text_Dataset.Text_Dataset.init_getitem`.</span>
+
+<span class="sd">        :param index: index of the sample</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before __getitem__&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before __getitem__&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">index</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">index</span><span class="o">&lt;</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;index </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> out of range&quot;</span><span class="p">)</span>
@@ -486,52 +527,38 @@
             <span class="k">if</span> <span class="n">cur_rec</span><span class="o">+</span><span class="n">rec</span> <span class="o">&gt;</span> <span class="n">index</span><span class="p">:</span>
                 <span class="n">rel_rec</span> <span class="o">=</span> <span class="n">index</span> <span class="o">-</span> <span class="n">cur_rec</span>
                 <span class="n">pos</span> <span class="o">=</span> <span class="n">rel_rec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_content_stepping</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="o">==</span><span class="s1">&#39;chargen_encoded&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="o">==</span><span class="s1">&#39;chargen&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span> <span class="o">==</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span>
                     <span class="n">sample</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
                     <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span>
-                        <span class="n">sample</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span>
-                    <span class="n">X_text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">y_text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                    <span class="k">return</span> <span class="n">X_text</span><span class="p">,</span> <span class="n">y_text</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="o">==</span><span class="s1">&#39;chargen_single_encoded&#39;</span><span class="p">:</span>
-                    <span class="n">sample</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span><span class="p">]</span>
-                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span><span class="p">:</span>
-                        <span class="n">sample</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span>
-                    <span class="n">X_text</span> <span class="o">=</span> <span class="n">sample</span>
-                    <span class="k">return</span> <span class="n">X_text</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="o">==</span><span class="s1">&#39;char&#39;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="s1">&#39;␠&#39;</span>  <span class="c1"># pad with ␠ character</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="o">==</span><span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="o">==</span><span class="s1">&#39;word&#39;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="s1">&#39;&lt;unk&gt;&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">sample</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span> <span class="o">==</span> <span class="s1">&#39;encoded&#39;</span><span class="p">:</span>
+                    <span class="n">sample</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s1">&#39;text_encoded&#39;</span><span class="p">][</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_length</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="o">==</span><span class="s1">&#39;char&#39;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">[</span><span class="s1">&#39;␠&#39;</span><span class="p">]</span>  <span class="c1"># pad with ␠ character</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="o">==</span><span class="s1">&#39;ngram&#39;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="o">==</span><span class="s1">&#39;word&#39;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">sample</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_getitem_chargen: unknown sample_type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown sample type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">cur_rec</span> <span class="o">+=</span> <span class="n">rec</span>
-            
+            <span class="n">cur_rec</span> <span class="o">+=</span> <span class="n">rec</span>        
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a sample from the dataset.</span>
-
-<span class="sd">        Format of the returned sample depends on :ref:`~Text_Dataset.Text_Dataset.init_getitem`.</span>
-
-<span class="sd">        :param index: index of the sample</span>
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before __getitem__&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before __getitem__&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span> <span class="o">==</span> <span class="s1">&#39;chargen&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getitem_chargen</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span> <span class="o">==</span> <span class="s1">&#39;chargen_encoded&#39;</span><span class="p">:</span>
-            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getitem_chargen</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span> <span class="o">==</span> <span class="s1">&#39;chargen_single_encoded&#39;</span><span class="p">:</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getitem_chargen</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">X</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown getitem sample_type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown getitem sample_type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">getitem_sample_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_display_colored_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">textlist</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Internal function to display text and citation references in HTML. &quot;&quot;&quot;</span>
