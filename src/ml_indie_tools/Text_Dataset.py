@@ -1,5 +1,6 @@
 import random
 import logging
+from collections import Counter
 try:
    from IPython.core.display import display, HTML
 except:
@@ -32,8 +33,10 @@ class Text_Dataset:
         self.index = 1
         self.word_tokenizer_init = False
         self.char_tokenizer_init = False
+        self.ngram_tokenizer_init = False
         self.getitem_init = False
         self.tokenizer_type = None
+        self.special_words=['<unk>', '<pad>', '<sos>', '<eos>', '<wsep>']
         
         req_attrs=['title', 'author', 'language', 'text']
         for ind in range(0,len(text_list)):
@@ -138,29 +141,66 @@ class Text_Dataset:
             sample = text[pos:pos+length]
         return (idx, sample)
 
-    def _word_splitter(self, text):
-        tokens=text.split()
+    def _word_splitter(self, text, word_separator=' '):
+        tokens=text.split(word_separator)
         return tokens
 
-    def init_tokenizer(self, tokenizer='word'):
-        """ Initialize the tokenizer with the text_list.
+    def _every_ngram(self, text, max_len, add_special_words=True):
+        """ Return all ngrams of length 1..max_len from text.
         
-        :param tokenizer: 'word' or 'char'
+        :param text: text to extract ngrams from
+        :param max_len: maximum length of ngrams to extract
+        :param add_special_words: If True, special words ('<unk>' etc.) are added to the ngrams.
+        """
+        ngrams = [text[i:i+j+1] for i in range(len(text)) for j in range(0, min(len(text)-i,max_len))]
+        if add_special_words is True:
+            ngrams = self.special_words + ngrams            
+        return ngrams
+
+    def _weight_ngrams(self, ngrams, max_weight=1e12):
+        """ Weight ngrams by their length. Ngrams of length==1 and special words ('<unk>' etc.) are 
+        weigted by max_weight, since we need the full character set and the special words to be 
+        included in the ngram collection.
+        """
+        eg_dict=Counter(ngrams)
+        return sorted([(''.join(l), max_weight if len(l)==1 or l in self.special_words else len(l)*eg_dict[l]) for l in eg_dict.keys()], key=lambda x: x[1], reverse=True) 
+
+    def init_tokenizer(self, tokenizer='word', max_ngrams=5, word_separator=None, max_tokens=5000):
+        """ Initialize the tokenizer with the text_list.
+
+        The character tokenizer simply splits any language text into glyphs. 
+        
+        A word tokenizer works for languages that have the concept of word separators (as in English, 
+        ' ' space). Word tokenizers are English-centric algorithms, since many other languages either
+        can compose words into larger words with no separators, words being more similar to English
+        syllables in that case, or have no word separators at all (as in Chinese), or have syllable
+        separators (as in Tibetan, which has also a second kind of separators for sentence-fragments). For multi-language applications, use ngram tokenizers or character
+        tokenizers.
+        
+        The ngram tokenizer can either first split text into words using a word_speparator 
+        and then extracting all possible ngrams, or it can extract all possible ngrams directly 
+        without any word-splitting, which is the default behavior with word_separator=None since it 
+        works for all languages classes.
+
+        For ngrams, the tokenizer can extract ngrams of length 1..max_ngrams, and selects the top most
+        used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually around 3-6, and
+        max_tokens should be significantly higher than the number of unique glyphs in the text_list.
+        Using word_separator=None is usually significantly better than using a word_separator for ngrams.
+
+        :param tokenizer: 'word', 'char', or 'ngram'
+        :param max_ngrams: (ngram only) maximum n-gram length
+        :param word_separator: (word, ngram) character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
+        :param max_tokens: (ngram only) maximum number of tokens to use
         """
         if tokenizer == 'word':
             self.tokenizer_type = 'word'
             self.w2i = {}
             self.i2w = {}
-            self.w2i['<unk>'] = 0
-            self.i2w[0] = '<unk>'
-            self.w2i['<pad>'] = 1
-            self.i2w[1] = '<pad>'
-            self.w2i['<eos>'] = 2
-            self.i2w[2] = '<eos>'
-            self.w2i['<sos>'] = 3
-            self.i2w[3] = '<sos>'
+            for ind, tok in enumerate(self.special_words):
+                self.w2i[tok] = ind
+                self.i2w[ind] = tok
             for text in self.text_list:
-                tokens = self._word_splitter(text['text'])
+                tokens = self._word_splitter(text['text'], word_separator=word_separator)
                 for token in tokens:
                     if token not in self.w2i:
                         self.w2i[token] = len(self.w2i)
@@ -187,6 +227,32 @@ class Text_Dataset:
                         self.c2i[c] = ind
                         self.i2c[ind] = c
             self.char_tokenizer_init=True
+        elif tokenizer == 'ngram':
+            self.t2i={}
+            self.i2t={}
+            self.tokenizer_type = 'ngram'
+            self.word_separator = word_separator
+            self.max_ngrams = max_ngrams
+            corpus=""
+            for text in self.text_list:
+                corpus+=text['text']   # TODO: This generates ngrams across text-bordes, should be changed at some point.
+            if word_separator is not None:
+                self.word_list=corpus.split(word_separator)
+            else:
+                self.word_list=None
+            if self.word_list is None:
+                ngrams=self._every_ngram(corpus,max_len=max_ngrams)
+                self.ngrams_list = self._weight_ngrams(ngrams)
+            else:
+                ngrams=[]
+                for word in self.word_list:
+                    ngrams += self._every_ngram(word, max_len=max_ngrams)
+                self.ngrams_list = self._weight_ngrams(ngrams)
+            if max_tokens is not None:
+                if len(self.ngrams_list)>max_tokens:
+                    self.ngrams_list=self.ngrams_list[:max_tokens]
+            self.t2i={t[1][0]: t[0] for t in enumerate(self.ngrams_list)}
+            self.ngram_tokenizer_init=True
         else:
             self.log.error(f"Unknown tokenizer {tokenizer}")
             raise ValueError(f"Unknown tokenizer {tokenizer}")
@@ -199,12 +265,48 @@ class Text_Dataset:
         tokens = []
         if self.tokenizer_type == 'word':
             if self.word_tokenizer_init is False:
-                self.init_tokenizer(tokenizer)
+                self.init_tokenizer(tokenizer='word')
             tokens = self._word_splitter(text)
         elif self.tokenizer_type == 'char':
             if self.char_tokenizer_init is False:
-                self.init_tokenizer(tokenizer)
+                self.init_tokenizer(tokenizer='char')
             tokens = list(text)
+        elif self.tokenizer_type == 'ngram':
+            if self.ngram_tokenizer_init is False:
+                self.init_tokenizer(tokenizer='ngram')
+            if self.word_separator is not None:
+                wrd_list=text.split(self.word_separator)
+                for word in wrd_list:
+                    while len(word)>0:
+                        mx = min(self.max_ngrams,len(word))            
+                        for si in range(mx,0,-1):
+                            tk=word[:si]
+                            if tk in self.t2i:
+                                ind = self.t2i[tk]
+                                word = word[si:]
+                                tokens.append(ind)
+                                break
+                        if len(word)>0:
+                            if word[0] not in self.t2i:
+                                tokens.append('<unk>')  # unknown encounter
+                                word=word[1:]  # throw away one char
+                    tokens.append('<wsep>')  # word separator
+                if len(wrd_list)>1:
+                    tokens=tokens[:-1]  # remove last seperator
+            else:
+                while len(text)>0:
+                    mx = min(self.max_ngrams,len(text))            
+                    for si in range(mx,0,-1):
+                        tk=text[:si]
+                        if tk in self.t2i:
+                            ind = self.t2i[tk]
+                            text = text[si:]
+                            tokens.append(ind)
+                            break
+                    if len(text)>0:
+                        if text[0] not in self.t2i:
+                            tokens.append('<unk>')
+                            text=text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
@@ -220,15 +322,18 @@ class Text_Dataset:
             encoded = [self.w2i[token] if token in self.w2i else self.w2i['<unk>'] for token in tokens]
         elif self.tokenizer_type == 'char':
             encoded = [self.c2i[token] if token in self.c2i else self.c2i['␚'] for token in tokens]
+        elif self.tokenizer_type == 'ngram':
+            encoded = tokens
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return encoded
 
-    def decode(self, encoded):
+    def decode(self, encoded, mark_separator=False):
         """ Decode a list of encoded tokens.
         
         :param encoded: list of encoded tokens
+        :param mark_separator: (ngram only) if True, add a separator between tokens for debug
         :return: text """
         if self.tokenizer_type == 'word':
             decoded = [self.i2w[token]+'' if token in self.i2w else '<unk>' for token in encoded]
@@ -236,6 +341,18 @@ class Text_Dataset:
         elif self.tokenizer_type == 'char':
             decoded = [self.i2c[token] if token in self.i2c else '␚' for token in encoded]
             decoded_text = ''.join(decoded)
+        elif self.tokenizer_type == 'ngram':
+            dec=""
+            for ind in encoded:
+                if ind=='<wsep>':  # Separator
+                    dec+=self.word_separator
+                elif ind=='<unk>':  # Unknown token
+                    dec+="<unk>"
+                else:
+                    dec+=self.ngrams_list[ind][0]
+                    if mark_separator is True:
+                        dec+='_'
+            decoded_text = dec
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")

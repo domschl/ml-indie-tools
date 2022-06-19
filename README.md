@@ -151,7 +151,7 @@ Then get a list of books (array). Each entry is a dict with meta-data:
 `search_result` is a list of dictionaries containing meta-data without the actual book-text.
 
 ```python
-search_result = gd.search({'author': ['kant', 'goethe'], language=['german', 'english']})
+search_result = gd.search({'author': ['kant', 'goethe'], 'language': ['german', 'english']})
 ```
 
 Insert the actual book text into the dictionaries. Note that download count is [limited](https://domschl.github.io/ml-indie-tools/_build/html/index.html#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts) if using a remote server.
@@ -160,15 +160,61 @@ Insert the actual book text into the dictionaries. Note that download count is [
 search_result = gd.insert_book_texts(search_result)
 # search_result entries now contain an additional field `text` with the filtered text of the book.
 import pandas as pd
-df = DataFrame(search_result)  # Display results as Pandas DataFrame
+df = pd.DataFrame(search_result)  # Display results as Pandas DataFrame
+df
 ```
   
 See the [Gutenberg_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Gutenberg_Dataset) for details.
 
 ### Text_Dataset
 
-See the [Text_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset) for details.
+A library for character, word, or dynamical ngram tokenization.
 
+```python
+import logging
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
+from ml_indie_tools.Gutenberg_Dataset import Gutenberg_Dataset
+from ml_indie_tools.Text_Dataset import Text_Dataset
+
+gd=Gutenberg_Dataset()
+gd.load_index()
+bl=gd.search({'title': ['proleg', 'hermen'], 'language': ['english']})
+bl=gd.insert_book_texts(bl)
+for i in range(len(bl)):
+    print(bl[i]['title'])
+```
+Prolegomena to the Study of Hegel's Philosophy<br>
+Kant's Prolegomena<br>
+The Cornish Fishermen's Watch Night and Other Stories<br>
+Prolegomena to the History of Israel<br>
+Legge Prolegomena<br>
+```python
+tl = Text_Dataset(bl)  # bl contains a list of texts (books from Gutenberg)
+tl.source_highlight("If we write anything that contains parts of the sources, like: that is their motto, then a highlight will be applied.")
+```
+`INFO:Datasets:Loaded 5 texts`<br>
+If we writ**e anything t**[4]**hat contains**[1] **parts of the s**[4]ources, like: **that is t**[1]**heir motto**[4], then a highligh**t will be a**[1]pplied.<br>
+Sources: Julius Wellhausen: Prolegomena to the History of Israel[4], William Wallace and G. W. F. Hegel: Prolegomena to the Study of Hegel's Philosophy[1]
+```python
+test_text="That would be a valid argument if we hadn't defeated it's assumptions way before."
+print(f"Text length {len(test_text)}, {test_text}")
+tokenizer='ngram'
+tl.init_tokenizer(tokenizer=tokenizer)
+st = tl.tokenize(test_text)
+print(f"Token-count: {len(st)}, {st}")
+```
+`Text length 81, That would be a valid argument if we hadn't defeated it's assumptions way before.
+Token-count: 27, [1447, 3688, 1722, 4711, 4880, 1210, 1393, 4393, 2382, 1352, 3655, 1972, 1939, 44, 23, 3333, 1871, 4975, 2967, 2884, 2216, 2382, 3048, 1546, 4589, 2272, 30]`
+```python
+test2="ðƒ "+test_text
+print(f"Text length {len(test2)}, {test2}")
+el=tl.encode(test2)
+print(f"Token-count: {len(el)}, {el}")
+```
+`Text length 84, ðƒ That would be a valid argument if we hadn't defeated it's assumptions way before.
+Token-count: 29, ['<unk>', '<unk>', 1397, 3688, 1722, 4711, 4880, 1210, 1393, 4393, 2382, 1352, 3655, 1972, 1939, 44, 23, 3333, 1871, 4975, 2967, 2884, 2216, 2382, 3048, 1546, 4589, 2272, 30]`
+
+See the [Text_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset) for details.
 ### ALU_Dataset
 
 See the [ALU_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset) for details.
@@ -194,6 +240,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.
 * (2022-06-07, 0.1.5) Support for pytorch nightly 1.13dev MPS, Apple Metal acceleration on Apple Silicon.
 * (2022-03-27, 0.1.4) Bugfixes to Gutenberg `search` and `load_book` and `get_book`.
 * (2022-03-15, 0.1.2) `env_tools.init()` no longer uses `tf.compat.v1.disable_eager_executition()` since there are rumors about old code-paths being used. Use `tf.function()` instead, or call with `env_tools.init(..., old_disable_eager=True)` which continues to use the old v1 API.
