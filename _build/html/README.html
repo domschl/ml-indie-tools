@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
@@ -14,7 +14,6 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -48,12 +47,12 @@
           <div class="body" role="main">
             
   <section id="a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments">
-<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this heading">¶</a></h1>
+<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="LICENSE"><img alt="License" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" /></a>
 <a class="reference external image-reference" href="https://domschl.github.io/ml-indie-tools/index.html"><img alt="Docs" src="https://img.shields.io/badge/docs-stable-blue.svg" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
 <section id="description">
-<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install ml-indie-tools
 </pre></div>
 </div>
@@ -136,10 +135,10 @@ persistent data- and model-storage.</p>
 with Huggingface <a class="reference external" href="https://huggingface.co/docs/datasets/">Datasets</a> or directly with ML libraries.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ALU_Dataset</span></code> is a toy-dataset that allows training of integer arithmetic and logical (ALU) operations.</p>
 <section id="env-tools">
-<h3>env_tools<a class="headerlink" href="#env-tools" title="Permalink to this heading">¶</a></h3>
+<h3>env_tools<a class="headerlink" href="#env-tools" title="Permalink to this headline">¶</a></h3>
 <p>A collection of tools that allow moving machine learning projects between local hardware and colab instances.</p>
 <section id="examples">
-<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h4>
+<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h4>
 <p>Local laptop:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ml_indie_tools.env_tools</span> <span class="kn">import</span> <span class="n">MLEnv</span>
 <span class="n">ml_env</span> <span class="o">=</span> <span class="n">MLEnv</span><span class="p">(</span><span class="n">platform</span><span class="o">=</span><span class="s1">&#39;tf&#39;</span><span class="p">,</span> <span class="n">accelator</span><span class="o">=</span><span class="s1">&#39;fastest&#39;</span><span class="p">)</span>
@@ -171,7 +170,7 @@ with Huggingface <a class="reference external" href="https://huggingface.co/docs
 </div>
 </section>
 <section id="project-paths">
-<h4>Project paths<a class="headerlink" href="#project-paths" title="Permalink to this heading">¶</a></h4>
+<h4>Project paths<a class="headerlink" href="#project-paths" title="Permalink to this headline">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">ml_env.init_paths('my_project',</span> <span class="pre">'my_model')</span></code> will give a list of paths that are adapted for local and colab usage</p>
 <p>Local project:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ml_env</span><span class="o">.</span><span class="n">init_paths</span><span class="p">(</span><span class="s2">&quot;my_project&quot;</span><span class="p">,</span> <span class="s2">&quot;my_model&quot;</span><span class="p">)</span>
@@ -197,12 +196,12 @@ training data and <code class="docutils literal notranslate"><span class="pre">&
 </section>
 </section>
 <section id="gutenberg-dataset">
-<h3>Gutenberg_Dataset<a class="headerlink" href="#gutenberg-dataset" title="Permalink to this heading">¶</a></h3>
+<h3>Gutenberg_Dataset<a class="headerlink" href="#gutenberg-dataset" title="Permalink to this headline">¶</a></h3>
 <p>Gutenberg_Dataset makes books from <a class="reference external" href="https://www.gutenberg.org">Project Gutenberg</a> available as dataset.</p>
 <p>This module can either work with a local mirror of Project Gutenberg, or download files on demand.
 Files that are downloaded are cached to prevent unnecessary load on Gutenberg’s servers.</p>
 <section id="working-with-a-local-mirror-of-project-gutenberg">
-<h4>Working with a local mirror of Project Gutenberg<a class="headerlink" href="#working-with-a-local-mirror-of-project-gutenberg" title="Permalink to this heading">¶</a></h4>
+<h4>Working with a local mirror of Project Gutenberg<a class="headerlink" href="#working-with-a-local-mirror-of-project-gutenberg" title="Permalink to this headline">¶</a></h4>
 <p>If you plan to use a lot of files (hundreds or more) from Gutenberg, a local mirror might be the best
 solution. Have a look at <a class="reference external" href="https://www.gutenberg.org/help/mirroring.html">Project Gutenberg’s notes on mirrors</a>.</p>
 <p>A mirror image suitable for this project can be made with:</p>
@@ -217,14 +216,14 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 </div>
 </section>
 <section id="working-without-a-remote-mirror">
-<h4>Working without a remote mirror<a class="headerlink" href="#working-without-a-remote-mirror" title="Permalink to this heading">¶</a></h4>
+<h4>Working without a remote mirror<a class="headerlink" href="#working-without-a-remote-mirror" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ml_indie_tools.Gutenberg_Dataset</span> <span class="kn">import</span> <span class="n">Gutenberg_Dataset</span>
 <span class="n">gd</span> <span class="o">=</span> <span class="n">Gutenberg_Dataset</span><span class="p">()</span>  <span class="c1"># the default Gutenberg site is used. Alternative specify a specific mirror with `root_url=http://...`.</span>
 </pre></div>
 </div>
 </section>
 <section id="getting-gutenberg-books">
-<h4>Getting Gutenberg books<a class="headerlink" href="#getting-gutenberg-books" title="Permalink to this heading">¶</a></h4>
+<h4>Getting Gutenberg books<a class="headerlink" href="#getting-gutenberg-books" title="Permalink to this headline">¶</a></h4>
 <p>After using one of the two methods to instantiate the <code class="docutils literal notranslate"><span class="pre">gd</span></code> object:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gd</span><span class="o">.</span><span class="n">load_index</span><span class="p">()</span>  <span class="c1"># load the index of books</span>
 </pre></div>
@@ -246,7 +245,7 @@ solution. Have a look at <a class="reference external" href="https://www.gutenbe
 </section>
 </section>
 <section id="text-dataset">
-<h3>Text_Dataset<a class="headerlink" href="#text-dataset" title="Permalink to this heading">¶</a></h3>
+<h3>Text_Dataset<a class="headerlink" href="#text-dataset" title="Permalink to this headline">¶</a></h3>
 <p>A library for character, word, or dynamical ngram tokenization.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
@@ -294,21 +293,21 @@ Sources: Julius Wellhausen: Prolegomena to the History of Israel[4], William Wal
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset">Text_Dataset API documentation</a> for details.</p>
 </section>
 <section id="alu-dataset">
-<h3>ALU_Dataset<a class="headerlink" href="#alu-dataset" title="Permalink to this heading">¶</a></h3>
+<h3>ALU_Dataset<a class="headerlink" href="#alu-dataset" title="Permalink to this headline">¶</a></h3>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset">ALU_Dataset API documentation</a> for details.
 A sample project is at <a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p>
 </section>
 <section id="keras-custom-layers">
-<h3>keras_custom_layers<a class="headerlink" href="#keras-custom-layers" title="Permalink to this heading">¶</a></h3>
+<h3>keras_custom_layers<a class="headerlink" href="#keras-custom-layers" title="Permalink to this headline">¶</a></h3>
 <p>A collection of Keras residual- and self-attention layers</p>
 <p>See the <a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-keras_custom_layers">keras_custom_layers API documentation</a> for details.</p>
 </section>
 </section>
 <section id="external-projects">
-<h2>External projects<a class="headerlink" href="#external-projects" title="Permalink to this heading">¶</a></h2>
+<h2>External projects<a class="headerlink" href="#external-projects" title="Permalink to this headline">¶</a></h2>
 <p>Checkout the following jupyter notebook based projects for example-usage:</p>
 <section id="text-generation">
-<h3>Text generation<a class="headerlink" href="#text-generation" title="Permalink to this heading">¶</a></h3>
+<h3>Text generation<a class="headerlink" href="#text-generation" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/domschl/tensor-poet">tensor-poet</a></p></li>
 <li><p><a class="reference external" href="https://github.com/domschl/torch-poet">torch-poet</a></p></li>
@@ -316,14 +315,14 @@ A sample project is at <a class="reference external" href="https://github.com/do
 </ul>
 </section>
 <section id="arithmetic-and-logic-operations">
-<h3>Arithmetic and logic operations<a class="headerlink" href="#arithmetic-and-logic-operations" title="Permalink to this heading">¶</a></h3>
+<h3>Arithmetic and logic operations<a class="headerlink" href="#arithmetic-and-logic-operations" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 </section>
 </section>
 <section id="history">
-<h2>History<a class="headerlink" href="#history" title="Permalink to this heading">¶</a></h2>
+<h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>(2022-06-19, 0.3.1) get_random_item(index) that works with all tokenization strategies, get_unique_token_count() added.</p></li>
 <li><p>(2022-06-19, 0.3.0) Breaking change in Text_Dataset <strong>get_item</strong>() behavior, old API didn’t fit with tokenization.</p></li>
@@ -397,7 +396,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -420,7 +419,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
