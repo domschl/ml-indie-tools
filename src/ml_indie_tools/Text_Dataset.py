@@ -137,9 +137,13 @@ class Text_Dataset:
         return ngrams
 
     def _weight_ngrams(self, ngrams, max_weight=1e12):
-        """ Weight ngrams by their length. Ngrams of length==1 and special words ('<unk>' etc.) are 
+        """ Weight ngrams by their length and frequency. Ngrams of length==1 and special words ('<unk>' etc.) are 
         weigted by max_weight, since we need the full character set and the special words to be 
         included in the ngram collection.
+
+        :param ngrams: ngrams to weight
+        :param max_weight: maximum weight of ngrams, used to marked 'preferred' ngrams: ngrams of length==1 and special words ('<unk>' etc.)
+        :return: ngrams with weights in reverse sorted order (highest weight first)
         """
         eg_dict=Counter(ngrams)
         return sorted([(''.join(l), max_weight if len(l)==1 or l in self.special_words else len(l)*eg_dict[l]) for l in eg_dict.keys()], key=lambda x: x[1], reverse=True) 
@@ -222,16 +226,18 @@ class Text_Dataset:
                 self.word_list=None
             if self.word_list is None:
                 ngrams=self._every_ngram(corpus,max_len=max_ngrams)
-                self.ngrams_list = self._weight_ngrams(ngrams)
+                ngrams_list = self._weight_ngrams(ngrams)
             else:
                 ngrams=[]
                 for word in self.word_list:
                     ngrams += self._every_ngram(word, max_len=max_ngrams)
-                self.ngrams_list = self._weight_ngrams(ngrams)
+                ngrams_list = self._weight_ngrams(ngrams)
             if max_tokens is not None:
-                if len(self.ngrams_list)>max_tokens:
-                    self.ngrams_list=self.ngrams_list[:max_tokens]
-            self.t2i={t[1][0]: t[0] for t in enumerate(self.ngrams_list)}
+                if len(ngrams_list)>max_tokens:
+                    ngrams_list=ngrams_list[:max_tokens]
+            self.t2i={t[1][0]: t[0] for t in enumerate(ngrams_list)}
+            del ngrams_list
+            self.i2t={t[1]: t[0] for t in self.t2i.items()}
             self.ngram_tokenizer_init=True
         else:
             self.log.error(f"Unknown tokenizer {tokenizer}")
@@ -353,7 +359,7 @@ class Text_Dataset:
                 elif ind=='<unk>':  # Unknown token
                     dec+="<unk>"
                 else:
-                    dec+=self.ngrams_list[ind][0]
+                    dec+=self.i2t[ind]
                     if mark_separator is True:
                         dec+='_'
             decoded_text = dec
