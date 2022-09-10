@@ -28,10 +28,10 @@ class MLEnv():
         self.known_platforms = ['tf', 'pt', 'jax']
         self.known_accelerators = ['cpu', 'gpu', 'tpu', 'fastest']
         if platform not in self.known_platforms:
-            self.log.error(f"Platform {platform} is not known, please check spelling.")
+            self.log.error(f"Platform {platform} is not among knowns: {self.known_platforms}, please check spelling.")
             return
         if accelerator not in self.known_accelerators:
-            self.log.error(f"Accelerator {accelerator} is not known, please check spelling.")
+            self.log.error(f"Accelerator {accelerator} is not among knowns: {self.known_accelerators}, please check spelling.")
             return
         self.os_type = None  #: Operating system type, e.g. `'Linux'`, `'Darwin'`
         self.py_version = None  #: Python version, e.g. `'3.7.3'`
@@ -51,6 +51,10 @@ class MLEnv():
         self.is_notebook = False  #: `True` if running in a notebook
         self.is_colab = False  #: `True` if running in a colab notebook
         self.tpu_strategy = None
+        self.flush_timer = 0
+        self.flush_timeout = 180
+        self._check_osenv()
+        self._check_notebook_type()
         if platform == 'tf':
             try:
                 import tensorflow as tf
@@ -258,12 +262,6 @@ class MLEnv():
                 else:
                     self.log.error("No Pytorch CPU accelerator available.")
                     return
-        self.flush_timer = 0
-        self.flush_timeout = 180
-        self._check_osenv()
-        self._check_notebook_type()
-        self.desc = self.describe()
-        self.log.info(self.desc)
 
     def _check_osenv(self):
         os_type = sys.platform
