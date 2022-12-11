@@ -577,7 +577,7 @@ class RecurrentSelfAttention(layers.Layer):
     """
 
     def __init__(self, units=None, norm=None, **kwargs):
-        super(SelfAttention, self).__init__(**kwargs)
+        super(RecurrentSelfAttention, self).__init__(**kwargs)
         self.units = units
         self.norm = norm
         if self.norm == "layernorm":
