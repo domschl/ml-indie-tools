@@ -297,7 +297,7 @@ class SelfAttention(layers.Layer):
             self.norm = layers.BatchNormalization()
         elif self.norm == "softmax":
             self.norm = layers.Softmax()
-        elif self.norm == None or self.norm == "none":
+        elif self.norm is None or self.norm == "none":
             self.norm = None
         else:
             raise ValueError("Unknown norm: {}".format(self.norm))
@@ -529,3 +529,117 @@ class PositionalEncoding(layers.Layer):
 
     def call(self, inputs):
         return tf.add(inputs, self.pe)
+
+
+class RecurrentSelfAttention(layers.Layer):
+    """Self-attention layer for Keras
+
+    The self-attention layer learns three matrices (key :math:`W_k`, query :math:`W_q`, value :math:`W_v`)
+    that provide context-information for the :math:`input`. Additionally, recurrent state is maintained
+    by :math:`W_{memory}`.
+    Input is mutiplied with all three matrices, then :math:`W_k` and :math:`W_q` are multiplied,
+    scaled down by :math:`\\sqrt{\\dim{input}[-1]}` and normalized, either by LayerNorm,
+    BatchNorm or Softmax or not at all. The result is then multiplied with :math:`W_v`, and, if hidden
+    dimension of the :math:`W_{x_i}` matrices is different from input units last dimension,
+    rescaled by a final dense matrix multiply. Output has same shape as input.
+
+    .. code-block:: none
+
+        #
+        #     ┌──────────┐
+        #  ┌► │Wk+Wmemory│───┐   ┌─────┐
+        #  │  └──────────┘   │   │Scale│
+        #  │  ┌──┐           × ─►│Norm │─┐   (opt.)
+        # ─┼─►│Wq│───────────┘   └─────┘ │   ┌─────┐
+        #  │  └──┘                       │   │Scale│─────────+────────► output
+        #  │  ┌──┐                       × ─►│Dense│         +
+        #  └► │Wv│───────────────────────┘   └─────┘       Wmemory ───► memory
+        #     └──┘
+        #
+
+    :param units: Positive integer, number of hidden units. The matrices :math:`W_{x_i}` are of shape :math:`hs \\times hs`.
+    :param norm: either 'batchnorm', 'layernorm', 'softmax', or None
+    """
+
+    def __init__(self, units=None, norm=None, **kwargs):
+        super(SelfAttention, self).__init__(**kwargs)
+        self.units = units
+        self.norm = norm
+        if self.norm == "layernorm":
+            self.norm = layers.LayerNormalization(axis=-1)
+        elif self.norm == "batchnorm":
+            self.norm = layers.BatchNormalization()
+        elif self.norm == "softmax":
+            self.norm = layers.Softmax()
+        elif self.norm is None or self.norm == "none":
+            self.norm = None
+        else:
+            raise ValueError("Unknown norm: {}".format(self.norm))
+        self.pm = layers.Permute((2, 1))
+
+    def build(self, input_shape):
+        self.fact = math.sqrt(input_shape[-1])
+        if self.units is None:
+            dim2 = input_shape[-1]
+        else:
+            dim2 = self.units
+            self.scale = self.add_weight(
+                shape=(dim2, input_shape[-1]),
+                initializer="random_normal",
+                name="w1",
+                trainable=True,
+            )
+        self.w_keys = self.add_weight(
+            shape=(input_shape[-1], dim2),
+            initializer="random_normal",
+            name="w2",
+            trainable=True,
+        )
+        self.w_queries = self.add_weight(
+            shape=(input_shape[-1], dim2),
+            initializer="random_normal",
+            name="w3",
+            trainable=True,
+        )
+        self.w_values = self.add_weight(
+            shape=(input_shape[-1], dim2),
+            initializer="random_normal",
+            name="w4",
+            trainable=True,
+        )
+        self.w_memory = self.add_weight(
+            shape=(input_shape[-1], dim2),
+            initializer="zeros",
+            name="w5",
+            trainable=False,
+        )
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"units": self.units, "norm": self.norm})
+        return config
+
+    def call(self, inputs, memory=None):
+        if memory is None:
+            vk = tf.matmul(inputs, self.w_keys)
+        else:
+            mem = tf.matmul(memory, self.w_memory)
+            self.w_memory = tf.tanh(mem)
+            vk = tf.matmul(inputs, self.w_keys + self.w_memory)
+        vq = tf.matmul(inputs, self.w_queries)
+        vv = tf.matmul(inputs, self.w_values)
+        kq = tf.matmul(vk, vq, transpose_b=True)
+        kqs = kq / self.fact
+        if self.norm is not None:
+            sn = self.norm(kqs)
+        else:
+            sn = kqs
+        out = tf.matmul(sn, self.pm(vv), transpose_b=True)
+
+        if self.units is not None:
+            out = tf.matmul(out, self.scale)
+        if memory is None:
+            return out, None
+        else:
+            mem = out + self.w_memory
+            return out, mem

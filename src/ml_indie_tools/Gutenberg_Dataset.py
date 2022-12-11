@@ -26,7 +26,8 @@ class Gutenberg_Dataset:
     Note: :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_index` needs to be called before any other methods.
 
     :param root_url: url of Project Gutenberg or any mirror URL, or a local directory containing a Gutenberg mirror.
-    :param cache_dir: path to a directory that will be used to cache the Gutenberg index and already downloaded texts. The cache directory is only used, if a remote Gutenberg URL and not a local mirror is used.
+    :param cache_dir: path to a directory that will be used to cache the Gutenberg index and already downloaded texts.
+    The cache directory is only used, if a remote Gutenberg URL and not a local mirror is used.
     """
 
     def __init__(
@@ -115,13 +116,13 @@ class Gutenberg_Dataset:
 
         # Sanity check
         try:
-            fa = re.findall(ebook_no, "\A[0-9]+[A-C]\Z")
+            fa = re.findall(ebook_no, r"\A[0-9]+[A-C]\Z")
         except Exception as e:
             fa = None
             if verbose is True:
                 self.log.warning(f"Failed to apply regex on >{ebook_no}<: {e}")
 
-        if len(rl[0]) < 5 or fa == None or len(ebook_no) > 7:
+        if len(rl[0]) < 5 or fa is None or len(ebook_no) > 7:
             if verbose is True:
                 print("-------------------------------------")
                 print(record)
@@ -292,7 +293,9 @@ class Gutenberg_Dataset:
 
         This should be the first method being used, since many other methods rely on the index being loaded.
 
-        :param cache: default `True`, use the cache directory to cache both index and text files. Index expires after `cache_expire_days`, text files never expire. Should *NOT* be set to `False` in order to prevent unnecessary re-downloading.
+        :param cache: default `True`, use the cache directory to cache both index and text files.
+        Index expires after `cache_expire_days`, text files never expire.
+        Should *NOT* be set to `False` in order to prevent unnecessary re-downloading.
         :param cache_expire_days: Number of days after which the index is re-downloaded.
         """
         raw_index = None
@@ -316,9 +319,9 @@ class Gutenberg_Dataset:
                         self.log.debug(
                             "Cache for Gutenberg-index is expired, reloading from web."
                         )
-                except:
+                except Exception as e:
                     self.log.warning(
-                        "Failed to read cache timestamp, reloading from web."
+                        f"Failed to read cache timestamp ({e}), reloading from web."
                     )
             if expired is False and os.path.isfile(cache_file):
                 try:
@@ -327,9 +330,11 @@ class Gutenberg_Dataset:
                         self.log.debug(
                             f"Gutenberg index read from local cache: {cache_file}"
                         )
-                except:
+                except Exception as e:
                     expired = True
-                    self.log.warning("Failed to read cached index, reloading from web.")
+                    self.log.warning(
+                        f"Failed to read cached index ({e}), reloading from web."
+                    )
             if expired is True:
                 index_url = self.root_url + "/GUTINDEX.ALL"
                 try:
@@ -404,7 +409,7 @@ class Gutenberg_Dataset:
                         downloaded = False
                         return data, None, downloaded
                 except Exception as e:
-                    self.log.error(f"Failed to read cached file {cache_file}")
+                    self.log.error(f"Failed to read cached file {cache_file}: {e}")
         data = None
         file_url = None
         for filename, encoding in filenames:
@@ -493,8 +498,8 @@ class Gutenberg_Dataset:
             try:
                 with open(cache_file, "w") as f:
                     f.write(data)
-            except:
-                self.log.error(f"Failed to cache file {cache_file}")
+            except Exception as e:
+                self.log.error(f"Failed to cache file {cache_file}: {e}")
         return data, downloaded, valid
 
     def filter_text(
@@ -569,7 +574,7 @@ class Gutenberg_Dataset:
                 self.log.debug(f"Trying extra skipping (2) for {pos2}...")
                 while new_book[xpos + pos2] == "\n":
                     pos2 += 1
-                new_book = new_book[xpos + pos2:]
+                new_book = new_book[xpos + pos2 :]
                 self.log.debug(f"Additionally shortened start by {xpos+pos2} chars")
             else:
                 pos2 = new_book[xpos:].find("\n")

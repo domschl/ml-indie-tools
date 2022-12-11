@@ -1,4 +1,4 @@
-"""Tools to configure ML environment for Tensorflow, Pytorch or JAX and 
+"""Tools to configure ML environment for Tensorflow, Pytorch or JAX and
 optional notebook/colab environment"""
 
 import os
@@ -188,7 +188,7 @@ class MLEnv:
                         jd = jax.devices()
                         self.tpu_type = f"TPU, {len(jd)} nodes"
                         self.log.debug(f"JAX TPU detected: {jd}")
-                    except:
+                    except:  # noqa: E722
                         if accelerator != "fastest":
                             self.log.debug("JAX TPU not detected.")
                             return
@@ -221,7 +221,7 @@ class MLEnv:
                                     )
                             except Exception as e:
                                 self.log.debug(f"Failed to determine GPU memory {e}")
-                    except:
+                    except:  # noqa: E722
                         if accelerator != "fastest":
                             self.log.debug("JAX GPU not available.")
                             return
@@ -236,7 +236,7 @@ class MLEnv:
                                 break
                         if self.is_cpu is False:
                             self.log.debug("JAX CPU not available.")
-                    except:
+                    except:  # noqa: E722
                         self.log.error("No JAX CPU available.")
                         return
         if platform == "pt":
@@ -254,7 +254,7 @@ class MLEnv:
                     try:
                         assert os.environ["COLAB_TPU_ADDR"]
                         tpu_env = True
-                    except:
+                    except:  # noqa: E722
                         self.log.debug("Pytorch TPU instance not detected.")
                     if tpu_env is True:
                         try:
@@ -271,7 +271,7 @@ class MLEnv:
 
                             self.is_tpu = True
                             self.log.debug("Pytorch TPU detected.")
-                        except:
+                        except:  # noqa: E722
                             self.log.error(
                                 "Pytorch TPU would be available, but failed to\
                                     import torch_xla.core.xla_model."
@@ -290,7 +290,7 @@ class MLEnv:
                                     f"Pytorch MPS acceleration detected: MPS={torch.has_mps}"
                                 )
                                 return
-                        except:
+                        except:  # noqa: E722
                             pass
                     try:
                         import torch.cuda
@@ -317,7 +317,7 @@ class MLEnv:
                                 self.log.debug(f"Failed to determine GPU memory {e}")
                         else:
                             self.log.debug("Pytorch GPU not available.")
-                    except:
+                    except:  # noqa: E722
                         if accelerator != "fastest":
                             self.log.error("Pytorch GPU not available.")
                             return
@@ -359,10 +359,10 @@ class MLEnv:
                     get_ipython().run_line_magic("load_ext", "tensorboard")
                     try:
                         get_ipython().run_line_magic("tensorflow_version", "2.x")
-                    except:
+                    except:  # noqa: E722
                         pass
                 self.log.debug("You are on a Colab instance.")
-            except:  # Not? ignore.
+            except:  # noqa: E722
                 self.is_colab = False
                 self.log.debug(
                     "You are not on a Colab instance, so no Google Drive access is possible."
@@ -396,7 +396,7 @@ class MLEnv:
             if self.gpu_memory is not None:
                 desc += f" ({self.gpu_memory})"
         if self.is_cpu is True:
-            desc += f", CPU"
+            desc += ", CPU"
         return desc
 
     def describe(self):

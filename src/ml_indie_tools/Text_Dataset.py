@@ -24,7 +24,8 @@ class Text_Dataset:
         # Now ls contains a valid list of text records:
         td = Text_Dataset(ls)
 
-    :param text_list: list of text-records of the form: {'author': 'author', 'title': 'title', 'language': 'some-language', 'text': 'the-long-text'}. Optinal parameters: 'weight': 1.0
+    :param text_list: list of text-records of the form: {'author': 'author', 'title': 'title', 'language': 'some-language',
+    'text': 'the-long-text'}. Optinal parameters: 'weight': 1.0
     :param sanitize_white_space: If True, white space is replaced by a single space.
     :param separate_punctuation: If True, punctuation is separated from words.
     :param preserve_case: If True, the case of the text is preserved.
@@ -173,12 +174,12 @@ class Text_Dataset:
         return sorted(
             [
                 (
-                    "".join(l),
+                    "".join(lk),
                     max_weight
-                    if len(l) == 1 or l in self.special_words
-                    else len(l) * eg_dict[l],
+                    if len(lk) == 1 or lk in self.special_words
+                    else len(lk) * eg_dict[lk],
                 )
-                for l in eg_dict.keys()
+                for lk in eg_dict.keys()
             ],
             key=lambda x: x[1],
             reverse=True,
