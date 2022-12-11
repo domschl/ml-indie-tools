@@ -389,7 +389,9 @@ class MultiHeadSelfAttention(layers.Layer):
     :param heads: Positive integer, number of self-attention heads.
     :param mh_normalize: Boolean, whether to normalize the output of the multi-head self-attention.
     :param norm: either 'batchnorm', 'layernorm, or 'softmax', the normalization used within each self-attention head.
+    :param final_relu: Boolean, whether to apply a ReLU after the final scaling and dense layer.
     :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need).
+    :param recurrent: Boolean, whether to use a recurrent self-attention layer.
     """
 
     def __init__(
@@ -400,6 +402,7 @@ class MultiHeadSelfAttention(layers.Layer):
         mh_normalize=True,
         final_relu=False,
         join_heads_by_add=False,
+        recurrent=False,
         **kwargs
     ):
         super(MultiHeadSelfAttention, self).__init__(**kwargs)
@@ -408,9 +411,15 @@ class MultiHeadSelfAttention(layers.Layer):
         self.norm = norm
         self.mh_normalize = mh_normalize
         self.final_relu = final_relu
+        self.recurrent = recurrent
         self.mhsa = []
         for _ in range(0, self.heads):
-            self.mhsa.append(SelfAttention(units=self.units, norm=self.norm))
+            if recurrent is True:
+                self.mhsa.append(
+                    RecurrentSelfAttention(units=self.units, norm=self.norm)
+                )
+            else:
+                self.mhsa.append(SelfAttention(units=self.units, norm=self.norm))
         self.join_heads_by_add = join_heads_by_add
         if self.join_heads_by_add is False:
             self.cc = layers.Concatenate(axis=1)
@@ -452,6 +461,7 @@ class MultiHeadSelfAttention(layers.Layer):
                 "norm": self.norm,
                 "mh_normalize": self.mh_normalize,
                 "final_relu": self.final_relu,
+                "recurrent": self.recurrent,
                 "join_heads_by_add": self.join_heads_by_add,
             }
         )
@@ -459,8 +469,13 @@ class MultiHeadSelfAttention(layers.Layer):
 
     def call(self, inputs):
         xa = []
+        mem = tf.zeros_like(inputs)  # persistence? parameter? (XXX)
         for i in range(0, self.heads):
-            xa.append(self.pm(self.mhsa[i](inputs) + inputs))
+            if self.recurrent is True:
+                xai, mem = self.mhsa[i](inputs, mem)
+            else:
+                xai = self.mhsa[i](inputs)
+            xa.append(self.pm(xai + inputs))
         if self.join_heads_by_add is True:
             for i in range(len(xa)):
                 if i == 0:
