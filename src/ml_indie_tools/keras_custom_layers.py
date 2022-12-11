@@ -639,8 +639,8 @@ class RecurrentSelfAttention(layers.Layer):
             vk = tf.matmul(inputs, self.w_keys)
         else:
             mem = tf.matmul(memory, self.w_memory)
-            self.w_memory = tf.tanh(mem)
-            vk = tf.matmul(inputs, self.w_keys) + self.w_memory
+            mem = tf.tanh(mem)
+            vk = tf.matmul(inputs, self.w_keys) + mem
         vq = tf.matmul(inputs, self.w_queries)
         vv = tf.matmul(inputs, self.w_values)
         kq = tf.matmul(vk, vq, transpose_b=True)
@@ -656,5 +656,5 @@ class RecurrentSelfAttention(layers.Layer):
         if memory is None:
             return out, None
         else:
-            mem = out + self.w_memory
-            return out, mem
+            self.w_memory = out + self.w_memory
+            return out, self.w_memory
