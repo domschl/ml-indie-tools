@@ -637,7 +637,7 @@ class RecurrentSelfAttention(layers.Layer):
         return config
 
     def call(self, inputs, memory=None):
-        if memory is None:
+        if memory is None or self.reshape is True:
             vk = tf.matmul(inputs, self.w_keys)
         else:
             vm = tf.matmul(memory, self.w_memory)
@@ -655,14 +655,12 @@ class RecurrentSelfAttention(layers.Layer):
 
         if self.reshape is True:
             out = tf.matmul(out, self.scale)
-        if memory is None:
-            return out, None
+        if memory is None or self.reshape is True:
+            return out, memory
         else:
             mv = tf.matmul(inputs, self.w_memory)
             mv = tf.tanh(mv)
             mvq = tf.matmul(mv, vm, transpose_b=True)
             ml = tf.matmul(mvq, self.pm(vv), transpose_b=True)
-            if self.reshape is True:
-                ml = tf.matmul(ml, self.scale)
             self.w_memory = ml
             return out, self.w_memory
