@@ -467,9 +467,12 @@ class MultiHeadSelfAttention(layers.Layer):
         )
         return config
 
-    def call(self, inputs):
+    def call(self, inputs, memory=None):
         xa = []
-        mem = tf.zeros_like(inputs)  # persistence? parameter? (XXX)
+        if memory is None:
+            mem = tf.zeros_like(inputs)
+        else:
+            mem = memory
         for i in range(0, self.heads):
             if self.recurrent is True:
                 xai, mem = self.mhsa[i](inputs, mem)
@@ -492,7 +495,10 @@ class MultiHeadSelfAttention(layers.Layer):
         x = tf.matmul(x, self.lin) + xt
         if self.mh_normalize is True:
             x = self.ln2(x)
-        return x
+        if self.recurrent is True and memory is not None:
+            return x, mem
+        else:
+            return x
 
 
 class PositionalEncoding(layers.Layer):
