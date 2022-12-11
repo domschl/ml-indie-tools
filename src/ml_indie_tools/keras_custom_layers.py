@@ -594,8 +594,9 @@ class RecurrentSelfAttention(layers.Layer):
 
     def build(self, input_shape):
         self.fact = math.sqrt(input_shape[-1])
-        if self.units is None:
+        if self.units is None or self.units == input_shape[-1]:
             dim2 = input_shape[-1]
+            self.reshape = False
         else:
             dim2 = self.units
             self.scale = self.add_weight(
@@ -604,6 +605,7 @@ class RecurrentSelfAttention(layers.Layer):
                 name="w1",
                 trainable=True,
             )
+            self.reshape = True
         self.w_keys = self.add_weight(
             shape=(input_shape[-1], dim2),
             initializer="random_normal",
@@ -638,9 +640,9 @@ class RecurrentSelfAttention(layers.Layer):
         if memory is None:
             vk = tf.matmul(inputs, self.w_keys)
         else:
-            mem = tf.matmul(memory, self.w_memory)
-            mem = tf.tanh(mem)
-            vk = tf.matmul(inputs, self.w_keys) + mem
+            vm = tf.matmul(memory, self.w_memory)
+            vm = tf.tanh(vm)
+            vk = tf.matmul(inputs, self.w_keys) + vm
         vq = tf.matmul(inputs, self.w_queries)
         vv = tf.matmul(inputs, self.w_values)
         kq = tf.matmul(vk, vq, transpose_b=True)
@@ -651,10 +653,16 @@ class RecurrentSelfAttention(layers.Layer):
             sn = kqs
         out = tf.matmul(sn, self.pm(vv), transpose_b=True)
 
-        if self.units is not None:
+        if self.reshape is True:
             out = tf.matmul(out, self.scale)
         if memory is None:
             return out, None
         else:
-            self.w_memory = out + self.w_memory
+            mv = tf.matmul(inputs, self.w_memory)
+            mv = tf.tanh(mv)
+            mvq = tf.matmul(mv, vm, transpose_b=True)
+            ml = tf.matmul(mvq, self.pm(vv), transpose_b=True)
+            if self.reshape is True:
+                ml = tf.matmul(ml, self.scale)
+            self.w_memory = ml
             return out, self.w_memory
