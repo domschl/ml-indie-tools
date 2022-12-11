@@ -240,6 +240,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2022-12-11, 0.3.10) Testversion for recurrent attention, WIP!
 * (2022-06-19, 0.3.1) get_random_item(index) that works with all tokenization strategies, get_unique_token_count() added.
 * (2022-06-19, 0.3.0) Breaking change in Text_Dataset __get_item__() behavior, old API didn't fit with tokenization.
 * (2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.
