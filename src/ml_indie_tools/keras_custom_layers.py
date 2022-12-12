@@ -727,7 +727,7 @@ class GatedMemorySelfAttention(layers.Layer):
         else:
             raise ValueError("Unknown norm: {}".format(self.norm))
         self.pm = layers.Permute((2, 1))
-        self.retain_factor = 0.99
+        self.retain_factor = 0.8
 
     def build(self, input_shape):
         self.fact = math.sqrt(input_shape[-1])
@@ -787,11 +787,11 @@ class GatedMemorySelfAttention(layers.Layer):
         vq = tf.matmul(inputs, self.w_queries)
         if self.reshape is False:
             vm = tf.transpose(tf.matmul(inputs, self.w_memory_gate), perm=[0, 2, 1])
-            memory = tf.reduce_mean(vm, axis=0, keepdims=False)
-            self.w_input_exp_memory = tf.tanh(
-                tf.math.multiply(self.w_input_exp_memory, self.retain_factor)
-                + tf.math.multiply(memory, 1.0 - self.retain_factor)
-            )
+            memory = tf.tanh(tf.reduce_mean(vm, axis=0, keepdims=False))
+            self.w_input_exp_memory = tf.math.multiply(
+                self.w_input_exp_memory, self.retain_factor
+            ) + tf.math.multiply(memory, 1.0 - self.retain_factor)
+
             vk = tf.math.multiply(vk, self.retain_factor) + tf.math.multiply(
                 self.w_input_exp_memory, 1.0 - self.retain_factor
             )
