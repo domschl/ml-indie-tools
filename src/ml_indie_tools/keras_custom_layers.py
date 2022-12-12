@@ -768,7 +768,7 @@ class GatedMemorySelfAttention(layers.Layer):
             trainable=True,
         )
         self.w_input_exp_memory = self.add_weight(
-            shape=(input_shape[1], input_shape[2]),
+            shape=(input_shape[-1], dim2),
             initializer="zeros",
             name="w6",
             trainable=False,
@@ -779,15 +779,23 @@ class GatedMemorySelfAttention(layers.Layer):
         config.update({"units": self.units, "norm": self.norm})
         return config
 
-    def call(self, inputs, memory=None):
-        self.w_input_exp_memory = tf.math.multiply(
-            self.w_input_exp_memory, self.retain_factor
-        ) + tf.math.multiply(inputs, 1.0 - self.retain_factor)
+    def call(self, inputs):
+        # self.w_input_exp_memory = tf.math.multiply(
+        #     self.w_input_exp_memory, self.retain_factor
+        # ) + tf.math.multiply(inputs, 1.0 - self.retain_factor)
         vk = tf.matmul(inputs, self.w_keys)
         vq = tf.matmul(inputs, self.w_queries)
-        vv = tf.matmul(inputs, self.w_values) + tf.matmul(
-            self.w_input_exp_memory, self.w_memory_gate
-        )
+        vm = tf.matmul(inputs, self.w_memory_gate)
+        for i in range(input.shape[0]):
+            if i == 0:
+                memory = vm[0, :, :]
+            else:
+                memory = memory + vm[i, :, :]
+        self.w_input_exp_memory = tf.math.multiply(
+            self.w_input_exp_memory, self.retain_factor
+        ) + tf.math.multiply(memory, 1.0 - self.retain_factor)
+
+        vv = tf.matmul(inputs, self.w_values) + self.w_input_exp_memory
         kq = tf.matmul(vk, vq, transpose_b=True)
         kqs = kq / self.fact
         if self.norm is not None:
