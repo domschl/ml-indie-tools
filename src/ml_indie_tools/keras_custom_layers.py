@@ -765,7 +765,7 @@ class GatedMemorySelfAttention(layers.Layer):
             shape=(input_shape[-1], dim2),
             initializer="random_normal",
             name="w5",
-            trainable=True,
+            trainable=not self.reshape,
         )
         self.w_input_exp_memory = self.add_weight(
             shape=(dim2, input_shape[-1]),
@@ -785,8 +785,8 @@ class GatedMemorySelfAttention(layers.Layer):
         # ) + tf.math.multiply(inputs, 1.0 - self.retain_factor)
         vk = tf.matmul(inputs, self.w_keys)
         vq = tf.matmul(inputs, self.w_queries)
-        vm = tf.transpose(tf.matmul(inputs, self.w_memory_gate), perm=[0, 2, 1])
         if self.reshape is False:
+            vm = tf.transpose(tf.matmul(inputs, self.w_memory_gate), perm=[0, 2, 1])
             memory = tf.reduce_mean(vm, axis=0, keepdims=False)
             self.w_input_exp_memory = tf.math.multiply(
                 self.w_input_exp_memory, self.retain_factor
