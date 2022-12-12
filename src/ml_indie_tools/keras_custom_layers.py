@@ -768,7 +768,7 @@ class GatedMemorySelfAttention(layers.Layer):
             trainable=True,
         )
         self.w_input_exp_memory = self.add_weight(
-            shape=input_shape,
+            shape=(input_shape[1], input_shape[2]),
             initializer="zeros",
             name="w6",
             trainable=False,
