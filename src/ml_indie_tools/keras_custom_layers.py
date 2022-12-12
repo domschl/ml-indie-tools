@@ -791,9 +791,10 @@ class GatedMemorySelfAttention(layers.Layer):
             self.w_input_exp_memory = tf.math.multiply(
                 self.w_input_exp_memory, self.retain_factor
             ) + tf.math.multiply(memory, 1.0 - self.retain_factor)
-            vv = tf.matmul(inputs, self.w_values) + self.w_input_exp_memory
-        else:
-            vv = tf.matmul(inputs, self.w_values)
+            vk = tf.math.multiply(vk, self.retain_factor) + tf.math.multiply(
+                self.w_input_exp_memory, 1.0 - self.retain_factor
+            )
+        vv = tf.matmul(inputs, self.w_values)
         kq = tf.matmul(vk, vq, transpose_b=True)
         kqs = kq / self.fact
         if self.norm is not None:
