@@ -786,13 +786,9 @@ class GatedMemorySelfAttention(layers.Layer):
         vk = tf.matmul(inputs, self.w_keys)
         vq = tf.matmul(inputs, self.w_queries)
         vm = tf.transpose(tf.matmul(inputs, self.w_memory_gate), perm=[0, 2, 1])
-        for i in range(
-            tf.shape.as_list()[0]
-        ):  # What a beautiful and concise API tf has to offer! And every year a new one!
-            if i == 0:
-                memory = vm[0, :, :]
-            else:
-                memory = memory + vm[i, :, :]
+        memory = vm[0, :, :]
+        for i in range(1, inputs.shape.as_list()[0]):
+            memory = memory + vm[i, :, :]
         self.w_input_exp_memory = tf.math.multiply(
             self.w_input_exp_memory, self.retain_factor
         ) + tf.math.multiply(memory, 1.0 - self.retain_factor)
