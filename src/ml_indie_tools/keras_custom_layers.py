@@ -390,7 +390,7 @@ class MultiHeadSelfAttention(layers.Layer):
     :param mh_normalize: Boolean, whether to normalize the output of the multi-head self-attention.
     :param norm: either 'batchnorm', 'layernorm, or 'softmax', the normalization used within each self-attention head.
     :param final_relu: Boolean, whether to apply a ReLU after the final scaling and dense layer.
-    :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need). 
+    :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need).
     True is recommended, since it requires less parameters at equal performance.
     """
 
@@ -544,4 +544,3 @@ class PositionalEncoding(layers.Layer):
 
     def call(self, inputs):
         return tf.add(inputs, self.pe)
-
