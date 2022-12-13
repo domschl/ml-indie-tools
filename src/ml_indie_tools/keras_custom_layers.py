@@ -454,24 +454,15 @@ class MultiHeadSelfAttention(layers.Layer):
                 "norm": self.norm,
                 "mh_normalize": self.mh_normalize,
                 "final_relu": self.final_relu,
-                "recurrent": self.recurrent,
-                "gated_memory": self.gated_memory,
                 "join_heads_by_add": self.join_heads_by_add,
             }
         )
         return config
 
-    def call(self, inputs, memory=None):
+    def call(self, inputs):
         xa = []
-        if memory is None:
-            mem = tf.zeros_like(inputs)
-        else:
-            mem = memory
         for i in range(0, self.heads):
-            if self.recurrent is True:
-                xai, mem = self.mhsa[i](inputs, mem)
-            else:
-                xai = self.mhsa[i](inputs)
+            xai = self.mhsa[i](inputs)
             xa.append(self.pm(xai + inputs))
         if self.join_heads_by_add is True:
             for i in range(len(xa)):
@@ -489,10 +480,7 @@ class MultiHeadSelfAttention(layers.Layer):
         x = tf.matmul(x, self.lin) + xt
         if self.mh_normalize is True:
             x = self.ln2(x)
-        if self.recurrent is True and memory is not None:
-            return x, mem
-        else:
-            return x
+        return x
 
 
 class PositionalEncoding(layers.Layer):
