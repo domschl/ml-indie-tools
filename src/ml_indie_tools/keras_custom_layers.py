@@ -390,9 +390,8 @@ class MultiHeadSelfAttention(layers.Layer):
     :param mh_normalize: Boolean, whether to normalize the output of the multi-head self-attention.
     :param norm: either 'batchnorm', 'layernorm, or 'softmax', the normalization used within each self-attention head.
     :param final_relu: Boolean, whether to apply a ReLU after the final scaling and dense layer.
-    :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need).
-    :param recurrent: Boolean, whether to use a recurrent self-attention layer.
-    :param gated_memory: Boolean, whether to use a gated memory self-attention layer.
+    :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need). 
+    True is recommended, since it requires less parameters at equal performance.
     """
 
     def __init__(
@@ -403,8 +402,6 @@ class MultiHeadSelfAttention(layers.Layer):
         mh_normalize=True,
         final_relu=False,
         join_heads_by_add=False,
-        recurrent=False,
-        gated_memory=False,
         **kwargs
     ):
         super(MultiHeadSelfAttention, self).__init__(**kwargs)
@@ -413,22 +410,9 @@ class MultiHeadSelfAttention(layers.Layer):
         self.norm = norm
         self.mh_normalize = mh_normalize
         self.final_relu = final_relu
-        self.recurrent = recurrent
-        self.gated_memory = gated_memory
-        if self.gated_memory is True:
-            self.recurrent = False
         self.mhsa = []
         for _ in range(0, self.heads):
-            if self.gated_memory is True:
-                self.mhsa.append(
-                    GatedMemorySelfAttention(units=self.units, norm=self.norm)
-                )
-            elif recurrent is True:
-                self.mhsa.append(
-                    RecurrentSelfAttention(units=self.units, norm=self.norm)
-                )
-            else:
-                self.mhsa.append(SelfAttention(units=self.units, norm=self.norm))
+            self.mhsa.append(SelfAttention(units=self.units, norm=self.norm))
         self.join_heads_by_add = join_heads_by_add
         if self.join_heads_by_add is False:
             self.cc = layers.Concatenate(axis=1)
@@ -561,249 +545,3 @@ class PositionalEncoding(layers.Layer):
     def call(self, inputs):
         return tf.add(inputs, self.pe)
 
-
-class RecurrentSelfAttention(layers.Layer):
-    """Self-attention layer for Keras
-
-    The self-attention layer learns three matrices (key :math:`W_k`, query :math:`W_q`, value :math:`W_v`)
-    that provide context-information for the :math:`input`. Additionally, recurrent state is maintained
-    by :math:`W_{memory}`.
-    Input is mutiplied with all three matrices, then :math:`W_k` and :math:`W_q` are multiplied,
-    scaled down by :math:`\\sqrt{\\dim{input}[-1]}` and normalized, either by LayerNorm,
-    BatchNorm or Softmax or not at all. The result is then multiplied with :math:`W_v`, and, if hidden
-    dimension of the :math:`W_{x_i}` matrices is different from input units last dimension,
-    rescaled by a final dense matrix multiply. Output has same shape as input.
-
-    .. code-block:: none
-
-        #
-        #     ┌──────────┐
-        #  ┌► │Wk+Wmemory│───┐   ┌─────┐
-        #  │  └──────────┘   │   │Scale│
-        #  │  ┌──┐           × ─►│Norm │─┐   (opt.)
-        # ─┼─►│Wq│───────────┘   └─────┘ │   ┌─────┐
-        #  │  └──┘                       │   │Scale│─────────+────────► output
-        #  │  ┌──┐                       × ─►│Dense│         +
-        #  └► │Wv│───────────────────────┘   └─────┘       Wmemory ───► memory
-        #     └──┘
-        #
-
-    :param units: Positive integer, number of hidden units. The matrices :math:`W_{x_i}` are of shape :math:`hs \\times hs`.
-    :param norm: either 'batchnorm', 'layernorm', 'softmax', or None
-    """
-
-    def __init__(self, units=None, norm=None, **kwargs):
-        super(RecurrentSelfAttention, self).__init__(**kwargs)
-        self.units = units
-        self.norm = norm
-        if self.norm == "layernorm":
-            self.norm = layers.LayerNormalization(axis=-1)
-        elif self.norm == "batchnorm":
-            self.norm = layers.BatchNormalization()
-        elif self.norm == "softmax":
-            self.norm = layers.Softmax()
-        elif self.norm is None or self.norm == "none":
-            self.norm = None
-        else:
-            raise ValueError("Unknown norm: {}".format(self.norm))
-        self.pm = layers.Permute((2, 1))
-
-    def build(self, input_shape):
-        self.fact = math.sqrt(input_shape[-1])
-        if self.units is None or self.units == input_shape[-1]:
-            dim2 = input_shape[-1]
-            self.reshape = False
-        else:
-            dim2 = self.units
-            self.scale = self.add_weight(
-                shape=(dim2, input_shape[-1]),
-                initializer="random_normal",
-                name="w1",
-                trainable=True,
-            )
-            self.reshape = True
-        self.w_keys = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w2",
-            trainable=True,
-        )
-        self.w_queries = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w3",
-            trainable=True,
-        )
-        self.w_values = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w4",
-            trainable=True,
-        )
-        self.w_memory = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="zeros",
-            name="w5",
-            trainable=False,
-        )
-
-    def get_config(self):
-        config = super().get_config()
-        config.update({"units": self.units, "norm": self.norm})
-        return config
-
-    def call(self, inputs, memory=None):
-        if memory is None or self.reshape is True:
-            vk = tf.matmul(inputs, self.w_keys)
-        else:
-            vm = tf.matmul(memory, self.w_memory)
-            vm = tf.tanh(vm)
-            vk = tf.matmul(inputs, self.w_keys) + vm
-        vq = tf.matmul(inputs, self.w_queries)
-        vv = tf.matmul(inputs, self.w_values)
-        kq = tf.matmul(vk, vq, transpose_b=True)
-        kqs = kq / self.fact
-        if self.norm is not None:
-            sn = self.norm(kqs)
-        else:
-            sn = kqs
-        out = tf.matmul(sn, self.pm(vv), transpose_b=True)
-
-        if self.reshape is True:
-            out = tf.matmul(out, self.scale)
-        if memory is None or self.reshape is True:
-            return out, memory
-        else:
-            mv = tf.matmul(inputs, self.w_memory)
-            mv = tf.tanh(mv)
-            mvq = tf.matmul(mv, vm, transpose_b=True)
-            ml = tf.matmul(mvq, self.pm(vv), transpose_b=True)
-            self.w_memory = ml
-            return out, self.w_memory
-
-
-class GatedMemorySelfAttention(layers.Layer):
-    """Self-attention layer for Keras
-
-    The self-attention layer learns three matrices (key :math:`W_k`, query :math:`W_q`, value :math:`W_v`)
-    that provide context-information for the :math:`input`. Additionally, a gated exponentially decaying
-    memory state is maintained.
-    Input is mutiplied with all three matrices, then :math:`W_k` and :math:`W_q` are multiplied,
-    scaled down by :math:`\\sqrt{\\dim{input}[-1]}` and normalized, either by LayerNorm,
-    BatchNorm or Softmax or not at all. The result is then multiplied with :math:`W_v`, and, if hidden
-    dimension of the :math:`W_{x_i}` matrices is different from input units last dimension,
-    rescaled by a final dense matrix multiply. Output has same shape as input.
-
-    .. code-block:: none
-
-        #  XXX memory missing
-        #     ┌──┐
-        #  ┌► │Wk│───┐   ┌─────┐
-        #  │  └──┘   │   │Scale│
-        #  │  ┌──┐   × ─►│Norm │─┐   (opt.)
-        # ─┼─►│Wq│───┘   └─────┘ │   ┌─────┐
-        #  │  └──┘               │   │Scale│──────────► output
-        #  │  ┌──┐               × ─►│Dense│
-        #  └► │Wv│───────────────┘   └─────┘
-        #     └──┘
-        #
-
-    :param units: Positive integer, number of hidden units. The matrices :math:`W_{x_i}` are of shape :math:`hs \\times hs`.
-    :param norm: either 'batchnorm', 'layernorm', 'softmax', or None
-    """
-
-    def __init__(self, units=None, norm=None, **kwargs):
-        super(GatedMemorySelfAttention, self).__init__(**kwargs)
-        self.units = units
-        self.norm = norm
-        if self.norm == "layernorm":
-            self.norm = layers.LayerNormalization(axis=-1)
-        elif self.norm == "batchnorm":
-            self.norm = layers.BatchNormalization()
-        elif self.norm == "softmax":
-            self.norm = layers.Softmax()
-        elif self.norm is None or self.norm == "none":
-            self.norm = None
-        else:
-            raise ValueError("Unknown norm: {}".format(self.norm))
-        self.pm = layers.Permute((2, 1))
-        self.retain_factor = 0.8
-
-    def build(self, input_shape):
-        self.fact = math.sqrt(input_shape[-1])
-        if self.units is None or self.units == input_shape[-1]:
-            dim2 = input_shape[-1]
-            self.reshape = False
-        else:
-            dim2 = self.units
-            self.scale = self.add_weight(
-                shape=(dim2, input_shape[-1]),
-                initializer="random_normal",
-                name="w1",
-                trainable=True,
-            )
-            self.reshape = True
-        self.w_keys = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w2",
-            trainable=True,
-        )
-        self.w_queries = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w3",
-            trainable=True,
-        )
-        self.w_values = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w4",
-            trainable=True,
-        )
-        self.w_memory_gate = self.add_weight(
-            shape=(input_shape[-1], dim2),
-            initializer="random_normal",
-            name="w5",
-            trainable=not self.reshape,
-        )
-        self.w_input_exp_memory = self.add_weight(
-            shape=(dim2, input_shape[-1]),
-            initializer="zeros",
-            name="w6",
-            trainable=False,
-        )
-
-    def get_config(self):
-        config = super().get_config()
-        config.update({"units": self.units, "norm": self.norm})
-        return config
-
-    def call(self, inputs):
-        # self.w_input_exp_memory = tf.math.multiply(
-        #     self.w_input_exp_memory, self.retain_factor
-        # ) + tf.math.multiply(inputs, 1.0 - self.retain_factor)
-        vk = tf.matmul(inputs, self.w_keys)
-        vq = tf.matmul(inputs, self.w_queries)
-        if self.reshape is False:
-            vm = tf.transpose(tf.matmul(inputs, self.w_memory_gate), perm=[0, 2, 1])
-            memory = tf.tanh(tf.reduce_mean(vm, axis=0, keepdims=False))
-            self.w_input_exp_memory = tf.math.multiply(
-                self.w_input_exp_memory, self.retain_factor
-            ) + tf.math.multiply(memory, 1.0 - self.retain_factor)
-
-            vk = tf.math.multiply(vk, self.retain_factor) + tf.math.multiply(
-                self.w_input_exp_memory, 1.0 - self.retain_factor
-            )
-        vv = tf.matmul(inputs, self.w_values)
-        kq = tf.matmul(vk, vq, transpose_b=True)
-        kqs = kq / self.fact
-        if self.norm is not None:
-            sn = self.norm(kqs)
-        else:
-            sn = kqs
-        out = tf.matmul(sn, self.pm(vv), transpose_b=True)
-
-        if self.reshape is True:
-            out = tf.matmul(out, self.scale)
-        return out
