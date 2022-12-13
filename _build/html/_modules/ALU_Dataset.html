@@ -2,17 +2,18 @@
 
 <!doctype html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ALU_Dataset &#8212; ml-indie-tools 0.0.33 documentation</title>
+    <title>ALU_Dataset &#8212; ml-indie-tools 0.3.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
     
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -31,7 +32,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.0.33 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">ALU_Dataset</a></li> 
       </ul>
@@ -50,52 +51,87 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="ALU_Dataset"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset">[docs]</a><span class="k">class</span> <span class="nc">ALU_Dataset</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; Generate training data for all ALU operations</span>
+<div class="viewcode-block" id="ALU_Dataset"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset">[docs]</a><span class="k">class</span> <span class="nc">ALU_Dataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Generate training data for all ALU operations</span>
 
 <span class="sd">    The ALU takes two integers and applies one of the supported</span>
 <span class="sd">    model_ops. E.g. `op1=123, op2=100, op=&#39;-&#39; -&gt; result 23`</span>
 
 <span class="sd">    The net is supposed to learn to &#39;calculate&#39; the results for</span>
-<span class="sd">    arbitrary op1, op2 (positive integers, `0..2**bit_count - 1`) and </span>
-<span class="sd">    the twelve supported ops: </span>
+<span class="sd">    arbitrary op1, op2 (positive integers, `0..2**bit_count - 1`) and</span>
+<span class="sd">    the twelve supported ops:</span>
 <span class="sd">    `[&quot;+&quot;, &quot;-&quot;, &quot;*&quot;, &quot;/&quot;, &quot;%&quot;, &quot;AND&quot;, &quot;OR&quot;, &quot;XOR&quot;, &quot;&gt;&quot;, &quot;&lt;&quot;, &quot;=&quot;, &quot;!=&quot;]`</span>
 
 <span class="sd">    :param bit_count: number of bits for each of the two operands, default 31 (mult uses 15 bits)</span>
 <span class="sd">    :param pre_weight: if True, the model_dis will be reweighted to generate samples for &#39;difficult&#39; ops</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit_count</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">pre_weight</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;Datasets&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span>
-                          <span class="s2">&quot;AND&quot;</span><span class="p">,</span> <span class="s2">&quot;OR&quot;</span><span class="p">,</span> <span class="s2">&quot;XOR&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="s2">&quot;!=&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_is_boolean</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span>
-                                 <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;+&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;%&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;AND&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OR&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;XOR&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;=&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;!=&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_is_boolean</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+        <span class="p">]</span>
         <span class="c1"># Probabilites for creating a sample for each of the ops, (Will be</span>
         <span class="c1"># reweighted on checks to generate for samples for &#39;difficult&#39; ops):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>   <span class="mi">10</span><span class="p">,</span>  <span class="mi">10</span><span class="p">,</span>   <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
         <span class="n">model_dis_w</span> <span class="o">=</span> <span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_add_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_diff_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mult_smpl</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_div_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mod_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_and_smpl</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_bor_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xor_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_greater_smpl</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_lesser_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_smpl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_neq_smpl</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_funcs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_diff_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mult_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_div_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mod_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_and_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bor_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xor_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_greater_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lesser_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eq_smpl</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_neq_smpl</span><span class="p">,</span>
+        <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">=</span> <span class="n">bit_count</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">op_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="o">+</span><span class="mi">1</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_count</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_count</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_count</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pre_weight</span> <span class="o">=</span> <span class="n">pre_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_bits_one</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_bits_one</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="mi">32</span>
         <span class="k">if</span> <span class="n">pre_weight</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="o">=</span><span class="n">model_dis_w</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span> <span class="o">=</span> <span class="n">model_dis_w</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_int_to_binary_vect</span><span class="p">(</span><span class="n">num_int</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; get a binary encoded vector of n of bit-lenght nm </span>
+        <span class="sd">&quot;&quot;&quot;get a binary encoded vector of n of bit-lenght nm</span>
 
 <span class="sd">        :param num_int: integer to encoded</span>
 <span class="sd">        :param num_bits: number of bits to use for positional_encoding</span>
@@ -109,7 +145,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_int_to_onehot_vect</span><span class="p">(</span><span class="n">num_int</span><span class="p">,</span> <span class="n">num_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; get a one-hot encoded vector of n of bit-lenght nm </span>
+        <span class="sd">&quot;&quot;&quot;get a one-hot encoded vector of n of bit-lenght nm</span>
 
 <span class="sd">        :param num_int: integer to encoded</span>
 <span class="sd">        :param num_bits: number of bits to use for positional_encoding</span>
@@ -121,15 +157,15 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_random_bits</span><span class="p">(</span><span class="n">bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; get bits random int 0...2**bits-1 </span>
+        <span class="sd">&quot;&quot;&quot;get bits random int 0...2**bits-1</span>
 
 <span class="sd">        :param bits: number of bits to uses</span>
 <span class="sd">        :return: random int `0...2**bits-1`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">bits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">bits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ALU_Dataset.op_string_to_index"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.op_string_to_index">[docs]</a>    <span class="k">def</span> <span class="nf">op_string_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_string</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; transform op_string (e.g. &#39;+&#39; -&gt; 0) into corresponding index </span>
+        <span class="sd">&quot;&quot;&quot;transform op_string (e.g. &#39;+&#39; -&gt; 0) into corresponding index</span>
 
 <span class="sd">        :param op_string: string of op to transform</span>
 <span class="sd">        :return: index of op_string</span>
@@ -139,8 +175,14 @@
                 <span class="k">return</span> <span class="n">i</span>
         <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
 
-<div class="viewcode-block" id="ALU_Dataset.get_data_point"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.get_data_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a random example for on ALU operation for training </span>
+<div class="viewcode-block" id="ALU_Dataset.get_data_point"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.get_data_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_point</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a random example for on ALU operation for training</span>
 
 <span class="sd">        :param equal_distrib: if False, more &#39;difficult&#39; ops will be generated more often.</span>
 <span class="sd">        :param valid_ops: if not None, only the ops in valid_ops will be used</span>
@@ -151,28 +193,32 @@
         <span class="c1"># result = -1</span>
         <span class="n">op1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">)</span>
         <span class="n">op2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-            <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">valid_ops</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">equal_distrib</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Op restriction via valid_ops forces equal_distrib=True&quot;</span><span class="p">)</span>
-                <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Op restriction via valid_ops forces equal_distrib=True&quot;</span>
+                <span class="p">)</span>
+                <span class="n">equal_distrib</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">valid_ops</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cannot restrict valid_ops to </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s1">, unknown operation, ignoring all valid_ops&#39;</span><span class="p">)</span>
-                    <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Cannot restrict valid_ops to </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2">, unknown operation, ignoring all valid_ops&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">valid_ops</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="k">break</span>
 
         <span class="k">if</span> <span class="n">equal_distrib</span> <span class="ow">or</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>   
-                <span class="n">op_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">op_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="n">op_index</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">op_index</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">op_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">op_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">[</span><span class="n">op_index</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># make &#39;difficult&#39; ops more present in training samples:</span>
+                    <span class="n">op_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">op_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">valid_ops</span><span class="p">[</span><span class="n">op_index</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># make &#39;difficult&#39; ops more present in training samples:</span>
             <span class="n">rx</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">md</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="p">:</span>
                 <span class="n">rx</span> <span class="o">+=</span> <span class="n">md</span>
@@ -183,81 +229,91 @@
                 <span class="n">rx</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="p">[</span><span class="n">op_index</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">rx</span> <span class="o">&gt;</span> <span class="n">rrx</span><span class="p">:</span>
                     <span class="k">break</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_op</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_index</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_op</span><span class="p">(</span>
+            <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_index</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="n">positional_encoding</span>
+        <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_generatorenerator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_training_data</span><span class="p">(</span><span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span> <span class="n">equal_distrib</span><span class="o">=</span><span class="n">equal_distrib</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_training_data</span><span class="p">(</span>
+                <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span>
+                <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
+                <span class="n">equal_distrib</span><span class="o">=</span><span class="n">equal_distrib</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">yield</span> <span class="n">x</span><span class="p">,</span> <span class="n">Y</span>
 
     <span class="k">def</span> <span class="nf">_encode_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_index</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; turn two ints and operation into training data &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;turn two ints and operation into training data&quot;&quot;&quot;</span>
         <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_funcs</span><span class="p">[</span><span class="n">op_index</span><span class="p">](</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_is_boolean</span><span class="p">[</span><span class="n">op_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">result</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span><span class="p">:</span>
 
-                <span class="n">str_result</span><span class="o">=</span><span class="s2">&quot;True&quot;</span>
+                <span class="n">str_result</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">str_result</span><span class="o">=</span><span class="s2">&quot;undefined&quot;</span>
+                <span class="n">str_result</span> <span class="o">=</span> <span class="s2">&quot;undefined&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">str_result</span><span class="o">=</span><span class="n">result</span>
+            <span class="n">str_result</span> <span class="o">=</span> <span class="n">result</span>
         <span class="n">sym</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">op1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">[</span><span class="n">op_index</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">op2</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">str_result</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">positional_suffix</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">sz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span><span class="o">+</span><span class="mi">3</span>
+                <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">+</span> <span class="mi">3</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">sz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span>
-            <span class="n">v1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
-            <span class="n">v2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_int_to_onehot_vect</span><span class="p">(</span><span class="n">op_index</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
-            <span class="n">v3</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
+                <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_onehot_vect</span><span class="p">(</span><span class="n">op_index</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
+            <span class="n">v3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">positional_suffix</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">v1</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
                 <span class="n">v2</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
                 <span class="n">v3</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">,</span><span class="n">v3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">v3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
-                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_onehot_vect</span><span class="p">(</span><span class="n">op_index</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_onehot_vect</span><span class="p">(</span><span class="n">op_index</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
 
         <span class="n">oup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_int_to_binary_vect</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inp</span><span class="p">,</span> <span class="n">oup</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">op_index</span><span class="p">,</span> <span class="n">sym</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_add_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; addition training example &quot;&quot;&quot;</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span><span class="o">+</span><span class="n">op2</span>
+        <span class="sd">&quot;&quot;&quot;addition training example&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">+</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_diff_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; subtraction training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;subtraction training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op2</span> <span class="o">&gt;</span> <span class="n">op1</span><span class="p">:</span>
             <span class="n">op2</span><span class="p">,</span> <span class="n">op1</span> <span class="o">=</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span><span class="o">-</span><span class="n">op2</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">-</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_mult_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; multiplication training example &quot;&quot;&quot;</span>
-        <span class="n">modul</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="sd">&quot;&quot;&quot;multiplication training example&quot;&quot;&quot;</span>
+        <span class="n">modul</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">op1</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">%</span> <span class="n">modul</span>
         <span class="n">op2</span> <span class="o">=</span> <span class="n">op2</span> <span class="o">%</span> <span class="n">modul</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span><span class="o">*</span><span class="n">op2</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">*</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_div_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; integer division training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;integer division training example&quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="n">op2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&lt;</span> <span class="n">op2</span> <span class="ow">and</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">op1</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span> <span class="o">=</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op1</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span><span class="o">//</span><span class="n">op2</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">//</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_mod_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; modulo (remainder) training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;modulo (remainder) training example&quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="n">op2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&lt;</span> <span class="n">op2</span> <span class="ow">and</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -268,24 +324,24 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_and_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; bitwise AND training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;bitwise AND training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">&amp;</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_bor_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; bitwise OR training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;bitwise OR training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">|</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_xor_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; bitwise XOR training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;bitwise XOR training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">^</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_greater_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; integer comparisation &gt; training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;integer comparisation &gt; training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&gt;</span> <span class="n">op2</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span>
         <span class="k">else</span><span class="p">:</span>
@@ -293,7 +349,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_lesser_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; integer comparisation &lt; training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;integer comparisation &lt; training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&lt;</span> <span class="n">op2</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span>
         <span class="k">else</span><span class="p">:</span>
@@ -301,7 +357,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_eq_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; integer comparisation == training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;integer comparisation == training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># create more cases</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="n">op1</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">==</span> <span class="n">op2</span><span class="p">:</span>
@@ -311,7 +367,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_neq_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; integer comparisation != training example &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;integer comparisation != training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># create more cases</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="n">op1</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">!=</span> <span class="n">op2</span><span class="p">:</span>
@@ -320,16 +376,25 @@
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
-<div class="viewcode-block" id="ALU_Dataset.create_data_point"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_data_point">[docs]</a>    <span class="k">def</span> <span class="nf">create_data_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_string</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; create training data from given ints op1, op2 and op_string &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ALU_Dataset.create_data_point"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_data_point">[docs]</a>    <span class="k">def</span> <span class="nf">create_data_point</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_string</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;create training data from given ints op1, op2 and op_string&quot;&quot;&quot;</span>
         <span class="n">op_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_string_to_index</span><span class="p">(</span><span class="n">op_string</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid operation </span><span class="si">{</span><span class="n">op_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_op</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_index</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ALU_Dataset.create_training_data"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_training_data">[docs]</a>    <span class="k">def</span> <span class="nf">create_training_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; create a number of training samples &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ALU_Dataset.create_training_data"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_training_data">[docs]</a>    <span class="k">def</span> <span class="nf">create_training_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;create a number of training samples&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">()</span>
         <span class="n">dpx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="n">dpy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
@@ -341,32 +406,41 @@
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="nb">print</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">(</span><span class="n">equal_distrib</span><span class="o">=</span><span class="n">equal_distrib</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">(</span>
-                    <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">)</span>
+                    <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span>
+                <span class="p">)</span>
             <span class="n">dpx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">x</span>
             <span class="n">dpy</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">y</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">dpx</span><span class="p">,</span> <span class="n">dpy</span></div>
 
-<div class="viewcode-block" id="ALU_Dataset.create_vector_training_data"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_vector_training_data">[docs]</a>    <span class="k">def</span> <span class="nf">create_vector_training_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; create a number of training samples &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ALU_Dataset.create_vector_training_data"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_vector_training_data">[docs]</a>    <span class="k">def</span> <span class="nf">create_vector_training_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+        <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;create a number of training samples&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">positional_encoding</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">sz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span><span class="o">+</span><span class="mi">3</span>
+            <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">+</span> <span class="mi">3</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span>
+            <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span>
         <span class="n">dpx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">sz</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="n">dpy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -377,120 +451,218 @@
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="nb">print</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">(</span><span class="n">equal_distrib</span><span class="o">=</span><span class="n">equal_distrib</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">)</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">(</span>
+                    <span class="n">equal_distrib</span><span class="o">=</span><span class="n">equal_distrib</span><span class="p">,</span>
+                    <span class="n">vector</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">(</span>
-                    <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">)</span>
+                    <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
+                    <span class="n">vector</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="n">dpx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">x</span>
             <span class="n">dpy</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">y</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">dpx</span><span class="p">,</span> <span class="n">dpy</span></div>
 
-    <span class="k">if</span> <span class="s1">&#39;tensorflow&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_tpu</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;tensorflow&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+            <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">for_tpu</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">):</span>
             <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-            <span class="n">is_loaded</span><span class="o">=</span><span class="kc">False</span>
+
+            <span class="n">is_loaded</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">cache_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;can&#39;t use cache if no cache_path is given, disabling cache!&quot;</span><span class="p">)</span>
                 <span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">infix</span><span class="o">=</span><span class="s1">&#39;_&#39;</span>
+                    <span class="n">infix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span>
                     <span class="k">for</span> <span class="n">vo</span> <span class="ow">in</span> <span class="n">valid_ops</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="c1"># Prevent poison-filenames</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s2">&quot;MULT&quot;</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;/&#39;</span><span class="p">:</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s2">&quot;DIV&quot;</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;%&#39;</span><span class="p">:</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s1">&#39;MOD&#39;</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s1">&#39;LT&#39;</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s1">&#39;GT&#39;</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;=&#39;</span><span class="p">:</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s1">&#39;EQ&#39;</span>
-                        <span class="k">if</span> <span class="n">vo</span><span class="o">==</span><span class="s1">&#39;!=&#39;</span><span class="p">:</span>
-                            <span class="n">vo</span><span class="o">=</span><span class="s1">&#39;NE&#39;</span>
-                        <span class="n">infix</span><span class="o">+=</span><span class="n">vo</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span><span class="p">:</span>  <span class="c1"># Prevent poison-filenames</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;MULT&quot;</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;DIV&quot;</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;%&quot;</span><span class="p">:</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;MOD&quot;</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;LT&quot;</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;GT&quot;</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;=&quot;</span><span class="p">:</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;EQ&quot;</span>
+                        <span class="k">if</span> <span class="n">vo</span> <span class="o">==</span> <span class="s2">&quot;!=&quot;</span><span class="p">:</span>
+                            <span class="n">vo</span> <span class="o">=</span> <span class="s2">&quot;NE&quot;</span>
+                        <span class="n">infix</span> <span class="o">+=</span> <span class="n">vo</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">infix</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+                    <span class="n">infix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                 <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">infix</span><span class="o">+=</span><span class="s2">&quot;_VECT&quot;</span>
+                    <span class="n">infix</span> <span class="o">+=</span> <span class="s2">&quot;_VECT&quot;</span>
                 <span class="k">if</span> <span class="n">positional_encoding</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">infix</span><span class="o">+=</span><span class="s2">&quot;_PE&quot;</span>
-                <span class="n">cache_file_x</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">infix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">_x.npy&quot;</span><span class="p">)</span>
-                <span class="n">cache_file_Y</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cache_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">infix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">_Y.npy&quot;</span><span class="p">)</span>
+                    <span class="n">infix</span> <span class="o">+=</span> <span class="s2">&quot;_PE&quot;</span>
+                <span class="n">cache_file_x</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">cache_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">infix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">_x.npy&quot;</span>
+                <span class="p">)</span>
+                <span class="n">cache_file_Y</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">cache_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">infix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">_Y.npy&quot;</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">cache_file_x</span><span class="o">=</span><span class="kc">None</span>
-                <span class="n">cache_file_Y</span><span class="o">=</span><span class="kc">None</span>
-            <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">is</span> <span class="kc">True</span>  <span class="ow">and</span> <span class="n">regenerate_cached_data</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file_x</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file_Y</span><span class="p">):</span>
+                <span class="n">cache_file_x</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">cache_file_Y</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">use_cache</span> <span class="ow">is</span> <span class="kc">True</span>
+                <span class="ow">and</span> <span class="n">regenerate_cached_data</span> <span class="ow">is</span> <span class="kc">False</span>
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file_x</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_file_Y</span><span class="p">)</span>
+            <span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cache_file_x</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cache_file_Y</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">==</span><span class="n">samples</span><span class="p">:</span>
-                        <span class="n">is_loaded</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">samples</span><span class="p">:</span>
+                        <span class="n">is_loaded</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> loaded from cache&quot;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample count has changed from </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">, regenerating </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> data...&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Sample count has changed from </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">, regenerating </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> data...&quot;</span>
+                        <span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Something went wrong when loading </span><span class="si">{</span><span class="n">cache_file_x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">cache_file_Y</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Something went wrong when loading </span><span class="si">{</span><span class="n">cache_file_x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">cache_file_Y</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
             <span class="k">if</span> <span class="n">is_loaded</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">vector</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">x</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_vector_training_data</span><span class="p">(</span>
-                        <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">)</span>
+                        <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span>
+                        <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">x</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_training_data</span><span class="p">(</span><span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_training_data</span><span class="p">(</span>
+                        <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">name</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing data-cache </span><span class="si">{</span><span class="n">cache_file_x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">cache_file_Y</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Writing data-cache </span><span class="si">{</span><span class="n">cache_file_x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">cache_file_Y</span><span class="si">}</span><span class="s2">...&quot;</span>
+                    <span class="p">)</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">cache_file_x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">cache_file_Y</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;x, Y, done.&quot;</span><span class="p">)</span>
-            <span class="n">shuffle_buffer</span><span class="o">=</span><span class="mi">10000</span>
-            <span class="n">dataset</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">Y</span><span class="p">))</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span>
+            <span class="n">shuffle_buffer</span> <span class="o">=</span> <span class="mi">10000</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">Y</span><span class="p">))</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">is_training</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffle_buffer</span><span class="p">,</span> <span class="n">reshuffle_each_iteration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffle_buffer</span><span class="p">,</span> <span class="n">reshuffle_each_iteration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">for_tpu</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">repeat</span><span class="p">()</span> <span class="c1"># Mandatory for Keras TPU for now</span>
-            <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">drop_remainder</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># drop_remainder is important on TPU, batch size must be fixed</span>
-            <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">prefetch</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># fetch next batches while training on the current one (-1: autotune prefetch buffer size)</span>
+                    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">repeat</span><span class="p">()</span>  <span class="c1"># Mandatory for Keras TPU for now</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="p">,</span> <span class="n">drop_remainder</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>  <span class="c1"># drop_remainder is important on TPU, batch size must be fixed</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">prefetch</span><span class="p">(</span>
+                <span class="o">-</span><span class="mi">1</span>
+            <span class="p">)</span>  <span class="c1"># fetch next batches while training on the current one (-1: autotune prefetch buffer size)</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
         <span class="k">def</span> <span class="nf">create_dataset_from_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-            <span class="n">dataset</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_generator</span><span class="p">(</span>
+
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_generator</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="p">,</span>
                 <span class="n">output_signature</span><span class="o">=</span><span class="p">(</span>
-                        <span class="n">tf</span><span class="o">.</span><span class="n">TensorSpec</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                        <span class="n">tf</span><span class="o">.</span><span class="n">TensorSpec</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
-                <span class="p">)</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">TensorSpec</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">TensorSpec</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="n">dataset</span>
 
-        <span class="k">def</span> <span class="nf">get_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_tpu</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-            <span class="n">train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
-                                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span><span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="n">regenerate_cached_data</span><span class="p">,</span> <span class="n">for_tpu</span><span class="o">=</span><span class="n">for_tpu</span><span class="p">)</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">samples</span><span class="o">=</span><span class="n">validation_samples</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
-                                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;validation&quot;</span><span class="p">,</span><span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="n">regenerate_cached_data</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">get_datasets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">pre_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">samples</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+            <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">for_tpu</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+                <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span>
+                <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span>
+                <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+                <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span><span class="p">,</span>
+                <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+                <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="n">regenerate_cached_data</span><span class="p">,</span>
+                <span class="n">for_tpu</span><span class="o">=</span><span class="n">for_tpu</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+                <span class="n">samples</span><span class="o">=</span><span class="n">validation_samples</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span>
+                <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span>
+                <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;validation&quot;</span><span class="p">,</span>
+                <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span><span class="p">,</span>
+                <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+                <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="n">regenerate_cached_data</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="n">train</span><span class="p">,</span> <span class="n">val</span>
+
     <span class="k">else</span><span class="p">:</span>
-<div class="viewcode-block" id="ALU_Dataset.get_datasets"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.get_datasets">[docs]</a>        <span class="k">def</span> <span class="nf">get_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ALU_Dataset.get_datasets"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.get_datasets">[docs]</a>        <span class="k">def</span> <span class="nf">get_datasets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">pre_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">samples</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+            <span class="n">validation_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+            <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">regenerate_cached_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No tensorflow, no datasets!&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ALU_Dataset.decode_results"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.decode_results">[docs]</a>    <span class="k">def</span> <span class="nf">decode_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result_int_vects</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; take an array of 32-float results from neural net and convert to ints &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;take an array of 32-float results from neural net and convert to ints&quot;&quot;&quot;</span>
         <span class="n">result_vect_ints</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">vect</span> <span class="ow">in</span> <span class="n">result_int_vects</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vect</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vect</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring unexpected vector of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vect</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">int_result</span> <span class="o">=</span> <span class="mi">0</span>
@@ -500,15 +672,27 @@
                 <span class="n">result_vect_ints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">int_result</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result_vect_ints</span></div>
 
-<div class="viewcode-block" id="ALU_Dataset.check_results"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.check_results">[docs]</a>    <span class="k">def</span> <span class="nf">check_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Run a number of tests on trained model &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ALU_Dataset.check_results"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.check_results">[docs]</a>    <span class="k">def</span> <span class="nf">check_results</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run a number of tests on trained model&quot;&quot;&quot;</span>
         <span class="n">ok</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">err</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">operr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
-        <span class="n">opok</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
+        <span class="n">operr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
+        <span class="n">opok</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">(</span>
-                <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span> <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span> <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">)</span>
+                <span class="n">equal_distrib</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span>
+                <span class="n">positional_encoding</span><span class="o">=</span><span class="n">positional_encoding</span><span class="p">,</span>
+                <span class="n">valid_ops</span><span class="o">=</span><span class="n">valid_ops</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode_results</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">])))</span>
             <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">z</span><span class="p">:</span>
                 <span class="n">ok</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -520,43 +704,41 @@
                 <span class="n">r</span> <span class="o">=</span> <span class="s2">&quot;Error&quot;</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_is_boolean</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span><span class="p">:</span>
-                        <span class="n">str_result</span><span class="o">=</span><span class="s2">&quot;False&quot;</span>
-                    <span class="k">elif</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span><span class="p">:</span>
-                        <span class="n">str_result</span><span class="o">=</span><span class="s2">&quot;True&quot;</span>
+                    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span><span class="p">:</span>
+                        <span class="n">str_result</span> <span class="o">=</span> <span class="s2">&quot;False&quot;</span>
+                    <span class="k">elif</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span><span class="p">:</span>
+                        <span class="n">str_result</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">str_result</span><span class="o">=</span><span class="s2">&quot;undefined&quot;</span>
+                        <span class="n">str_result</span> <span class="o">=</span> <span class="s2">&quot;undefined&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">str_result</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">z</span><span class="p">:</span>
+                    <span class="n">str_result</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">z</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> == </span><span class="si">{</span><span class="n">str_result</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="n">str_result</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_is_boolean</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                         <span class="nb">print</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
                         <span class="nb">print</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
-        <span class="n">opsum</span> <span class="o">=</span> <span class="n">ok</span><span class="o">+</span><span class="n">err</span>
+        <span class="n">opsum</span> <span class="o">=</span> <span class="n">ok</span> <span class="o">+</span> <span class="n">err</span>
         <span class="k">if</span> <span class="n">opsum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">opsum</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ok: </span><span class="si">{</span><span class="n">ok</span><span class="si">}</span><span class="s2">, Error: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">ok</span><span class="o">/</span><span class="n">opsum</span><span class="o">*</span><span class="mf">100.0</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)):</span>
-            <span class="n">opsumi</span> <span class="o">=</span> <span class="n">opok</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">operr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">opsumi</span> <span class="o">=</span> <span class="n">opok</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">operr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">opsumi</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="c1"># modify the distribution of training-data generated to favour</span>
             <span class="c1"># ops with bad test results, so that more training data is</span>
             <span class="c1"># generated on difficult cases:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">operr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">opsumi</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">10</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;OP</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">: Ok: </span><span class="si">{</span><span class="n">opok</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, Error: </span><span class="si">{</span><span class="n">operr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">operr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">opsumi</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OP</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">: Ok: </span><span class="si">{</span><span class="n">opok</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, Error: </span><span class="si">{</span><span class="n">operr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; -&gt; </span><span class="si">{</span><span class="n">opok</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">opsumi</span><span class="o">*</span><span class="mf">100.0</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">valid_ops</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">valid_ops</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Change probability for ops in new training data:&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ops:     </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Weights: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_dis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ok</span><span class="o">/</span><span class="n">opsum</span></div></div>
-
+        <span class="k">return</span> <span class="n">ok</span> <span class="o">/</span> <span class="n">opsum</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -574,7 +756,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -588,14 +770,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.0.33 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">ALU_Dataset</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+        &#169; Copyright 2022, dsc.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

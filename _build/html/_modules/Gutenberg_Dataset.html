@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -51,15 +52,16 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 
-<div class="viewcode-block" id="Gutenberg_Dataset"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset">[docs]</a><span class="k">class</span> <span class="nc">Gutenberg_Dataset</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; A fuzzy, lightweight class to access, search and filter Project Gutenberg resources</span>
-<span class="sd">    </span>
+
+<div class="viewcode-block" id="Gutenberg_Dataset"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset">[docs]</a><span class="k">class</span> <span class="nc">Gutenberg_Dataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A fuzzy, lightweight class to access, search and filter Project Gutenberg resources</span>
+
 <span class="sd">    GutenbergLib by default uses a mirror&#39;s root URL. Alternatively, you can specify a local directory containing a Gutenberg mirror.</span>
-<span class="sd">    That mirror directory needs to contain a GUTINDEX.ALL file and has typically many </span>
+<span class="sd">    That mirror directory needs to contain a GUTINDEX.ALL file and has typically many</span>
 <span class="sd">    sub-directories `0` ,.. `n` .</span>
 
 <span class="sd">    A mirror of project Gutenberg can be created by:</span>
-<span class="sd">    </span>
+
 <span class="sd">    .. code-block:: console</span>
 
 <span class="sd">        #!/bin/bash</span>
@@ -68,291 +70,362 @@
 <span class="sd">    You can remove the PDF files, since they are currently not used, and need to review the `--dry-run` option.</span>
 
 <span class="sd">    Note: :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_index` needs to be called before any other methods.</span>
-<span class="sd">    </span>
+
 <span class="sd">    :param root_url: url of Project Gutenberg or any mirror URL, or a local directory containing a Gutenberg mirror.</span>
-<span class="sd">    :param cache_dir: path to a directory that will be used to cache the Gutenberg index and already downloaded texts. The cache directory is only used, if a remote Gutenberg URL and not a local mirror is used.</span>
+<span class="sd">    :param cache_dir: path to a directory that will be used to cache the Gutenberg index and already downloaded texts.</span>
+<span class="sd">    The cache directory is only used, if a remote Gutenberg URL and not a local mirror is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_url</span><span class="o">=</span><span class="s2">&quot;https://www.gutenberg.org/dirs&quot;</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="s2">&quot;gutenberg&quot;</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">root_url</span><span class="o">=</span><span class="s2">&quot;https://www.gutenberg.org/dirs&quot;</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="s2">&quot;gutenberg&quot;</span>
+    <span class="p">):</span>
         <span class="c1"># old root, vanished: http://www.mirrorservice.org/sites/ftp.ibiblio.org/pub/docs/books/gutenberg</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;GutenbergLib&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;GutenbergLib&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">=</span> <span class="n">root_url</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span><span class="o">=</span><span class="mi">2048</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start_tokens</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*** START OF THIS PROJECT&quot;</span><span class="p">,</span> <span class="s2">&quot;E-text prepared by&quot;</span><span class="p">,</span> 
-                           <span class="s2">&quot;This book was generously provided by the &quot;</span><span class="p">,</span> <span class="s2">&quot;*** START OF THIS PROJECT GUTENBERG&quot;</span><span class="p">,</span>
-                           <span class="s2">&quot;START OF THE PROJECT GUTENBERG&quot;</span><span class="p">]</span>    
-        <span class="bp">self</span><span class="o">.</span><span class="n">near_start_tokens</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;produced by &quot;</span><span class="p">,</span> <span class="s2">&quot;Produced by &quot;</span><span class="p">,</span> <span class="s2">&quot;, prepared by&quot;</span><span class="p">,</span> <span class="s2">&quot;Transcriber&#39;s Note&quot;</span><span class="p">,</span> 
-                                <span class="s2">&quot;Transcriber&#39;s note:&quot;</span><span class="p">,</span> <span class="s2">&quot;Anmerkungen zur Tanskription&quot;</span><span class="p">,</span> 
-                                <span class="s2">&quot;Distributed Proofreading Team&quot;</span><span class="p">,</span> <span class="s2">&quot;offensichtliche Schreibfehler&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;Inkonsistenzen in der Rechtschreibung&quot;</span><span class="p">,</span> <span class="s2">&quot;Im Original&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;Obvious printer errors&quot;</span><span class="p">,</span> <span class="s2">&quot;spelling was kept&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;ERRATA have been applied&quot;</span><span class="p">,</span> <span class="s2">&quot;punctuation errors&quot;</span><span class="p">,</span> <span class="s2">&quot;have been silently corrected&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;changes to the text&quot;</span><span class="p">,</span> <span class="s2">&quot;Transcriber note&quot;</span><span class="p">,</span> <span class="s2">&quot;Transcriber Note&quot;</span><span class="p">,</span><span class="s2">&quot;_italic_&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;Variable spelling&quot;</span><span class="p">]</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">end_tokens</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;End of the Project Gutenberg&quot;</span><span class="p">,</span> <span class="s2">&quot;*** END OF THIS PROJECT&quot;</span><span class="p">,</span> 
-                         <span class="s2">&quot;***END OF THE PROJECT GUTENBER&quot;</span><span class="p">,</span> <span class="s2">&quot;Ende dieses Projekt Gutenberg&quot;</span><span class="p">,</span> 
-                         <span class="s2">&quot;*** END OF THE PROJECT GUTENBERG&quot;</span><span class="p">,</span>
-                         <span class="s2">&quot;End of Project Gutenberg&quot;</span><span class="p">,</span> <span class="s2">&quot;Transcriber&#39;s Note&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span><span class="o">=</span><span class="kc">False</span>
-        <span class="k">if</span> <span class="n">root_url</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;http&#39;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span> <span class="o">=</span> <span class="mi">2048</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_tokens</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;*** START OF THIS PROJECT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;E-text prepared by&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;This book was generously provided by the &quot;</span><span class="p">,</span>
+            <span class="s2">&quot;*** START OF THIS PROJECT GUTENBERG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;START OF THE PROJECT GUTENBERG&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">near_start_tokens</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;produced by &quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Produced by &quot;</span><span class="p">,</span>
+            <span class="s2">&quot;, prepared by&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Transcriber&#39;s Note&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Transcriber&#39;s note:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Anmerkungen zur Tanskription&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Distributed Proofreading Team&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;offensichtliche Schreibfehler&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Inkonsistenzen in der Rechtschreibung&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Im Original&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Obvious printer errors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;spelling was kept&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ERRATA have been applied&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;punctuation errors&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;have been silently corrected&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;changes to the text&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Transcriber note&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Transcriber Note&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;_italic_&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Variable spelling&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_tokens</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;End of the Project Gutenberg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;*** END OF THIS PROJECT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;***END OF THE PROJECT GUTENBER&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Ende dieses Projekt Gutenberg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;*** END OF THE PROJECT GUTENBERG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;End of Project Gutenberg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Transcriber&#39;s Note&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">root_url</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">root_url</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;If root_url points to non-http URL, it must be an existing local directory containing a Gutenberg mirror: </span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;If root_url points to non-http URL, it must be an existing local directory containing a Gutenberg mirror: </span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">index_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_url</span><span class="p">,</span> <span class="s2">&quot;GUTINDEX.ALL&quot;</span><span class="p">)</span>
+                <span class="n">index_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_url</span><span class="p">,</span> <span class="s2">&quot;GUTINDEX.ALL&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">index_path</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GUTINDEX.ALL not found in </span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s1">, this is not a valid Gutenberg mirror&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;GUTINDEX.ALL not found in </span><span class="si">{</span><span class="n">root_url</span><span class="si">}</span><span class="s2">, this is not a valid Gutenberg mirror&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span><span class="o">=</span><span class="kc">True</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">):</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">cache_dir</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="o">=</span><span class="n">cache_dir</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="o">=</span><span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create cache directory </span><span class="si">{</span><span class="n">cache_dir</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_parse_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; internal function to recreate some consistent record information from near-freestyle text &quot;&quot;&quot;</span>
-        <span class="n">rl</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">white</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">160</span><span class="p">))</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot; &quot;</span> <span class="c1"># non-breaking space, TAB, and space</span>
-        <span class="n">ebook_no</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
-            <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
-            <span class="n">ebook_no</span><span class="o">=</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">ebook_no</span>
-            <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
-            <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        
+        <span class="sd">&quot;&quot;&quot;internal function to recreate some consistent record information from near-freestyle text&quot;&quot;&quot;</span>
+        <span class="n">rl</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">white</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">160</span><span class="p">))</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>  <span class="c1"># non-breaking space, TAB, and space</span>
+        <span class="n">ebook_no</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
+            <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
+            <span class="n">ebook_no</span> <span class="o">=</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ebook_no</span>
+            <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
+            <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="c1"># Sanity check</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">fa</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">ebook_no</span><span class="p">,</span><span class="s2">&quot;\A[0-9]+[A-C]\Z&quot;</span><span class="p">)</span>
+            <span class="n">fa</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">ebook_no</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\A[0-9]+[A-C]\Z&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">fa</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">fa</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to apply regex on &gt;</span><span class="si">{</span><span class="n">ebook_no</span><span class="si">}</span><span class="s2">&lt;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">&lt;</span><span class="mi">5</span> <span class="ow">or</span> <span class="n">fa</span><span class="o">==</span><span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ebook_no</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">7</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;-------------------------------------&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;- - - - - - - - - - - - - - - - - - -&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dodgy record: </span><span class="si">{</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    ebook-id:  &gt;</span><span class="si">{</span><span class="n">ebook_no</span><span class="si">}</span><span class="s2">&lt;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">fa</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ebook_no</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-------------------------------------&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- - - - - - - - - - - - - - - - - - -&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dodgy record: </span><span class="si">{</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    ebook-id:  &gt;</span><span class="si">{</span><span class="n">ebook_no</span><span class="si">}</span><span class="s2">&lt;&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
-        
+
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">)):</span>
-            <span class="n">rl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">rl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            
-        <span class="n">p</span><span class="o">=</span><span class="mi">0</span>
-        <span class="k">while</span> <span class="n">p</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid rec: </span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">p</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">rl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">rl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rl</span><span class="p">[</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid rec: </span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s2">&quot;[&quot;</span><span class="p">:</span>
-                    <span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">+=</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">del</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;]&#39;</span><span class="p">:</span>
-                        <span class="n">p</span><span class="o">+=</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;[&quot;</span><span class="p">:</span>
+                    <span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="k">del</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">rl</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;]&quot;</span><span class="p">:</span>
+                        <span class="n">p</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">p</span><span class="o">+=</span><span class="mi">1</span>
-        <span class="n">rec</span><span class="o">=</span><span class="p">{}</span>
-        <span class="n">l0</span><span class="o">=</span><span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, by &quot;</span><span class="p">)</span>
-        <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">l0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ebook_no</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l0</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">l0</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">rec</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">l0</span> <span class="o">=</span> <span class="n">rl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;, by &quot;</span><span class="p">)</span>
+        <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">l0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;ebook_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ebook_no</span>
+        <span class="c1"># if len(l0)&gt;2:</span>
+        <span class="c1">#    print(f&quot;Chaos title: {rl[0]}&quot;)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">l0</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rl</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;[&#39;</span> <span class="ow">or</span> <span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="s1">&#39;]&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;[&#39;</span><span class="p">:</span>
-                    <span class="n">ind</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;[&quot;</span> <span class="ow">or</span> <span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;]&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;[&quot;</span><span class="p">:</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">ind</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                        <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">[:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="c1"># print(f&quot;Garbage trail {r}&quot;)</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:</span> <span class="n">ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="c1"># print(f&quot;Fixed: {r}&quot;)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">r</span><span class="o">+=</span><span class="s1">&#39;]&#39;</span>
-            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;[&#39;</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;]&#39;</span><span class="p">:</span>
-                <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">i1</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">i1</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Author a.k.a.&quot;</span><span class="p">,</span><span class="s2">&quot;Author a.k.a.:&quot;</span><span class="p">)</span>
-                    <span class="n">i1</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">i1</span><span class="o">!=-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="n">i2</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="n">i1</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">+</span><span class="n">i1</span>
+                        <span class="c1"># print(f&quot;Missing closing ] {r}&quot;)</span>
+                        <span class="n">r</span> <span class="o">+=</span> <span class="s2">&quot;]&quot;</span>
+                        <span class="c1"># print(f&quot;Fixed: {r}&quot;)</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;[&quot;</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;]&quot;</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">i1</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Author a.k.a.&quot;</span><span class="p">,</span> <span class="s2">&quot;Author a.k.a.:&quot;</span><span class="p">)</span>
+                    <span class="n">i1</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i1</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">i2</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">i1</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">i1</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">i2</span><span class="o">=-</span><span class="mi">1</span>
-                <span class="k">if</span> <span class="n">i1</span><span class="o">==-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">i2</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">i2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">i2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="k">pass</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">i2</span><span class="o">-</span><span class="n">i1</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
-                        <span class="n">key</span><span class="o">=</span><span class="n">r</span><span class="p">[:</span><span class="n">i1</span><span class="p">]</span>
-                        <span class="n">val</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="n">i2</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
-                        <span class="k">if</span> <span class="s1">&#39;[&#39;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;]&#39;</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;[&#39;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">or</span> <span class="s1">&#39;]&#39;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">15</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i2</span> <span class="o">-</span> <span class="n">i1</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:</span><span class="n">i1</span><span class="p">]</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">i2</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">key</span>
+                            <span class="ow">or</span> <span class="s2">&quot;]&quot;</span> <span class="ow">in</span> <span class="n">key</span>
+                            <span class="ow">or</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">val</span>
+                            <span class="ow">or</span> <span class="s2">&quot;]&quot;</span> <span class="ow">in</span> <span class="n">val</span>
+                            <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">15</span>
+                        <span class="p">):</span>
                             <span class="k">pass</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span><span class="o">=</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># print(f&quot;Invalid attribut in {rl}::{r}&quot;)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;language&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;language&quot;</span><span class="p">]</span><span class="o">=</span><span class="s2">&quot;English&quot;</span>
+                <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;language&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;English&quot;</span>
         <span class="k">return</span> <span class="n">rec</span>
-        
+
     <span class="k">def</span> <span class="nf">_parse_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; internal function to parse the fuzzy text-based Gutenberg table of content &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;internal function to parse the fuzzy text-based Gutenberg table of content&quot;&quot;&quot;</span>
+
         <span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-            <span class="n">NONE</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">SYNC_START</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-            <span class="n">SYNC_REC</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-            <span class="n">END</span><span class="o">=</span><span class="mi">5</span>
-    
-        <span class="n">white</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">160</span><span class="p">))</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot; &quot;</span> <span class="c1"># non-breaking space, TAB, and space</span>
-        <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">NONE</span>
-        <span class="n">start_token</span><span class="o">=</span><span class="s2">&quot;~ ~ ~ ~&quot;</span>
-        <span class="n">stop_token</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;=====&quot;</span><span class="p">]</span>
-        <span class="n">end_token</span><span class="o">=</span><span class="s2">&quot;&lt;==End&quot;</span>
-        <span class="n">ignore_headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TITLE and AUTHOR&quot;</span><span class="p">]</span>
-        <span class="n">ignore_content</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Not in the Posted Archives&quot;</span><span class="p">,</span><span class="s2">&quot;human-read audio ebooks&quot;</span><span class="p">,</span> <span class="s2">&quot;Audio:&quot;</span><span class="p">]</span>
-        <span class="n">empty_lines</span><span class="o">=</span><span class="mi">0</span>
-        <span class="n">records</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">NONE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
+            <span class="n">SYNC_START</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span>
+            <span class="n">SYNC_REC</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,)</span>
+            <span class="n">END</span> <span class="o">=</span> <span class="mi">5</span>
+
+        <span class="n">white</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">160</span><span class="p">))</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>  <span class="c1"># non-breaking space, TAB, and space</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">NONE</span>
+        <span class="n">start_token</span> <span class="o">=</span> <span class="s2">&quot;~ ~ ~ ~&quot;</span>
+        <span class="n">stop_token</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;=====&quot;</span><span class="p">]</span>
+        <span class="n">end_token</span> <span class="o">=</span> <span class="s2">&quot;&lt;==End&quot;</span>
+        <span class="n">ignore_headers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;TITLE and AUTHOR&quot;</span><span class="p">]</span>
+        <span class="n">ignore_content</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;Not in the Posted Archives&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;human-read audio ebooks&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Audio:&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">empty_lines</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">end_token</span><span class="p">)]</span><span class="o">==</span><span class="n">end_token</span><span class="p">:</span>
-                <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">END</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">end_token</span><span class="p">)]</span> <span class="o">==</span> <span class="n">end_token</span><span class="p">:</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">END</span>
                 <span class="k">break</span>
 
-            <span class="k">if</span> <span class="n">state</span><span class="o">==</span><span class="n">State</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">start_token</span><span class="p">)]</span><span class="o">==</span><span class="n">start_token</span><span class="p">:</span>
-                    <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">SYNC_START</span>
-                    <span class="n">empty_lines</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">State</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_token</span><span class="p">)]</span> <span class="o">==</span> <span class="n">start_token</span><span class="p">:</span>
+                    <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">SYNC_START</span>
+                    <span class="n">empty_lines</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">state</span><span class="o">==</span><span class="n">State</span><span class="o">.</span><span class="n">SYNC_START</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                    <span class="n">empty_lines</span><span class="o">+=</span><span class="mi">1</span>
-                    <span class="k">if</span> <span class="n">empty_lines</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
-                        <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">NONE</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">State</span><span class="o">.</span><span class="n">SYNC_START</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">empty_lines</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">empty_lines</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">NONE</span>
                         <span class="k">continue</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">stopped</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="n">stopped</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">for</span> <span class="n">stop</span> <span class="ow">in</span> <span class="n">stop_token</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">stop</span><span class="p">)]</span><span class="o">==</span><span class="n">stop</span><span class="p">:</span>
-                            <span class="n">stopped</span><span class="o">=</span><span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">stop</span><span class="p">)]</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+                            <span class="n">stopped</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="k">break</span>
                     <span class="k">if</span> <span class="n">stopped</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">NONE</span>
-                        <span class="n">empty_lines</span><span class="o">=</span><span class="mi">0</span>
+                        <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">NONE</span>
+                        <span class="n">empty_lines</span> <span class="o">=</span> <span class="mi">0</span>
                         <span class="k">continue</span>
-                    <span class="n">ignore</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="n">ignore</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">ignore_headers</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)]</span><span class="o">==</span><span class="n">header</span><span class="p">:</span>
-                            <span class="n">empty_lines</span><span class="o">=</span><span class="mi">0</span>
-                            <span class="n">ignore</span><span class="o">=</span><span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)]</span> <span class="o">==</span> <span class="n">header</span><span class="p">:</span>
+                            <span class="n">empty_lines</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="n">ignore</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">ignore_content</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                            <span class="n">empty_lines</span><span class="o">=</span><span class="mi">0</span>
-                            <span class="n">ignore</span><span class="o">=</span><span class="kc">True</span>
+                            <span class="n">empty_lines</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="n">ignore</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">if</span> <span class="n">ignore</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                         <span class="k">continue</span>
-                    <span class="n">rec</span><span class="o">=</span><span class="n">line</span>
-                    <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">SYNC_REC</span>
+                    <span class="n">rec</span> <span class="o">=</span> <span class="n">line</span>
+                    <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">SYNC_REC</span>
                     <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">state</span><span class="o">==</span><span class="n">State</span><span class="o">.</span><span class="n">SYNC_REC</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">==</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
-                    <span class="n">parsed_rec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_record</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="n">State</span><span class="o">.</span><span class="n">SYNC_REC</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">white</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">parsed_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_record</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">parsed_rec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_record</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
                     <span class="k">if</span> <span class="n">parsed_rec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parsed_rec</span><span class="p">)</span>
-                    <span class="n">empty_lines</span><span class="o">=</span><span class="mi">1</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                        <span class="n">state</span><span class="o">=</span><span class="n">State</span><span class="o">.</span><span class="n">SYNC_START</span>
+                    <span class="n">empty_lines</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">state</span> <span class="o">=</span> <span class="n">State</span><span class="o">.</span><span class="n">SYNC_START</span>
                         <span class="k">continue</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">rec</span><span class="o">=</span><span class="n">line</span>
+                        <span class="n">rec</span> <span class="o">=</span> <span class="n">line</span>
                         <span class="k">continue</span>
-                <span class="n">rec</span><span class="o">=</span><span class="n">rec</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">line</span>
+                <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">line</span>
         <span class="k">return</span> <span class="n">records</span>
-                    
+
 <div class="viewcode-block" id="Gutenberg_Dataset.load_index"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.load_index">[docs]</a>    <span class="k">def</span> <span class="nf">load_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache_expire_days</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; This function loads the Gutenberg record index, either from cache, or from a website</span>
-<span class="sd">        </span>
+        <span class="sd">&quot;&quot;&quot;This function loads the Gutenberg record index, either from cache, or from a website</span>
+
 <span class="sd">        This should be the first method being used, since many other methods rely on the index being loaded.</span>
 
-<span class="sd">        :param cache: default `True`, use the cache directory to cache both index and text files. Index expires after `cache_expire_days`, text files never expire. Should *NOT* be set to `False` in order to prevent unnecessary re-downloading.</span>
+<span class="sd">        :param cache: default `True`, use the cache directory to cache both index and text files.</span>
+<span class="sd">        Index expires after `cache_expire_days`, text files never expire.</span>
+<span class="sd">        Should *NOT* be set to `False` in order to prevent unnecessary re-downloading.</span>
 <span class="sd">        :param cache_expire_days: Number of days after which the index is re-downloaded.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">raw_index</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">raw_index</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Cannot cache library index, no valid cache directory.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
-            <span class="n">ts_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span>
-            <span class="n">cache_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span><span class="s2">&quot;gutenberg_index&quot;</span><span class="p">)</span>
-            <span class="n">expired</span><span class="o">=</span><span class="kc">True</span>
-            <span class="n">read_from_cache</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">ts_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">)</span>
+            <span class="n">cache_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span> <span class="s2">&quot;gutenberg_index&quot;</span><span class="p">)</span>
+            <span class="n">expired</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">read_from_cache</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">ts_file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ts_file</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">ts</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-                    <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">ts</span><span class="o">&lt;</span><span class="n">cache_expire_days</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">3600</span><span class="p">:</span>
-                        <span class="n">expired</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ts_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">ts</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ts</span> <span class="o">&lt;</span> <span class="n">cache_expire_days</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">:</span>
+                        <span class="n">expired</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="n">read_from_cache</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cache timestamp read.&quot;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cache for Gutenberg-index is expired, reloading from web.&quot;</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to read cache timestamp, reloading from web.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;Cache for Gutenberg-index is expired, reloading from web.&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to read cache timestamp (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">), reloading from web.&quot;</span>
+                    <span class="p">)</span>
             <span class="k">if</span> <span class="n">expired</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">raw_index</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gutenberg index read from local cache: </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span>
-                    <span class="n">expired</span><span class="o">=</span><span class="kc">True</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to read cached index, reloading from web.&quot;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">raw_index</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Gutenberg index read from local cache: </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">expired</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to read cached index (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">), reloading from web.&quot;</span>
+                    <span class="p">)</span>
             <span class="k">if</span> <span class="n">expired</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">index_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root_url</span><span class="o">+</span><span class="s2">&quot;/GUTINDEX.ALL&quot;</span>
+                <span class="n">index_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">+</span> <span class="s2">&quot;/GUTINDEX.ALL&quot;</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">raw_index</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">raw_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">&#39;</span><span class="p">:</span>  <span class="c1"># Ignore BOM</span>
-                        <span class="n">raw_index</span><span class="o">=</span><span class="n">raw_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                    <span class="n">raw_index</span><span class="o">=</span><span class="n">raw_index</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">raw_index</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">index_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">raw_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\ufeff</span><span class="s2">&quot;</span><span class="p">:</span>  <span class="c1"># Ignore BOM</span>
+                        <span class="n">raw_index</span> <span class="o">=</span> <span class="n">raw_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">raw_index</span> <span class="o">=</span> <span class="n">raw_index</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gutenberg index read from </span><span class="si">{</span><span class="n">index_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download Gutenberg index from </span><span class="si">{</span><span class="n">index_url</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to download Gutenberg index from </span><span class="si">{</span><span class="n">index_url</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
                     <span class="k">return</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">read_from_cache</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ts_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ts_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Wrote read cache timestamp.&quot;</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to write cache timestamp to </span><span class="si">{</span><span class="n">ts_file</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">raw_index</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Wrote read cached index.&quot;</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to write cached index to </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">index_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_url</span><span class="p">,</span> <span class="s2">&quot;GUTINDEX.ALL&quot;</span><span class="p">)</span>
+            <span class="n">index_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_url</span><span class="p">,</span> <span class="s2">&quot;GUTINDEX.ALL&quot;</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">index_file</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">raw_index</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="n">raw_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">&#39;</span><span class="p">:</span>  <span class="c1"># Ignore BOM</span>
-                        <span class="n">raw_index</span><span class="o">=</span><span class="n">raw_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                    <span class="n">raw_index</span><span class="o">=</span><span class="n">raw_index</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gutenberg index read from local mirror: </span><span class="si">{</span><span class="n">index_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">index_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">raw_index</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">raw_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\ufeff</span><span class="s2">&quot;</span><span class="p">:</span>  <span class="c1"># Ignore BOM</span>
+                        <span class="n">raw_index</span> <span class="o">=</span> <span class="n">raw_index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">raw_index</span> <span class="o">=</span> <span class="n">raw_index</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Gutenberg index read from local mirror: </span><span class="si">{</span><span class="n">index_file</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read Gutenberg index from local mirror: </span><span class="si">{</span><span class="n">index_file</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to read Gutenberg index from local mirror: </span><span class="si">{</span><span class="n">index_file</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
                 <span class="k">return</span>
-        <span class="n">lines</span><span class="o">=</span><span class="n">raw_index</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_index</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">raw_index</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_index</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Gutenberg_Dataset.load_book"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.load_book">[docs]</a>    <span class="k">def</span> <span class="nf">load_book</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ebook_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; get text of an ebook from Gutenberg by ebook_id </span>
-<span class="sd">        </span>
+        <span class="sd">&quot;&quot;&quot;get text of an ebook from Gutenberg by ebook_id</span>
+
 <span class="sd">        This function returns the unfiltered raw text including all Gutenberg headers and footers.</span>
 <span class="sd">        Use :func:`~Gutenberg_Dataset.Gutenberg_Dataset.get_book` to retrieve a dictionary with metadata and filtered text.</span>
 
@@ -366,27 +439,27 @@
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dl</span></div>
 
     <span class="k">def</span> <span class="nf">_read_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">path_stub</span><span class="p">,</span> <span class="n">cache_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Internal function to read ebook from cache or download it. &quot;&quot;&quot;</span>
-        <span class="n">cache_file</span><span class="o">=</span><span class="kc">None</span>
-        <span class="n">downloaded</span><span class="o">=</span><span class="kc">False</span>
+        <span class="sd">&quot;&quot;&quot;Internal function to read ebook from cache or download it.&quot;&quot;&quot;</span>
+        <span class="n">cache_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">downloaded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cache_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span><span class="n">cache_name</span><span class="p">)</span>
+            <span class="n">cache_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">,</span> <span class="n">cache_name</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cache_file</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">data</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Book read from cache at </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="n">downloaded</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">downloaded</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read cached file </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">data</span><span class="o">=</span><span class="kc">None</span>
-        <span class="n">file_url</span><span class="o">=</span><span class="kc">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read cached file </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">file_url</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">encoding</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
-            <span class="n">file_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root_url</span><span class="o">+</span><span class="n">path_stub</span><span class="o">+</span><span class="n">filename</span>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_url</span> <span class="o">+</span> <span class="n">path_stub</span> <span class="o">+</span> <span class="n">filename</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">encoding</span> <span class="o">!=</span> <span class="s1">&#39;bin&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">encoding</span> <span class="o">!=</span> <span class="s2">&quot;bin&quot;</span><span class="p">:</span>
                         <span class="n">data</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">data</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -397,11 +470,11 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download </span><span class="si">{</span><span class="n">file_url</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">encoding</span> <span class="o">!=</span> <span class="s1">&#39;bin&#39;</span><span class="p">:</span>
-                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_url</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">encoding</span> <span class="o">!=</span> <span class="s2">&quot;bin&quot;</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_url</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                             <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_url</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_url</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                             <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Book read from local mirror at </span><span class="si">{</span><span class="n">file_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">downloaded</span> <span class="o">=</span> <span class="kc">False</span>
@@ -411,8 +484,8 @@
         <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">,</span> <span class="n">downloaded</span>
 
     <span class="k">def</span> <span class="nf">_load_book_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ebook_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Internal function to get text of an ebook from Gutenberg by ebook_id with remote download information</span>
-<span class="sd">        </span>
+        <span class="sd">&quot;&quot;&quot;Internal function to get text of an ebook from Gutenberg by ebook_id with remote download information</span>
+
 <span class="sd">        This function returns the unfiltered raw text including all Gutenberg headers and footers and a boolean flag</span>
 <span class="sd">        indicating with &#39;True&#39;, if the book was downloaded from a remote source, &#39;False&#39; indicates cached book retrieval</span>
 <span class="sd">        without remote access.</span>
@@ -422,57 +495,74 @@
 <span class="sd">        Use :func:`~Gutenberg_Dataset.Gutenberg_Dataset.get_book` to retrieve a dictionary with metadata and filtered text.</span>
 
 <span class="sd">        :param ebook_id: Gutenberg id (Note: string, since this sometimes contains a character!)</span>
-<span class="sd">        :returns: tuple: book text as string, unfiltered, and a flag indicating with &#39;True&#39; if book was downloaded from remote, validity flag, &#39;True&#39; indicates valid text. </span>
+<span class="sd">        :returns: tuple: book text as string, unfiltered, and a flag indicating with &#39;True&#39; if book was downloaded from remote, validity flag, &#39;True&#39; indicates valid text.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">ebook_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ebook_id</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ebook_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ebook_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No ebook_id given.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">ebook_id</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;C&#39;</span><span class="p">:</span>
-            <span class="n">ebook_id</span><span class="o">=</span><span class="n">ebook_id</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">path_stub</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ebook_id</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
+            <span class="n">ebook_id</span> <span class="o">=</span> <span class="n">ebook_id</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">path_stub</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">downloaded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
-        
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ebook_id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-            <span class="n">path_stub</span><span class="o">+=</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">ebook_id</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">path_stub</span><span class="o">+=</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;/&quot;</span>
-        <span class="n">filenames</span><span class="o">=</span><span class="p">[(</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;-0.txt&quot;</span><span class="p">,</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;-8.txt&quot;</span><span class="p">,</span><span class="s2">&quot;latin1&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span><span class="p">,</span><span class="s2">&quot;latin1&quot;</span><span class="p">)]</span>
-        <span class="n">cache_name</span><span class="o">=</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;.txt&quot;</span>
-        <span class="n">data</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">,</span> <span class="n">downloaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_download</span><span class="p">(</span><span class="n">filenames</span><span class="p">,</span> <span class="n">path_stub</span><span class="p">,</span> <span class="n">cache_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ebook_id</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">path_stub</span> <span class="o">+=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">ebook_id</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">path_stub</span> <span class="o">+=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;-0.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;-8.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;latin1&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;latin1&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">cache_name</span> <span class="o">=</span> <span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">,</span> <span class="n">downloaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_download</span><span class="p">(</span>
+            <span class="n">filenames</span><span class="p">,</span> <span class="n">path_stub</span><span class="p">,</span> <span class="n">cache_name</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">&#39;</span><span class="p">:</span>  <span class="c1"># Ignore BOM</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\ufeff</span><span class="s2">&quot;</span><span class="p">:</span>  <span class="c1"># Ignore BOM</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">filenames</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;-pdf.pdf&quot;</span><span class="p">,</span><span class="s2">&quot;bin&quot;</span><span class="p">)]</span>
-            <span class="n">cache_name</span><span class="o">=</span><span class="n">ebook_id</span><span class="o">+</span><span class="s2">&quot;.pdf&quot;</span>
-            <span class="n">data</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">,</span> <span class="n">downloaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_download</span><span class="p">(</span><span class="n">filenames</span><span class="p">,</span> <span class="n">path_stub</span><span class="p">,</span> <span class="n">cache_name</span><span class="p">)</span>
+            <span class="n">filenames</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;-pdf.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;bin&quot;</span><span class="p">)]</span>
+            <span class="n">cache_name</span> <span class="o">=</span> <span class="n">ebook_id</span> <span class="o">+</span> <span class="s2">&quot;.pdf&quot;</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">,</span> <span class="n">downloaded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_download</span><span class="p">(</span>
+                <span class="n">filenames</span><span class="p">,</span> <span class="n">path_stub</span><span class="p">,</span> <span class="n">cache_name</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ebook </span><span class="si">{</span><span class="n">cache_name</span><span class="si">}</span><span class="s2"> is only available in PDF format, this is not supported.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Ebook </span><span class="si">{</span><span class="n">cache_name</span><span class="si">}</span><span class="s2"> is only available in PDF format, this is not supported.&quot;</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download </span><span class="si">{</span><span class="n">filenames</span><span class="si">}</span><span class="s2">, skipping book.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">downloaded</span><span class="p">,</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">cache_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to cache file </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to cache file </span><span class="si">{</span><span class="n">cache_file</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">downloaded</span><span class="p">,</span> <span class="n">valid</span>
-    
-<div class="viewcode-block" id="Gutenberg_Dataset.filter_text"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.filter_text">[docs]</a>    <span class="k">def</span> <span class="nf">filter_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">book_text</span><span class="p">,</span> <span class="n">add_start_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_near_start_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_end_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Heuristically remove header and trailer texts not part of the actual books</span>
+
+<div class="viewcode-block" id="Gutenberg_Dataset.filter_text"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.filter_text">[docs]</a>    <span class="k">def</span> <span class="nf">filter_text</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">book_text</span><span class="p">,</span>
+        <span class="n">add_start_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_near_start_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">add_end_tokens</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Heuristically remove header and trailer texts not part of the actual books</span>
 
 <span class="sd">        Unfortunatelly, formatting of Gutenberg books is an unbelievable mess. Using lists of tokens `self.start_tokens` (indicating</span>
-<span class="sd">        the start of the actual book text), `self.near_start_tokens` (indicating possibly ambiguous tokens near a `start_tokens` token, </span>
-<span class="sd">        further narrowing the start of text), and `self.end_tokens` (indicating the end of the book text), this function tries to find </span>
-<span class="sd">        the start and end of the book text. The user can either extend the lists of class member tokens, of provide temporary additional </span>
+<span class="sd">        the start of the actual book text), `self.near_start_tokens` (indicating possibly ambiguous tokens near a `start_tokens` token,</span>
+<span class="sd">        further narrowing the start of text), and `self.end_tokens` (indicating the end of the book text), this function tries to find</span>
+<span class="sd">        the start and end of the book text. The user can either extend the lists of class member tokens, of provide temporary additional</span>
 <span class="sd">        tokens as parameter to this function.</span>
-<span class="sd">        </span>
-<span class="sd">        The list of `start_tokens` contains only tokens that are always significant as being part of header-cruft (e.g. &#39;START OF THIS GUTENBERG&#39;). </span>
-<span class="sd">        `near_start_tokens` are tokens that might be ambiguous, but are still part of the header-cruft, (e.g. &#39;produced by&#39;). </span>
-<span class="sd">        `near_start_tokens` are only used, if they are within `self.NEAR` bytes to the latest `start_tokens` token, </span>
+
+<span class="sd">        The list of `start_tokens` contains only tokens that are always significant as being part of header-cruft (e.g. &#39;START OF THIS GUTENBERG&#39;).</span>
+<span class="sd">        `near_start_tokens` are tokens that might be ambiguous, but are still part of the header-cruft, (e.g. &#39;produced by&#39;).</span>
+<span class="sd">        `near_start_tokens` are only used, if they are within `self.NEAR` bytes to the latest `start_tokens` token,</span>
 <span class="sd">        to heuristically prevent false positives.</span>
 
 <span class="sd">        *Note:* Use logging via `logging.basicConfig(level=logging.DEBUG)` to analyze the filtering process.</span>
@@ -496,95 +586,97 @@
         <span class="k">if</span> <span class="n">book_text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Filter: book text is None, returning None&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">blen</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">book_text</span><span class="p">)</span>
-        
-        <span class="n">pstart</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">blen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">book_text</span><span class="p">)</span>
+
+        <span class="n">pstart</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">start_tokens</span><span class="p">:</span>
-            <span class="n">pos</span><span class="o">=</span><span class="n">book_text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">book_text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="n">pstart</span><span class="p">:</span>
                 <span class="n">pstart</span> <span class="o">=</span> <span class="n">pos</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start-token [</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">] found at position </span><span class="si">{</span><span class="n">pos</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pstart</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="n">pos</span><span class="o">=</span><span class="n">book_text</span><span class="p">[</span><span class="n">pstart</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pos</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pstart</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">book_text</span><span class="p">[</span><span class="n">pstart</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span><span class="p">:</span>
                 <span class="n">pos</span> <span class="o">+=</span> <span class="n">pstart</span>
-                <span class="k">while</span> <span class="n">book_text</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">book_text</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
                     <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># eof?!</span>
-                <span class="n">pstart</span><span class="o">=</span><span class="n">pos</span>
-        <span class="k">if</span> <span class="n">pstart</span><span class="o">&gt;</span><span class="n">blen</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">pstart</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="k">if</span> <span class="n">pstart</span> <span class="o">&gt;</span> <span class="n">blen</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Preamble is taking more than half of the book!&quot;</span><span class="p">)</span>
-        <span class="n">new_book</span><span class="o">=</span><span class="n">book_text</span><span class="p">[</span><span class="n">pstart</span><span class="p">:]</span>
-        <span class="n">xpos</span><span class="o">=-</span><span class="mi">1</span>
+        <span class="n">new_book</span> <span class="o">=</span> <span class="n">book_text</span><span class="p">[</span><span class="n">pstart</span><span class="p">:]</span>
+        <span class="n">xpos</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">near_start_tokens</span><span class="p">:</span>
-            <span class="n">pos</span><span class="o">=</span><span class="n">new_book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pos</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">pos</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">new_book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Near-Start-token [</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">] found at position </span><span class="si">{</span><span class="n">pos</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">pos</span><span class="o">&gt;</span><span class="n">xpos</span><span class="p">:</span>
-                    <span class="n">xpos</span><span class="o">=</span><span class="n">pos</span>
+                <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="n">xpos</span><span class="p">:</span>
+                    <span class="n">xpos</span> <span class="o">=</span> <span class="n">pos</span>
         <span class="k">if</span> <span class="n">xpos</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">pos2</span><span class="o">=</span><span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pos2</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span> <span class="ow">and</span> <span class="n">pos2</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">pos2</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pos2</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span> <span class="ow">and</span> <span class="n">pos2</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trying extra skipping (2) for </span><span class="si">{</span><span class="n">pos2</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-                <span class="k">while</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span> <span class="o">+</span> <span class="n">pos2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
                     <span class="n">pos2</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">new_book</span><span class="o">=</span><span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="p">:]</span>
+                <span class="n">new_book</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span> <span class="o">+</span> <span class="n">pos2</span> <span class="p">:]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Additionally shortened start by </span><span class="si">{</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="si">}</span><span class="s2"> chars&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">pos2</span><span class="o">=</span><span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">pos2</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span> <span class="ow">and</span> <span class="n">pos2</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">pos2</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pos2</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NEAR</span> <span class="ow">and</span> <span class="n">pos2</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trying extra skipping (3) for </span><span class="si">{</span><span class="n">pos2</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-                    <span class="k">while</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                    <span class="k">while</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span> <span class="o">+</span> <span class="n">pos2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
                         <span class="n">pos2</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">new_book</span><span class="o">=</span><span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="p">:]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Additionally shortened start by </span><span class="si">{</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">xpos</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">pos2</span><span class="si">}</span><span class="s2"> chars&quot;</span><span class="p">)</span>
+                    <span class="n">new_book</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span> <span class="o">+</span> <span class="n">pos2</span> <span class="p">:]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Additionally shortened start by </span><span class="si">{</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">xpos</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">pos2</span><span class="si">}</span><span class="s2"> chars&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">pos2</span><span class="o">=</span><span class="mi">0</span>
-                    <span class="n">new_book</span><span class="o">=</span><span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span><span class="o">+</span><span class="n">pos2</span><span class="p">:]</span>
-        
-        <span class="n">pend</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">new_book</span><span class="p">)</span>
+                    <span class="n">pos2</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">new_book</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[</span><span class="n">xpos</span> <span class="o">+</span> <span class="n">pos2</span> <span class="p">:]</span>
+
+        <span class="n">pend</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_book</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">end_tokens</span><span class="p">:</span>
-            <span class="n">pos</span><span class="o">=</span><span class="n">new_book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pos</span><span class="o">!=-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="n">pend</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">new_book</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pos</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="n">pend</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;End-token [</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">] found at pos </span><span class="si">{</span><span class="n">pos</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">pend</span> <span class="o">=</span> <span class="n">pos</span>
-        <span class="k">if</span> <span class="n">pend</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">new_book</span><span class="p">):</span>
-            <span class="n">pos</span><span class="o">=</span><span class="n">new_book</span><span class="p">[:</span><span class="n">pend</span><span class="p">]</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pos</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-                <span class="k">while</span> <span class="n">new_book</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pend</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_book</span><span class="p">):</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[:</span><span class="n">pend</span><span class="p">]</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">while</span> <span class="n">new_book</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
                     <span class="n">pos</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># eof?!</span>
-                <span class="n">pend</span><span class="o">=</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span>
+                <span class="n">pend</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No end token found!&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pend</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">new_book</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pend</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_book</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;End-text is taking more than half of the book!&quot;</span><span class="p">)</span>
-        <span class="n">new_book</span><span class="o">=</span><span class="n">new_book</span><span class="p">[:</span><span class="n">pend</span><span class="p">]</span>
+        <span class="n">new_book</span> <span class="o">=</span> <span class="n">new_book</span><span class="p">[:</span><span class="n">pend</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">new_book</span></div>
-        
-<div class="viewcode-block" id="Gutenberg_Dataset.find_keywords"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.find_keywords">[docs]</a>    <span class="k">def</span> <span class="nf">find_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">search_keys</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Search of an arbitrary number of keywords in a book record</span>
-<span class="sd">       </span>
+
+<div class="viewcode-block" id="Gutenberg_Dataset.find_keywords"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.find_keywords">[docs]</a>    <span class="k">def</span> <span class="nf">find_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">search_keys</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Search of an arbitrary number of keywords in a book record</span>
+
 <span class="sd">        *Note:* :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_index` needs to be called once before this function can be used.</span>
 
 <span class="sd">        :returns: list of records that contain all keywords in any field.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">frecs</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">frecs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
-            <span class="n">found</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">sk</span> <span class="ow">in</span> <span class="n">search_keys</span><span class="p">:</span>
-                <span class="n">subkey</span><span class="o">=</span><span class="kc">False</span>
+                <span class="n">subkey</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">sk</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="n">sk</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-                        <span class="n">subkey</span><span class="o">=</span><span class="kc">True</span>
+                        <span class="n">subkey</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="k">break</span>
                 <span class="k">if</span> <span class="n">subkey</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                    <span class="n">found</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">frecs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">rec</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">frecs</span></div>
-    
+
 <div class="viewcode-block" id="Gutenberg_Dataset.search"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Search for book record with key specific key values</span>
+        <span class="sd">&quot;&quot;&quot;Search for book record with key specific key values</span>
 <span class="sd">        For a list of valid keys, use `get_record_keys()`</span>
 <span class="sd">        Standard keys are: `ebook_id`, `author`, `language`, `title`</span>
 
@@ -592,100 +684,108 @@
 
 <span class="sd">        Example: `search({&quot;title&quot;: [&quot;philosoph&quot;,&quot;phenomen&quot;,&quot;physic&quot;,&quot;hermeneu&quot;,&quot;logic&quot;], &quot;language&quot;:&quot;english&quot;})`</span>
 <span class="sd">        Find all books whose titles contain at least one of the keywords, language english. Search keys can either be</span>
-<span class="sd">        search for a single keyword (e.g. english), or an array of keywords. </span>
-<span class="sd">        </span>
-<span class="sd">        :returns: list of records &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;records&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="sd">        search for a single keyword (e.g. english), or an array of keywords.</span>
+
+<span class="sd">        :returns: list of records&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;records&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Index not loaded, trying to load...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_index</span><span class="p">()</span>
-        <span class="n">frecs</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">frecs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
-            <span class="n">found</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">sk</span> <span class="ow">in</span> <span class="n">search_dict</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">sk</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">:</span>
-                    <span class="n">found</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="k">break</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">skl</span><span class="o">=</span><span class="n">search_dict</span><span class="p">[</span><span class="n">sk</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">skl</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
-                        <span class="n">skl</span><span class="o">=</span><span class="p">[</span><span class="n">skl</span><span class="p">]</span>
-                    <span class="n">nf</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="n">skl</span> <span class="o">=</span> <span class="n">search_dict</span><span class="p">[</span><span class="n">sk</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">skl</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">skl</span> <span class="o">=</span> <span class="p">[</span><span class="n">skl</span><span class="p">]</span>
+                    <span class="n">nf</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="k">for</span> <span class="n">skli</span> <span class="ow">in</span> <span class="n">skl</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">skli</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">[</span><span class="n">sk</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
-                            <span class="n">nf</span><span class="o">=</span><span class="n">nf</span><span class="o">+</span><span class="mi">1</span>
-                    <span class="k">if</span> <span class="n">nf</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                        <span class="n">found</span><span class="o">=</span><span class="kc">False</span>
+                            <span class="n">nf</span> <span class="o">=</span> <span class="n">nf</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">nf</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="k">break</span>
             <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">frecs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">rec</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">frecs</span></div>
-        
+
 <div class="viewcode-block" id="Gutenberg_Dataset.insert_book_texts"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts">[docs]</a>    <span class="k">def</span> <span class="nf">insert_book_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_dict</span><span class="p">,</span> <span class="n">download_count_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Inserts book texts into the records returned by :func:`~Gutenberg_Dataset.Gutenberg_Dataset.search`.</span>
+        <span class="sd">&quot;&quot;&quot;Inserts book texts into the records returned by :func:`~Gutenberg_Dataset.Gutenberg_Dataset.search`.</span>
 
 <span class="sd">        In order to prevent the download of too many books, the download count limit is set to `download_count_limit`.</span>
 <span class="sd">        Downloaded books are cached and cached books are not counted towards the download count limit. Calling this</span>
 <span class="sd">        function again will download books that have not been downloaded yet. The filtered book content is inserted</span>
 <span class="sd">        into the dictionary with the key `text`.</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param search_dict: search array of dictionaries that at least contain the key `ebook_id`.</span>
 <span class="sd">        :param download_count_limit: maximum number of books to download, if no local mirror is used. No limits apply for local mirrors.</span>
 <span class="sd">        :returns: list of records including filtered book text-based in the `text` field.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dls</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">dls</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">search_dict</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting id=</span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Getting id=</span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
             <span class="n">bt</span><span class="p">,</span> <span class="n">dl</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_book_ex</span><span class="p">(</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;ebook_id&quot;</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">bt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download of book </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: invalid format!&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Download of book </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: invalid format!&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download of book </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> failed!&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Download of book </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> failed!&quot;</span>
+                    <span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_text</span><span class="p">(</span><span class="n">bt</span><span class="p">)</span>
+            <span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_text</span><span class="p">(</span><span class="n">bt</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_mirror</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">dls</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">dls</span><span class="o">&gt;</span><span class="n">download_count_limit</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download limit reached (</span><span class="si">{</span><span class="n">download_count_limit</span><span class="si">}</span><span class="s2">), stopping download...&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dls</span> <span class="o">&gt;</span> <span class="n">download_count_limit</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Download limit reached (</span><span class="si">{</span><span class="n">download_count_limit</span><span class="si">}</span><span class="s2">), stopping download...&quot;</span>
+                    <span class="p">)</span>
                     <span class="k">break</span>
-        <span class="k">return</span> <span class="n">search_dict</span>  </div>
+        <span class="k">return</span> <span class="n">search_dict</span></div>
 
 <div class="viewcode-block" id="Gutenberg_Dataset.get_book"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.get_book">[docs]</a>    <span class="k">def</span> <span class="nf">get_book</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ebook_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a book record metadata and filtered text by its ebook_id</span>
-<span class="sd">       </span>
-<span class="sd">        This function returns a dictionary with metadata and filtered text. Use :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_book` </span>
+        <span class="sd">&quot;&quot;&quot;Get a book record metadata and filtered text by its ebook_id</span>
+
+<span class="sd">        This function returns a dictionary with metadata and filtered text. Use :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_book`</span>
 <span class="sd">        to get the raw unfiltered text.</span>
-<span class="sd">        </span>
+
 <span class="sd">        *Note:* :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_index` needs to be called once before this function can be used.</span>
 
 <span class="sd">        :param ebook_id: ebook_id (String, since some IDs contain letters) of the book to be retrieved</span>
 <span class="sd">        :returns: book record (dictionary with metadata and filtered text)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;ebook_id&quot;</span><span class="p">]</span><span class="o">==</span><span class="n">ebook_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;ebook_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ebook_id</span><span class="p">:</span>
                 <span class="n">text</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_book_ex</span><span class="p">(</span><span class="n">ebook_id</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">valid</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download of book </span><span class="si">{</span><span class="n">ebook_id</span><span class="si">}</span><span class="s2"> failed!&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">None</span>
-                <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">rec</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Gutenberg_Dataset.get_record_keys"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.get_record_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_record_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a list of all keys that are used within records. </span>
+        <span class="sd">&quot;&quot;&quot;Get a list of all keys that are used within records.</span>
 <span class="sd">        Standard keys are: `ebook_id`, `author`, `language`, `title`.</span>
-<span class="sd">        </span>
+
 <span class="sd">        *Note:* :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_index` needs to be called once before this function can be used.</span>
 
 <span class="sd">        :returns: list of all different keys that are somehow used.&quot;&quot;&quot;</span>
-        <span class="n">rks</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">rks</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
-            <span class="n">rks</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rks</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">rks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rks</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">rks</span></div>
 
 <div class="viewcode-block" id="Gutenberg_Dataset.get_unique_record_values"><a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.get_unique_record_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_record_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a list of all unique values a given keys has for all records.</span>
-<span class="sd">        </span>
+        <span class="sd">&quot;&quot;&quot;Get a list of all unique values a given keys has for all records.</span>
+
 <span class="sd">        *Note:* :func:`~Gutenberg_Dataset.Gutenberg_Dataset.load_index` needs to be called once before this function can be used.</span>
 
 <span class="sd">        Example: `get_unique_records_values(&#39;language&#39;)` returns all languages in Gutenberg.</span>
@@ -693,14 +793,14 @@
 <span class="sd">        :param key: key to search for.</span>
 <span class="sd">        :returns: list of all unique values for a given key.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">uv</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">uv</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_record_keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> is not a key used in any record!&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
-                <span class="n">uv</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
-        <span class="n">uv</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span>
+                <span class="n">uv</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
+        <span class="n">uv</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">uv</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">uv</span></div></div>
 </pre></div>
 
@@ -719,7 +819,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -740,7 +840,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

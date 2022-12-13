@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
@@ -14,6 +14,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -47,12 +48,12 @@
           <div class="body" role="main">
             
   <section id="welcome-to-ml-indie-tools-s-documentation">
-<h1>Welcome to ml-indie-tools’s documentation!<a class="headerlink" href="#welcome-to-ml-indie-tools-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to ml-indie-tools’s documentation!<a class="headerlink" href="#welcome-to-ml-indie-tools-s-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <section id="module-env_tools">
-<span id="mlenv-object"></span><h2>MLEnv object<a class="headerlink" href="#module-env_tools" title="Permalink to this headline">¶</a></h2>
-<p>Tools to configure ML environment for Tensorflow, Pytorch or JAX and 
+<span id="mlenv-object"></span><h2>MLEnv object<a class="headerlink" href="#module-env_tools" title="Permalink to this heading">¶</a></h2>
+<p>Tools to configure ML environment for Tensorflow, Pytorch or JAX and
 optional notebook/colab environment</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="env_tools.MLEnv">
@@ -63,7 +64,7 @@ optional notebook/colab environment</p>
 At return, the following variables are set: <cite>self.is_tensorflow</cite>, <cite>self.is_pytorch</cite>, <cite>self.is_jax</cite>,
 indicating that the ml environment is available for Tensorflow, Pytorch or JAX respectively if <cite>True</cite>.
 <cite>self.is_notebook</cite> and <cite>self.is_colab</cite> indicate if the environment is a notebook or colab environment.
-<cite>self.is_gpu</cite> indicates if the environment is a GPU environment, <cite>self.is_tpu</cite> indicates if the 
+<cite>self.is_gpu</cite> indicates if the environment is a GPU environment, <cite>self.is_tpu</cite> indicates if the
 environment is a TPU environment, and <cite>self.is_cpu</cite> that no accelerator is available.</p>
 <p>The logger <cite>MLEnv</cite> provdides details about the hardware and ml environment.</p>
 <dl class="field-list simple">
@@ -71,10 +72,11 @@ environment is a TPU environment, and <cite>self.is_cpu</cite> that no accelerat
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>platform</strong> – Known platforms are: <cite>‘tf’</cite> (tensorflow), <cite>‘pt’</cite> (pytorch), and <cite>‘jax’</cite></p></li>
 <li><p><strong>accelerator</strong> – known accelerators are: <cite>‘fastest’</cite> (pick best available hardware), <cite>‘cpu’</cite>, <cite>‘gpu’</cite>, <cite>‘tpu’</cite>.</p></li>
-<li><p><strong>old_disable_eager</strong> – default ‘False’, on True, old v1 compatibility layer is used to disable eager mode. According to rumors that might in resulting old codepaths being used?</p></li>
+<li><p><strong>old_disable_eager</strong> – default ‘False’, on True, old v1 compatibility layer is used to disable eager mode.</p></li>
 </ul>
 </dd>
 </dl>
+<p>According to rumors that might in resulting old codepaths being used?</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="env_tools.MLEnv.describe">
 <span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/env_tools.html#MLEnv.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#env_tools.MLEnv.describe" title="Permalink to this definition">¶</a></dt>
@@ -94,12 +96,6 @@ environment is a TPU environment, and <cite>self.is_cpu</cite> that no accelerat
 <dt class="sig sig-object py" id="env_tools.MLEnv.describe_osenv">
 <span class="sig-name descname"><span class="pre">describe_osenv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/env_tools.html#MLEnv.describe_osenv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#env_tools.MLEnv.describe_osenv" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="env_tools.MLEnv.gpu_memory">
-<span class="sig-name descname"><span class="pre">gpu_memory</span></span><a class="headerlink" href="#env_tools.MLEnv.gpu_memory" title="Permalink to this definition">¶</a></dt>
-<dd><p>GPU memory for NVidia cards as provided by <cite>nvidia-smi</cite></p>
-</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="env_tools.MLEnv.gpu_type">
@@ -233,7 +229,7 @@ is lost, once the Colab session is closed.</p>
 
 </section>
 <section id="module-tuner">
-<span id="mltuner-object"></span><h2>MLTuner object<a class="headerlink" href="#module-tuner" title="Permalink to this headline">¶</a></h2>
+<span id="mltuner-object"></span><h2>MLTuner object<a class="headerlink" href="#module-tuner" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tuner.MLTuner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tuner.</span></span><span class="sig-name descname"><span class="pre">MLTuner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tuner.html#MLTuner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tuner.MLTuner" title="Permalink to this definition">¶</a></dt>
@@ -292,14 +288,14 @@ is lost, once the Colab session is closed.</p>
 
 </section>
 <section id="module-Gutenberg_Dataset">
-<span id="gutenberg-dataset-object"></span><h2>Gutenberg_Dataset object<a class="headerlink" href="#module-Gutenberg_Dataset" title="Permalink to this headline">¶</a></h2>
+<span id="gutenberg-dataset-object"></span><h2>Gutenberg_Dataset object<a class="headerlink" href="#module-Gutenberg_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Gutenberg_Dataset.</span></span><span class="sig-name descname"><span class="pre">Gutenberg_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://www.gutenberg.org/dirs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gutenberg'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A fuzzy, lightweight class to access, search and filter Project Gutenberg resources</p>
 <p>GutenbergLib by default uses a mirror’s root URL. Alternatively, you can specify a local directory containing a Gutenberg mirror.
-That mirror directory needs to contain a GUTINDEX.ALL file and has typically many 
+That mirror directory needs to contain a GUTINDEX.ALL file and has typically many
 sub-directories <cite>0</cite> ,.. <cite>n</cite> .</p>
 <p>A mirror of project Gutenberg can be created by:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">#</span>!/bin/bash
@@ -312,22 +308,23 @@ sub-directories <cite>0</cite> ,.. <cite>n</cite> .</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>root_url</strong> – url of Project Gutenberg or any mirror URL, or a local directory containing a Gutenberg mirror.</p></li>
-<li><p><strong>cache_dir</strong> – path to a directory that will be used to cache the Gutenberg index and already downloaded texts. The cache directory is only used, if a remote Gutenberg URL and not a local mirror is used.</p></li>
+<li><p><strong>cache_dir</strong> – path to a directory that will be used to cache the Gutenberg index and already downloaded texts.</p></li>
 </ul>
 </dd>
 </dl>
+<p>The cache directory is only used, if a remote Gutenberg URL and not a local mirror is used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset.filter_text">
 <span class="sig-name descname"><span class="pre">filter_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">book_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_start_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_near_start_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_end_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset.filter_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset.filter_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Heuristically remove header and trailer texts not part of the actual books</p>
 <p>Unfortunatelly, formatting of Gutenberg books is an unbelievable mess. Using lists of tokens <cite>self.start_tokens</cite> (indicating
-the start of the actual book text), <cite>self.near_start_tokens</cite> (indicating possibly ambiguous tokens near a <cite>start_tokens</cite> token, 
-further narrowing the start of text), and <cite>self.end_tokens</cite> (indicating the end of the book text), this function tries to find 
-the start and end of the book text. The user can either extend the lists of class member tokens, of provide temporary additional 
+the start of the actual book text), <cite>self.near_start_tokens</cite> (indicating possibly ambiguous tokens near a <cite>start_tokens</cite> token,
+further narrowing the start of text), and <cite>self.end_tokens</cite> (indicating the end of the book text), this function tries to find
+the start and end of the book text. The user can either extend the lists of class member tokens, of provide temporary additional
 tokens as parameter to this function.</p>
-<p>The list of <cite>start_tokens</cite> contains only tokens that are always significant as being part of header-cruft (e.g. ‘START OF THIS GUTENBERG’). 
-<cite>near_start_tokens</cite> are tokens that might be ambiguous, but are still part of the header-cruft, (e.g. ‘produced by’). 
-<cite>near_start_tokens</cite> are only used, if they are within <cite>self.NEAR</cite> bytes to the latest <cite>start_tokens</cite> token, 
+<p>The list of <cite>start_tokens</cite> contains only tokens that are always significant as being part of header-cruft (e.g. ‘START OF THIS GUTENBERG’).
+<cite>near_start_tokens</cite> are tokens that might be ambiguous, but are still part of the header-cruft, (e.g. ‘produced by’).
+<cite>near_start_tokens</cite> are only used, if they are within <cite>self.NEAR</cite> bytes to the latest <cite>start_tokens</cite> token,
 to heuristically prevent false positives.</p>
 <p><em>Note:</em> Use logging via <cite>logging.basicConfig(level=logging.DEBUG)</cite> to analyze the filtering process.</p>
 <dl class="field-list simple">
@@ -361,7 +358,7 @@ to heuristically prevent false positives.</p>
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset.get_book">
 <span class="sig-name descname"><span class="pre">get_book</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ebook_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset.get_book"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset.get_book" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a book record metadata and filtered text by its ebook_id</p>
-<p>This function returns a dictionary with metadata and filtered text. Use <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_book" title="Gutenberg_Dataset.Gutenberg_Dataset.load_book"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_book()</span></code></a> 
+<p>This function returns a dictionary with metadata and filtered text. Use <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_book" title="Gutenberg_Dataset.Gutenberg_Dataset.load_book"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_book()</span></code></a>
 to get the raw unfiltered text.</p>
 <p><em>Note:</em> <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
 <dl class="field-list simple">
@@ -377,7 +374,7 @@ to get the raw unfiltered text.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset.get_record_keys">
 <span class="sig-name descname"><span class="pre">get_record_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset.get_record_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset.get_record_keys" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of all keys that are used within records. 
+<dd><p>Get a list of all keys that are used within records.
 Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</cite>, <cite>title</cite>.</p>
 <p><em>Note:</em> <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
 <dl class="field-list simple">
@@ -447,12 +444,12 @@ Use <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.get
 <p>This should be the first method being used, since many other methods rely on the index being loaded.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cache</strong> – default <cite>True</cite>, use the cache directory to cache both index and text files. Index expires after <cite>cache_expire_days</cite>, text files never expire. Should <em>NOT</em> be set to <cite>False</cite> in order to prevent unnecessary re-downloading.</p></li>
-<li><p><strong>cache_expire_days</strong> – Number of days after which the index is re-downloaded.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>cache</strong> – default <cite>True</cite>, use the cache directory to cache both index and text files.</p>
 </dd>
 </dl>
+<p>Index expires after <cite>cache_expire_days</cite>, text files never expire.
+Should <em>NOT</em> be set to <cite>False</cite> in order to prevent unnecessary re-downloading.
+:param cache_expire_days: Number of days after which the index is re-downloaded.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -476,7 +473,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 
 </section>
 <section id="module-Text_Dataset">
-<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this headline">¶</a></h2>
+<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Text_Dataset.</span></span><span class="sig-name descname"><span class="pre">Text_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -495,14 +492,13 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>text_list</strong> – list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’, ‘text’: ‘the-long-text’}. Optinal parameters: ‘weight’: 1.0</p></li>
-<li><p><strong>sanitize_white_space</strong> – If True, white space is replaced by a single space.</p></li>
-<li><p><strong>separate_punctuation</strong> – If True, punctuation is separated from words.</p></li>
-<li><p><strong>preserve_case</strong> – If True, the case of the text is preserved.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>text_list</strong> – list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
 </dd>
 </dl>
+<p>‘text’: ‘the-long-text’}. Optinal parameters: ‘weight’: 1.0
+:param sanitize_white_space: If True, white space is replaced by a single space.
+:param separate_punctuation: If True, punctuation is separated from words.
+:param preserve_case: If True, the case of the text is preserved.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.decode">
 <span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.decode" title="Permalink to this definition">¶</a></dt>
@@ -592,7 +588,7 @@ of encoding is returned on index-access.</p>
 <span class="c1"># Output: 12 and (&#39;some&#39;, &#39;ome &#39;)</span>
 </pre></div>
 </div>
-<p>The method of tokenization (char, word, ngram) for ‘encoded’ sample_type is determined by 
+<p>The method of tokenization (char, word, ngram) for ‘encoded’ sample_type is determined by
 the tokenizer_type in call to init_tokenizer().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -610,15 +606,15 @@ the tokenizer_type in call to init_tokenizer().</p>
 <span class="sig-name descname"><span class="pre">init_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'word'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ngrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_tokenizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the tokenizer with the text_list.</p>
 <p>The character tokenizer simply splits any language text into glyphs.</p>
-<p>A word tokenizer works for languages that have the concept of word separators (as in English, 
+<p>A word tokenizer works for languages that have the concept of word separators (as in English,
 ‘ ‘ space). Word tokenizers are English-centric algorithms, since many other languages either
 can compose words into larger words with no separators, words being more similar to English
 syllables in that case, or have no word separators at all (as in Chinese), or have syllable
 separators (as in Tibetan, which has also a second kind of separators for sentence-fragments). For multi-language applications, use ngram tokenizers or character
 tokenizers.</p>
-<p>The ngram tokenizer can either first split text into words using a word_speparator 
-and then extracting all possible ngrams, or it can extract all possible ngrams directly 
-without any word-splitting, which is the default behavior with word_separator=None since it 
+<p>The ngram tokenizer can either first split text into words using a word_speparator
+and then extracting all possible ngrams, or it can extract all possible ngrams directly
+without any word-splitting, which is the default behavior with word_separator=None since it
 works for all languages classes.</p>
 <p>For ngrams, the tokenizer can extract ngrams of length 1..max_ngrams, and selects the top most
 used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually around 3-6, and
@@ -671,7 +667,7 @@ Using word_separator=None is usually significantly better than using a word_sepa
 
 </section>
 <section id="module-ALU_Dataset">
-<span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Permalink to this headline">¶</a></h2>
+<span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ALU_Dataset.ALU_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ALU_Dataset.</span></span><span class="sig-name descname"><span class="pre">ALU_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">31</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ALU_Dataset.html#ALU_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ALU_Dataset.ALU_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -680,8 +676,8 @@ Using word_separator=None is usually significantly better than using a word_sepa
 <p>The ALU takes two integers and applies one of the supported
 model_ops. E.g. <cite>op1=123, op2=100, op=’-’ -&gt; result 23</cite></p>
 <p>The net is supposed to learn to ‘calculate’ the results for
-arbitrary op1, op2 (positive integers, <cite>0..2**bit_count - 1</cite>) and 
-the twelve supported ops: 
+arbitrary op1, op2 (positive integers, <cite>0..2**bit_count - 1</cite>) and
+the twelve supported ops:
 <cite>[“+”, “-”, “*”, “/”, “%”, “AND”, “OR”, “XOR”, “&gt;”, “&lt;”, “=”, “!=”]</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -760,32 +756,32 @@ the twelve supported ops:
 
 </section>
 <section id="residualblock-object">
-<h2>ResidualBlock object<a class="headerlink" href="#residualblock-object" title="Permalink to this headline">¶</a></h2>
+<h2>ResidualBlock object<a class="headerlink" href="#residualblock-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="residualdense-object">
-<h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this headline">¶</a></h2>
+<h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="residualdensestack-object">
-<h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this headline">¶</a></h2>
+<h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="parallelresidualdensestacks-object">
-<h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this headline">¶</a></h2>
+<h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="selfattention-object">
-<h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this headline">¶</a></h2>
+<h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="multiheadselfattention-object">
-<h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this headline">¶</a></h2>
+<h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="positionalencoding-object">
-<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this headline">¶</a></h2>
+<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="readme-file">
-<h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h2>
+<h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 <section id="a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments">
-<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this headline">¶</a></h1>
+<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this heading">¶</a></h1>
 <a class="reference external image-reference" href="LICENSE"><img alt="License" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" /></a>
 <a class="reference external image-reference" href="https://domschl.github.io/ml-indie-tools/index.html"><img alt="Docs" src="https://img.shields.io/badge/docs-stable-blue.svg" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
@@ -1018,6 +1014,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2022-12-11, 0.3.17) Testversion for slightly handwavy recurrent attention</p></li>
 <li><p>(2022-06-19, 0.3.1) get_random_item(index) that works with all tokenization strategies, get_unique_token_count() added.</p></li>
 <li><p>(2022-06-19, 0.3.0) Breaking change in Text_Dataset <strong>get_item</strong>() behavior, old API didn’t fit with tokenization.</p></li>
 <li><p>(2022-06-19, 0.2.0) Language agnostic dynamic ngram tokenizer.</p></li>
@@ -1040,7 +1037,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -1100,7 +1097,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1123,7 +1120,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>
