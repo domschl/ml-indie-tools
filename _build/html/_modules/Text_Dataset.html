@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,6 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -55,7 +54,7 @@
 
 
 <div class="viewcode-block" id="Text_Dataset"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset">[docs]</a><span class="k">class</span> <span class="nc">Text_Dataset</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Initialize the Text_Dataset with a list of texts.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Text_Dataset with a list of texts.</span>
 
 <span class="sd">    The Gutenberg_Dataset can be used to create such a list, by:</span>
 
@@ -144,7 +143,7 @@
             <span class="n">tc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tcum</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_random_text_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a random text index from the Text_Dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a random text index from the Text_Dataset.</span>
 
 <span class="sd">        :param weighted: If True, the probability of a text is weighted by its calculated &#39;probability_weight&#39; attribute.</span>
 <span class="sd">        :return: a random text index</span>
@@ -161,7 +160,7 @@
         <span class="n">separate_punctuation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">preserve_case</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Filter a text.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter a text.</span>
 
 <span class="sd">        :param text: text to filter</span>
 <span class="sd">        :param sanitize_white_space: If True, white space is replaced by a single space.</span>
@@ -192,7 +191,7 @@
         <span class="k">return</span> <span class="n">tokens</span>
 
     <span class="k">def</span> <span class="nf">_every_ngram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">add_special_words</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return all ngrams of length 1..max_len from text.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all ngrams of length 1..max_len from text.</span>
 
 <span class="sd">        :param text: text to extract ngrams from</span>
 <span class="sd">        :param max_len: maximum length of ngrams to extract</span>
@@ -208,7 +207,7 @@
         <span class="k">return</span> <span class="n">ngrams</span>
 
     <span class="k">def</span> <span class="nf">_weight_ngrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ngrams</span><span class="p">,</span> <span class="n">max_weight</span><span class="o">=</span><span class="mf">1e12</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Weight ngrams by their length and frequency. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Weight ngrams by their length and frequency. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are</span>
 <span class="sd">        weigted by max_weight, since we need the full character set and the special words to be</span>
 <span class="sd">        included in the ngram collection.</span>
 
@@ -234,7 +233,7 @@
 <div class="viewcode-block" id="Text_Dataset.init_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">init_tokenizer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;word&quot;</span><span class="p">,</span> <span class="n">max_ngrams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5000</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the tokenizer with the text_list.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tokenizer with the text_list.</span>
 
 <span class="sd">        The character tokenizer simply splits any language text into glyphs.</span>
 
@@ -310,7 +309,7 @@
             <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
                 <span class="n">corpus</span> <span class="o">+=</span> <span class="n">text</span><span class="p">[</span>
                     <span class="s2">&quot;text&quot;</span>
-                <span class="p">]</span>  <span class="c1"># TODO: This generates ngrams across text-bordes, should be changed at some point.</span>
+                <span class="p">]</span>  <span class="c1"># TODO: This generates ngrams across text-borders, should be changed at some point.</span>
             <span class="k">if</span> <span class="n">word_separator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">word_separator</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -341,7 +340,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora as ngrams done.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.tokenize"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.tokenize">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Tokenize a text.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tokenize a text.</span>
 
 <span class="sd">        :param text: text to tokenize</span>
 <span class="sd">        :return: list of tokens&quot;&quot;&quot;</span>
@@ -414,7 +413,7 @@
         <span class="k">return</span> <span class="n">tokens</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.encode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Encode a text.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode a text.</span>
 
 <span class="sd">        :param text: text to encode</span>
 <span class="sd">        :return: list of encoded tokens&quot;&quot;&quot;</span>
@@ -437,7 +436,7 @@
         <span class="k">return</span> <span class="n">encoded</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.decode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">mark_separator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Decode a list of encoded tokens.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode a list of encoded tokens.</span>
 
 <span class="sd">        :param encoded: list of encoded tokens</span>
 <span class="sd">        :param mark_separator: (ngram only) if True, add a separator between tokens for debug</span>
@@ -471,7 +470,7 @@
         <span class="k">return</span> <span class="n">decoded_text</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.get_unique_token_count"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_unique_token_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_token_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the number of unique tokens.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of unique tokens.</span>
 
 <span class="sd">        :return: number of unique tokens&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;word&quot;</span><span class="p">:</span>
@@ -485,7 +484,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.init_getitem"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the __getitem__ and __len__ methods.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the __getitem__ and __len__ methods.</span>
 
 <span class="sd">        This method needs to be called before using len() or index-access of the dataset.</span>
 
@@ -540,7 +539,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the length of the dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the length of the dataset.</span>
 
 <span class="sd">        Note that this length depends on the initialization via :ref:`~Text_Dataset.Text_Dataset.init_getitem`.</span>
 
@@ -552,7 +551,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a sample from the dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a sample from the dataset.</span>
 
 <span class="sd">        Format of the returned sample depends on :ref:`~Text_Dataset.Text_Dataset.init_getitem`.</span>
 
@@ -611,7 +610,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Text_Dataset.get_random_item"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a random sample from the dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a random sample from the dataset.</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -624,7 +623,7 @@
     <span class="k">def</span> <span class="nf">_display_colored_html</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">textlist</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Internal function to display text and citation references in HTML.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function to display text and citation references in HTML.&quot;&quot;&quot;</span>
         <span class="n">bgcolorsWht</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;#d4e6e1&quot;</span><span class="p">,</span>
             <span class="s2">&quot;#d8daef&quot;</span><span class="p">,</span>
@@ -692,7 +691,7 @@
 <div class="viewcode-block" id="Text_Dataset.source_highlight"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.source_highlight">[docs]</a>    <span class="k">def</span> <span class="nf">source_highlight</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ref_txt</span><span class="p">,</span> <span class="n">min_quote_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Analyse which parts of `ref_txt` are cited from the texts in the Text_Dataset.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyse which parts of `ref_txt` are cited from the texts in the Text_Dataset.</span>
 
 <span class="sd">        Note: this function requires a jupyter notebook in order to display HTML with markup.</span>
 
@@ -769,7 +768,7 @@
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -790,7 +789,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
