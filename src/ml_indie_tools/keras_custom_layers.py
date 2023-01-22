@@ -390,7 +390,7 @@ class MultiHeadSelfAttention(layers.Layer):
     :param mh_normalize: Boolean, whether to normalize the output of the multi-head self-attention.
     :param norm: either 'batchnorm', 'layernorm, or 'softmax', the normalization used within each self-attention head.
     :param final_relu: Boolean, whether to apply a ReLU after the final scaling and dense layer.
-    :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need). 
+    :param join_heads_by_add: on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need).
     True is recommended, since it requires less parameters at equal performance.
     """
 
@@ -454,24 +454,15 @@ class MultiHeadSelfAttention(layers.Layer):
                 "norm": self.norm,
                 "mh_normalize": self.mh_normalize,
                 "final_relu": self.final_relu,
-                "recurrent": self.recurrent,
-                "gated_memory": self.gated_memory,
                 "join_heads_by_add": self.join_heads_by_add,
             }
         )
         return config
 
-    def call(self, inputs, memory=None):
+    def call(self, inputs):
         xa = []
-        if memory is None:
-            mem = tf.zeros_like(inputs)
-        else:
-            mem = memory
         for i in range(0, self.heads):
-            if self.recurrent is True:
-                xai, mem = self.mhsa[i](inputs, mem)
-            else:
-                xai = self.mhsa[i](inputs)
+            xai = self.mhsa[i](inputs)
             xa.append(self.pm(xai + inputs))
         if self.join_heads_by_add is True:
             for i in range(len(xa)):
@@ -489,10 +480,7 @@ class MultiHeadSelfAttention(layers.Layer):
         x = tf.matmul(x, self.lin) + xt
         if self.mh_normalize is True:
             x = self.ln2(x)
-        if self.recurrent is True and memory is not None:
-            return x, mem
-        else:
-            return x
+        return x
 
 
 class PositionalEncoding(layers.Layer):
@@ -544,4 +532,3 @@ class PositionalEncoding(layers.Layer):
 
     def call(self, inputs):
         return tf.add(inputs, self.pe)
-

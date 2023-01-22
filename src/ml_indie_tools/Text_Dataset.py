@@ -264,7 +264,7 @@ class Text_Dataset:
             for text in self.text_list:
                 corpus += text[
                     "text"
-                ]  # TODO: This generates ngrams across text-bordes, should be changed at some point.
+                ]  # TODO: This generates ngrams across text-borders, should be changed at some point.
             if word_separator is not None:
                 self.word_list = corpus.split(word_separator)
             else:
