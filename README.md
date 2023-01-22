@@ -240,6 +240,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2023-01-22, 0.4.3) Add temperature parameter to generator.
 * (2023-01-21, 0.4.2) Start of port of pytorch transformers from Andrej Karpathy's nanoGPT as implemented in [`ng-video-lecture`](https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py). Additional tests with Apple Silicon MPS and pytorch 2.0 nightly.
 * (2022-12-13, 0.4.0) The great cleanup: neither recurrence nor gated memory improved the transformer architecture, so they are removed again.
 * (2022-12-11, 0.3.17) Testversion for slightly handwavy recurrent attention
