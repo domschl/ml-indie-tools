@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -45,6 +46,7 @@
   <h1>Source code for Text_Dataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -54,7 +56,7 @@
 
 
 <div class="viewcode-block" id="Text_Dataset"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset">[docs]</a><span class="k">class</span> <span class="nc">Text_Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Text_Dataset with a list of texts.</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the Text_Dataset with a list of texts.</span>
 
 <span class="sd">    The Gutenberg_Dataset can be used to create such a list, by:</span>
 
@@ -69,8 +71,10 @@
 <span class="sd">        # Now ls contains a valid list of text records:</span>
 <span class="sd">        td = Text_Dataset(ls)</span>
 
-<span class="sd">    :param text_list: list of text-records of the form: {&#39;author&#39;: &#39;author&#39;, &#39;title&#39;: &#39;title&#39;, &#39;language&#39;: &#39;some-language&#39;,</span>
-<span class="sd">    &#39;text&#39;: &#39;the-long-text&#39;}. Optinal parameters: &#39;weight&#39;: 1.0</span>
+<span class="sd">    If text_list at initialization is None, texts can be added later with the load_texts() method.</span>
+
+<span class="sd">    :param text_list: optional list of text-records of the form: {&#39;author&#39;: &#39;author&#39;, &#39;title&#39;: &#39;title&#39;, &#39;language&#39;: &#39;some-language&#39;,</span>
+<span class="sd">    &#39;text&#39;: &#39;the-long-text&#39;}. Optional parameters: &#39;weight&#39;: 1.0</span>
 <span class="sd">    :param sanitize_white_space: If True, white space is replaced by a single space.</span>
 <span class="sd">    :param separate_punctuation: If True, punctuation is separated from words.</span>
 <span class="sd">    :param preserve_case: If True, the case of the text is preserved.</span>
@@ -78,7 +82,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">text_list</span><span class="p">,</span>
+        <span class="n">text_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sanitize_white_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">separate_punctuation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">preserve_case</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -91,8 +95,39 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;pad&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;sos&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;eos&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;wsep&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;subst&gt;&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">text_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_texts</span><span class="p">(</span>
+                <span class="n">text_list</span><span class="p">,</span>
+                <span class="n">sanitize_white_space</span><span class="o">=</span><span class="n">sanitize_white_space</span><span class="p">,</span>
+                <span class="n">separate_punctuation</span><span class="o">=</span><span class="n">separate_punctuation</span><span class="p">,</span>
+                <span class="n">preserve_case</span><span class="o">=</span><span class="n">preserve_case</span><span class="p">,</span>
+            <span class="p">)</span>
 
+<div class="viewcode-block" id="Text_Dataset.load_texts"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.load_texts">[docs]</a>    <span class="k">def</span> <span class="nf">load_texts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">text_list</span><span class="p">,</span>
+        <span class="n">sanitize_white_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">separate_punctuation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">preserve_case</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a list of texts into the Text_Dataset.</span>
+
+<span class="sd">        Note: if there are already texts in the Text_Dataset, the new texts are appended.</span>
+
+<span class="sd">        :param text_list: list of text-records of the form: {&#39;author&#39;: &#39;author&#39;, &#39;title&#39;: &#39;title&#39;, &#39;language&#39;: &#39;some-language&#39;,</span>
+<span class="sd">        &#39;text&#39;: &#39;the-long-text&#39;}. Optional parameters: &#39;weight&#39;: 1.0</span>
+<span class="sd">        :param sanitize_white_space: If True, white space is replaced by a single space.</span>
+<span class="sd">        :param separate_punctuation: If True, punctuation is separated from words.</span>
+<span class="sd">        :param preserve_case: If True, the case of the text is preserved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">req_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">text_list</span><span class="p">)):</span>
             <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
@@ -102,7 +137,9 @@
                     <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="n">miss</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">valid</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing attribute(s) </span><span class="si">{</span><span class="n">miss</span><span class="si">}</span><span class="s2"> in text[</span><span class="si">{</span><span class="n">ind</span><span class="si">}</span><span class="s2">], skipping&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Missing attribute(s) </span><span class="si">{</span><span class="n">miss</span><span class="si">}</span><span class="s2"> in text[</span><span class="si">{</span><span class="n">ind</span><span class="si">}</span><span class="s2">], skipping this text.&quot;</span>
+                <span class="p">)</span>
                 <span class="k">continue</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text_list</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
             <span class="n">text</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
@@ -119,7 +156,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">lt</span><span class="si">}</span><span class="s2"> text&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">lt</span><span class="si">}</span><span class="s2"> texts&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_calc_probability_weights</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calc_probability_weights</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_calc_probability_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">prs</span> <span class="o">=</span> <span class="mi">0</span>
@@ -143,7 +180,7 @@
             <span class="n">tc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tcum</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_random_text_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a random text index from the Text_Dataset.</span>
+        <span class="sd">&quot;&quot;&quot;Return a random text index from the Text_Dataset.</span>
 
 <span class="sd">        :param weighted: If True, the probability of a text is weighted by its calculated &#39;probability_weight&#39; attribute.</span>
 <span class="sd">        :return: a random text index</span>
@@ -160,7 +197,7 @@
         <span class="n">separate_punctuation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">preserve_case</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter a text.</span>
+        <span class="sd">&quot;&quot;&quot;Filter a text.</span>
 
 <span class="sd">        :param text: text to filter</span>
 <span class="sd">        :param sanitize_white_space: If True, white space is replaced by a single space.</span>
@@ -191,7 +228,7 @@
         <span class="k">return</span> <span class="n">tokens</span>
 
     <span class="k">def</span> <span class="nf">_every_ngram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">add_special_words</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all ngrams of length 1..max_len from text.</span>
+        <span class="sd">&quot;&quot;&quot;Return all ngrams of length 1..max_len from text.</span>
 
 <span class="sd">        :param text: text to extract ngrams from</span>
 <span class="sd">        :param max_len: maximum length of ngrams to extract</span>
@@ -207,7 +244,7 @@
         <span class="k">return</span> <span class="n">ngrams</span>
 
     <span class="k">def</span> <span class="nf">_weight_ngrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ngrams</span><span class="p">,</span> <span class="n">max_weight</span><span class="o">=</span><span class="mf">1e12</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Weight ngrams by their length and frequency. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are</span>
+        <span class="sd">&quot;&quot;&quot;Weight ngrams by their length and frequency. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are</span>
 <span class="sd">        weigted by max_weight, since we need the full character set and the special words to be</span>
 <span class="sd">        included in the ngram collection.</span>
 
@@ -231,9 +268,9 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="Text_Dataset.init_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">init_tokenizer</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;word&quot;</span><span class="p">,</span> <span class="n">max_ngrams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5000</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;ngram&quot;</span><span class="p">,</span> <span class="n">max_ngrams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5000</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tokenizer with the text_list.</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the tokenizer with the text_list.</span>
 
 <span class="sd">        The character tokenizer simply splits any language text into glyphs.</span>
 
@@ -254,11 +291,12 @@
 <span class="sd">        max_tokens should be significantly higher than the number of unique glyphs in the text_list.</span>
 <span class="sd">        Using word_separator=None is usually significantly better than using a word_separator for ngrams.</span>
 
-<span class="sd">        :param tokenizer: &#39;word&#39;, &#39;char&#39;, or &#39;ngram&#39;</span>
+<span class="sd">        :param tokenizer: &#39;word&#39;, &#39;char&#39;, or &#39;ngram&#39; (default)</span>
 <span class="sd">        :param max_ngrams: (ngram only) maximum n-gram length</span>
 <span class="sd">        :param word_separator: (word, ngram) character used to separate words, default None, which amounts to &#39; &#39; (space) for word and no word-splitting for ngram.</span>
 <span class="sd">        :param max_tokens: (ngram only) maximum number of tokens to use</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting tokenizer on </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> texts...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tokenizer</span> <span class="o">==</span> <span class="s2">&quot;word&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="s2">&quot;word&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="o">=</span> <span class="p">{}</span>
@@ -339,8 +377,62 @@
             <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text_encoded&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora as ngrams done.&quot;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Text_Dataset.save_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.save_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">save_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save tokenizer data and text library to JSON-file.</span>
+
+<span class="sd">        This json file can be loaded with load_tokenizer() and has all information needed</span>
+<span class="sd">        to use the tokenizer with trained models and new text.</span>
+
+<span class="sd">        :param file_path: path to file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving tokenizer to </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;tokenizer_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="p">,</span>
+                    <span class="s2">&quot;w2i&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">,</span>
+                    <span class="s2">&quot;i2w&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">,</span>
+                    <span class="s2">&quot;c2i&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">,</span>
+                    <span class="s2">&quot;i2c&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span><span class="p">,</span>
+                    <span class="s2">&quot;t2i&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">,</span>
+                    <span class="s2">&quot;i2t&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span><span class="p">,</span>
+                    <span class="s2">&quot;word_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span><span class="p">,</span>
+                    <span class="s2">&quot;char_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span><span class="p">,</span>
+                    <span class="s2">&quot;ngram_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span><span class="p">,</span>
+                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                    <span class="s2">&quot;word_separator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span><span class="p">,</span>
+                    <span class="s2">&quot;max_ngrams&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span><span class="p">,</span>
+                    <span class="s2">&quot;text_list&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">f</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Text_Dataset.load_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.load_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">load_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load tokenizer data and text library from JSON-file.</span>
+
+<span class="sd">        :param file_path: path to file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading tokenizer from </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tokenizer_type&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;w2i&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2w&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;c2i&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2c&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;t2i&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2t&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;word_tokenizer_init&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;char_tokenizer_init&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ngram_tokenizer_init&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;word_separator&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_ngrams&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;text_list&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading tokenizer done.&quot;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Text_Dataset.tokenize"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.tokenize">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tokenize a text.</span>
+        <span class="sd">&quot;&quot;&quot;Tokenize a text.</span>
 
 <span class="sd">        :param text: text to tokenize</span>
 <span class="sd">        :return: list of tokens&quot;&quot;&quot;</span>
@@ -413,7 +505,7 @@
         <span class="k">return</span> <span class="n">tokens</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.encode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode a text.</span>
+        <span class="sd">&quot;&quot;&quot;Encode a text.</span>
 
 <span class="sd">        :param text: text to encode</span>
 <span class="sd">        :return: list of encoded tokens&quot;&quot;&quot;</span>
@@ -436,7 +528,7 @@
         <span class="k">return</span> <span class="n">encoded</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.decode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">mark_separator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode a list of encoded tokens.</span>
+        <span class="sd">&quot;&quot;&quot;Decode a list of encoded tokens.</span>
 
 <span class="sd">        :param encoded: list of encoded tokens</span>
 <span class="sd">        :param mark_separator: (ngram only) if True, add a separator between tokens for debug</span>
@@ -470,7 +562,7 @@
         <span class="k">return</span> <span class="n">decoded_text</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.get_unique_token_count"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_unique_token_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_token_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of unique tokens.</span>
+        <span class="sd">&quot;&quot;&quot;Get the number of unique tokens.</span>
 
 <span class="sd">        :return: number of unique tokens&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;word&quot;</span><span class="p">:</span>
@@ -484,7 +576,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Text_Dataset.init_getitem"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the __getitem__ and __len__ methods.</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the __getitem__ and __len__ methods.</span>
 
 <span class="sd">        This method needs to be called before using len() or index-access of the dataset.</span>
 
@@ -539,7 +631,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the length of the dataset.</span>
+        <span class="sd">&quot;&quot;&quot;Get the length of the dataset.</span>
 
 <span class="sd">        Note that this length depends on the initialization via :ref:`~Text_Dataset.Text_Dataset.init_getitem`.</span>
 
@@ -551,7 +643,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a sample from the dataset.</span>
+        <span class="sd">&quot;&quot;&quot;Get a sample from the dataset.</span>
 
 <span class="sd">        Format of the returned sample depends on :ref:`~Text_Dataset.Text_Dataset.init_getitem`.</span>
 
@@ -610,7 +702,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Text_Dataset.get_random_item"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a random sample from the dataset.</span>
+        <span class="sd">&quot;&quot;&quot;Get a random sample from the dataset.</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -623,7 +715,7 @@
     <span class="k">def</span> <span class="nf">_display_colored_html</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">textlist</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function to display text and citation references in HTML.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Internal function to display text and citation references in HTML.&quot;&quot;&quot;</span>
         <span class="n">bgcolorsWht</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;#d4e6e1&quot;</span><span class="p">,</span>
             <span class="s2">&quot;#d8daef&quot;</span><span class="p">,</span>
@@ -691,7 +783,7 @@
 <div class="viewcode-block" id="Text_Dataset.source_highlight"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.source_highlight">[docs]</a>    <span class="k">def</span> <span class="nf">source_highlight</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ref_txt</span><span class="p">,</span> <span class="n">min_quote_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyse which parts of `ref_txt` are cited from the texts in the Text_Dataset.</span>
+        <span class="sd">&quot;&quot;&quot;Analyse which parts of `ref_txt` are cited from the texts in the Text_Dataset.</span>
 
 <span class="sd">        Note: this function requires a jupyter notebook in order to display HTML with markup.</span>
 
@@ -768,7 +860,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -789,7 +881,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

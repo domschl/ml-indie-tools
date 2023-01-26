@@ -234,12 +234,14 @@ Checkout the following jupyter notebook based projects for example-usage:
 * [tensor-poet](https://github.com/domschl/tensor-poet)
 * [torch-poet](https://github.com/domschl/torch-poet)
 * [transformer-poet](https://github.com/domschl/transformer-poet)
+* [torch-transformer-poet](https://github.com/domschl/torch-transformer-poet), using pytorch transformers from Andrej Karpathy's nanoGPT as implemented in [`ng-video-lecture`](https://github.com/karpathy/ng-video-lecture)
 
 ### Arithmetic and logic operations
 * [ALU_Net](https://github.com/domschl/ALU_Net)
 
 ## History
 
+* (2023-01-26, 0.4.4) Add save/load tokenizer to Text_Dataset to enable reusing tokenizer data.
 * (2023-01-22, 0.4.3) Add temperature parameter to generator.
 * (2023-01-21, 0.4.2) Start of port of pytorch transformers from Andrej Karpathy's nanoGPT as implemented in [`ng-video-lecture`](https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py). Additional tests with Apple Silicon MPS and pytorch 2.0 nightly.
 * (2022-12-13, 0.4.0) The great cleanup: neither recurrence nor gated memory improved the transformer architecture, so they are removed again.

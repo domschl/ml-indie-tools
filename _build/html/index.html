@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
@@ -14,8 +14,8 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -48,11 +48,11 @@
           <div class="body" role="main">
             
   <section id="welcome-to-ml-indie-tools-s-documentation">
-<h1>Welcome to ml-indie-tools’s documentation!<a class="headerlink" href="#welcome-to-ml-indie-tools-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to ml-indie-tools’s documentation!<a class="headerlink" href="#welcome-to-ml-indie-tools-s-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <section id="module-env_tools">
-<span id="mlenv-object"></span><h2>MLEnv object<a class="headerlink" href="#module-env_tools" title="Permalink to this headline">¶</a></h2>
+<span id="mlenv-object"></span><h2>MLEnv object<a class="headerlink" href="#module-env_tools" title="Permalink to this heading">¶</a></h2>
 <p>Tools to configure ML environment for Tensorflow, Pytorch or JAX and
 optional notebook/colab environment</p>
 <dl class="py class">
@@ -229,7 +229,7 @@ is lost, once the Colab session is closed.</p>
 
 </section>
 <section id="module-tuner">
-<span id="mltuner-object"></span><h2>MLTuner object<a class="headerlink" href="#module-tuner" title="Permalink to this headline">¶</a></h2>
+<span id="mltuner-object"></span><h2>MLTuner object<a class="headerlink" href="#module-tuner" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tuner.MLTuner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tuner.</span></span><span class="sig-name descname"><span class="pre">MLTuner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tuner.html#MLTuner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tuner.MLTuner" title="Permalink to this definition">¶</a></dt>
@@ -288,7 +288,7 @@ is lost, once the Colab session is closed.</p>
 
 </section>
 <section id="module-Gutenberg_Dataset">
-<span id="gutenberg-dataset-object"></span><h2>Gutenberg_Dataset object<a class="headerlink" href="#module-Gutenberg_Dataset" title="Permalink to this headline">¶</a></h2>
+<span id="gutenberg-dataset-object"></span><h2>Gutenberg_Dataset object<a class="headerlink" href="#module-Gutenberg_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Gutenberg_Dataset.</span></span><span class="sig-name descname"><span class="pre">Gutenberg_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://www.gutenberg.org/dirs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gutenberg'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -473,10 +473,10 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 
 </section>
 <section id="module-Text_Dataset">
-<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this headline">¶</a></h2>
+<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Text_Dataset.</span></span><span class="sig-name descname"><span class="pre">Text_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Text_Dataset.</span></span><span class="sig-name descname"><span class="pre">Text_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Initialize the Text_Dataset with a list of texts.</p>
 <p>The Gutenberg_Dataset can be used to create such a list, by:</p>
@@ -490,12 +490,13 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="n">td</span> <span class="o">=</span> <span class="n">Text_Dataset</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>If text_list at initialization is None, texts can be added later with the load_texts() method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text_list</strong> – list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
+<dd class="field-odd"><p><strong>text_list</strong> – optional list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
 </dd>
 </dl>
-<p>‘text’: ‘the-long-text’}. Optinal parameters: ‘weight’: 1.0
+<p>‘text’: ‘the-long-text’}. Optional parameters: ‘weight’: 1.0
 :param sanitize_white_space: If True, white space is replaced by a single space.
 :param separate_punctuation: If True, punctuation is separated from words.
 :param preserve_case: If True, the case of the text is preserved.</p>
@@ -603,7 +604,7 @@ the tokenizer_type in call to init_tokenizer().</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.init_tokenizer">
-<span class="sig-name descname"><span class="pre">init_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'word'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ngrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_tokenizer" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">init_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ngram'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ngrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_tokenizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the tokenizer with the text_list.</p>
 <p>The character tokenizer simply splits any language text into glyphs.</p>
 <p>A word tokenizer works for languages that have the concept of word separators (as in English,
@@ -623,11 +624,51 @@ Using word_separator=None is usually significantly better than using a word_sepa
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> – ‘word’, ‘char’, or ‘ngram’</p></li>
+<li><p><strong>tokenizer</strong> – ‘word’, ‘char’, or ‘ngram’ (default)</p></li>
 <li><p><strong>max_ngrams</strong> – (ngram only) maximum n-gram length</p></li>
 <li><p><strong>word_separator</strong> – (word, ngram) character used to separate words, default None, which amounts to ‘ ‘ (space) for word and no word-splitting for ngram.</p></li>
 <li><p><strong>max_tokens</strong> – (ngram only) maximum number of tokens to use</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.load_texts">
+<span class="sig-name descname"><span class="pre">load_texts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.load_texts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.load_texts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a list of texts into the Text_Dataset.</p>
+<p>Note: if there are already texts in the Text_Dataset, the new texts are appended.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text_list</strong> – list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
+</dd>
+</dl>
+<p>‘text’: ‘the-long-text’}. Optional parameters: ‘weight’: 1.0
+:param sanitize_white_space: If True, white space is replaced by a single space.
+:param separate_punctuation: If True, punctuation is separated from words.
+:param preserve_case: If True, the case of the text is preserved.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.load_tokenizer">
+<span class="sig-name descname"><span class="pre">load_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.load_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.load_tokenizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load tokenizer data and text library from JSON-file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> – path to file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.save_tokenizer">
+<span class="sig-name descname"><span class="pre">save_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.save_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.save_tokenizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save tokenizer data and text library to JSON-file.</p>
+<p>This json file can be loaded with load_tokenizer() and has all information needed
+to use the tokenizer with trained models and new text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> – path to file</p>
 </dd>
 </dl>
 </dd></dl>
@@ -667,7 +708,7 @@ Using word_separator=None is usually significantly better than using a word_sepa
 
 </section>
 <section id="module-ALU_Dataset">
-<span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Permalink to this headline">¶</a></h2>
+<span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ALU_Dataset.ALU_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ALU_Dataset.</span></span><span class="sig-name descname"><span class="pre">ALU_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">31</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ALU_Dataset.html#ALU_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ALU_Dataset.ALU_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -755,250 +796,37 @@ the twelve supported ops:
 </dd></dl>
 
 </section>
-<section id="module-keras_custom_layers">
-<span id="residualblock-object"></span><h2>ResidualBlock object<a class="headerlink" href="#module-keras_custom_layers" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.ResidualBlock">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ResidualBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ResidualBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ResidualBlock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Residual Block layer for Keras</p>
-<p>The residual block consists of two fully connected layers with units neurons
-followed by two BatchNorms and ReLUs:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#   ┌──────────────────────────────────────────────────┐
-#   │  ┌─────┐  ┌──┐  ┌────┐    ┌─────┐  ┌──┐  ┌────┐  ▼
-# ──┴─►│Dense│─►│BN│─►│ReLU│───►│Dense│─►│BN│─►│ReLU│─ + ─►    highway=True
-#      └─────┘  └──┘  └────┘    └─────┘  └──┘  └────┘
-#
-#   ┌──────────────────────────────────────────┐
-#   │  ┌─────┐  ┌──┐  ┌────┐    ┌─────┐  ┌──┐  ▼   ┌────┐
-# ──┴─►│Dense│─►│BN│─►│ReLU│───►│Dense│─►│BN│─ + ─►│ReLU│─►    highway=False
-#      └─────┘  └──┘  └────┘    └─────┘  └──┘      └────┘
-</pre></div>
-</div>
-<p>The additive residual connection either bridges all layers (highway), or
-connects just before the last ReLU.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
-<li><p><strong>highway</strong> – Boolean, whether to use highway connection or not.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="residualblock-object">
+<h2>ResidualBlock object<a class="headerlink" href="#residualblock-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="residualdense-object">
-<h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.ResidualDense">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ResidualDense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ResidualDense"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ResidualDense" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Residual Dense layer for Keras</p>
-<p>The residual dense layer consists of a fully connected layer followed by BatchNorm and ReLU:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#   ┌─────────────────────────┐
-#   │  ┌─────┐  ┌──┐  ┌────┐  ▼
-# ──┴─►│Dense│─►│BN│─►│ReLU│─ + ─►
-#      └─────┘  └──┘  └────┘
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
-<li><p><strong>regularizer</strong> – Positive float, regularization strength for the Dense layer.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="residualdensestack-object">
-<h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.ResidualDenseStack">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ResidualDenseStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ResidualDenseStack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ResidualDenseStack" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Residual Dense layer for Keras</p>
-<p>The residual dense layer stack consists of <cite>layer_count</cite> <a class="reference internal" href="#keras_custom_layers.ResidualDense" title="keras_custom_layers.ResidualDense"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualDense</span></code></a> layers.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#  ┌─────────── n ─────────────┐   n = layer_count repetitions
-#   ┌─────────────────────────┐
-#   │  ┌─────┐  ┌──┐  ┌────┐  ▼
-# ──┴─►│Dense│─►│BN│─►│ReLU│─ + ─►
-#      └─────┘  └──┘  └────┘
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
-<li><p><strong>layer_count</strong> – Positive integer, number of layer-blocks, each a <cite>ResidualDense</cite> block.</p></li>
-<li><p><strong>regularizer</strong> – Positive float, regularization strength for the Dense layer.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="parallelresidualdensestacks-object">
-<h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.ParallelResidualDenseStacks">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">ParallelResidualDenseStacks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#ParallelResidualDenseStacks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.ParallelResidualDenseStacks" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Parallel Residual Dense Stacks layer for Keras</p>
-<p>The parallel residual dense layer stacks consist of <cite>stacks</cite> count parallel
-<a class="reference internal" href="#keras_custom_layers.ResidualDenseStack" title="keras_custom_layers.ResidualDenseStack"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualDenseStack</span></code></a>, each of which consists of  <cite>layer_count</cite> <a class="reference internal" href="#keras_custom_layers.ResidualDense" title="keras_custom_layers.ResidualDense"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidualDense</span></code></a>
-layers. The output of all parallel stacks is concatenated and scaled down to <cite>units</cite> units.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#        ┌─────────── n ─────────────┐   n = layer_count repetitions
-#         ┌─────────────────────────┐
-#         │  ┌─────┐  ┌──┐  ┌────┐  ▼    ┌──────┐
-#   ┌─────┴─►│Dense│─►│BN│─►│ReLU│─ + ─► │      │
-#   │        └─────┘  └──┘  └────┘       │      │
-#   │                                    │      │
-#   │    ┌─────────── n ─────────────┐   │      │
-#   │     ┌─────────────────────────┐    │      │
-#   │     │  ┌─────┐  ┌──┐  ┌────┐  ▼    │concat│   ┌─────┐  ┌────┐
-#   ├─────┴─►│Dense│─►│BN│─►│ReLU│─ + ─► │      │ ─►│Dense│─►│ReLU│─►
-# ──┤        └─────┘  └──┘  └────┘       │      │   └─────┘  └────┘
-#   │                .                   │      │    scale down to
-#   │                . `stacks` reps     │      │    `units`.
-#   │                .                   │      │
-#   │    ┌─────────── n ─────────────┐   │      │
-#   │     ┌─────────────────────────┐    │      │
-#   │     │  ┌─────┐  ┌──┐  ┌────┐  ▼    │      │
-#   └─────┴─►│Dense│─►│BN│─►│ReLU│─ + ─► │      │
-#            └─────┘  └──┘  └────┘       └──────┘
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>units</strong> – Positive integer, number of hidden units.</p></li>
-<li><p><strong>layer_count</strong> – Positive integer, number of layer-blocks, each a <cite>ResidualDense</cite> block.</p></li>
-<li><p><strong>stacks</strong> – Positive integer, number of parallel stacks.</p></li>
-<li><p><strong>regularizer</strong> – Positive float, regularization strength for the Dense layer.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="selfattention-object">
-<h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.SelfAttention">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">SelfAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#SelfAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.SelfAttention" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Self-attention layer for Keras</p>
-<p>The self-attention layer learns three matrices (key <span class="math notranslate nohighlight">\(W_k\)</span>, query <span class="math notranslate nohighlight">\(W_q\)</span>, value <span class="math notranslate nohighlight">\(W_v\)</span>)
-that provide context-information for the <span class="math notranslate nohighlight">\(input\)</span>.
-Input is mutiplied with all three matrices, then <span class="math notranslate nohighlight">\(W_k\)</span> and <span class="math notranslate nohighlight">\(W_q\)</span> are multiplied,
-scaled down by <span class="math notranslate nohighlight">\(\sqrt{\dim{input}[-1]}\)</span> and normalized, either by LayerNorm,
-BatchNorm or Softmax or not at all. The result is then multiplied with <span class="math notranslate nohighlight">\(W_v\)</span>, and, if hidden
-dimension of the <span class="math notranslate nohighlight">\(W_{x_i}\)</span> matrices is different from input units last dimension,
-rescaled by a final dense matrix multiply. Output has same shape as input.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#
-#     ┌──┐
-#  ┌► │Wk│───┐   ┌─────┐
-#  │  └──┘   │   │Scale│
-#  │  ┌──┐   × ─►│Norm │─┐   (opt.)
-# ─┼─►│Wq│───┘   └─────┘ │   ┌─────┐
-#  │  └──┘               │   │Scale│──►
-#  │  ┌──┐               × ─►│Dense│
-#  └► │Wv│───────────────┘   └─────┘
-#     └──┘
-#
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>units</strong> – Positive integer, number of hidden units. The matrices <span class="math notranslate nohighlight">\(W_{x_i}\)</span> are of shape <span class="math notranslate nohighlight">\(hs \times hs\)</span>.</p></li>
-<li><p><strong>norm</strong> – either ‘batchnorm’, ‘layernorm’, ‘softmax’, or None</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="multiheadselfattention-object">
-<h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.MultiHeadSelfAttention">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">MultiHeadSelfAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#MultiHeadSelfAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.MultiHeadSelfAttention" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Multi-head self-attention layer for Keras</p>
-<p>The multi-head self-attention layer concatenates the output of <cite>heads</cite> <a class="reference internal" href="#keras_custom_layers.SelfAttention" title="keras_custom_layers.SelfAttention"><code class="xref py py-class docutils literal notranslate"><span class="pre">SelfAttention</span></code></a>
-layers. Each of the self-attention layers has an additive residual connection.
-If <cite>mh_normalize</cite> is True, the concatenated output is normalized.
-After scaling down to the number of units, the output is then passed through a
-ReLU and Dense layer again with residual connection.
-Finally, optional normalization and a final optional ReLU is applied.
-Output has same shape as input.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#    ┌──────────────┐
-#    │  ┌────────┐  ▼   ┌──────┐  ┌────┐
-#  ┌─┴─►│SelfAtt.│─ + ─►│      │  │    │
-#  │    └────────┘      │      │  │    │
-#  │ ┌──────────────┐   │      │  │    │          ┌───────────────────┐   ┌────┐
-# ─┤ │  ┌────────┐  ▼   │      │  │Opt.│  ┌─────┐ │  ┌────┐  ┌─────┐  ▼   │Opt │
-#  ├─┴─►│SelfAtt.│─ + ─►│      │─►│Norm│─►│Scale│─┴─►│ReLU│─►│Dense│─ + ─►│Norm│─►
-#  │    └────────┘      │concat│  │    │  └─────┘    └────┘  └─────┘      └────┘
-#  │        .           │ or   │  │    │
-#  │        . head      │ relu │  │    │
-#  │        . reps      │ +add │  │    │
-#  │ ┌──────────────┐   │      │  │    │
-#  │ │  ┌────────┐  ▼   │      │  │    │
-#  └─┴─►│SelfAtt.│─ + ─►│      │  │    │
-#       └────────┘      └──────┘  └────┘
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>units</strong> – Positive integer <cite>hs</cite>, number of hidden units.</p></li>
-<li><p><strong>heads</strong> – Positive integer, number of self-attention heads.</p></li>
-<li><p><strong>mh_normalize</strong> – Boolean, whether to normalize the output of the multi-head self-attention.</p></li>
-<li><p><strong>norm</strong> – either ‘batchnorm’, ‘layernorm, or ‘softmax’, the normalization used within each self-attention head.</p></li>
-<li><p><strong>final_relu</strong> – Boolean, whether to apply a ReLU after the final scaling and dense layer.</p></li>
-<li><p><strong>join_heads_by_add</strong> – on true heads are added after additional relu-nonlin, instead of concatenated (original all-you-need).</p></li>
-</ul>
-</dd>
-</dl>
-<p>True is recommended, since it requires less parameters at equal performance.</p>
-</dd></dl>
-
+<h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="positionalencoding-object">
-<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="keras_custom_layers.PositionalEncoding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">keras_custom_layers.</span></span><span class="sig-name descname"><span class="pre">PositionalEncoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/keras_custom_layers.html#PositionalEncoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#keras_custom_layers.PositionalEncoding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">keras.engine.base_layer.Layer</span></code></p>
-<p>Positional encoding layer.</p>
-<p>adds sinusoid of different frequencies to the input. Can be used to add sequence-information to input
-data for transformers or attention layers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>amplitude</strong> – float, amplitude of the encoding, default=1.0.</p></li>
-<li><p><strong>trainable</strong> – boolean, whether the weights of the layer are trainable, default=False.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="readme-file">
-<h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h2>
+<h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 <section id="a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments">
-<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this headline">¶</a></h1>
+<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this heading">¶</a></h1>
 <a class="reference external image-reference" href="LICENSE"><img alt="License" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" /></a>
 <a class="reference external image-reference" href="https://domschl.github.io/ml-indie-tools/index.html"><img alt="Docs" src="https://img.shields.io/badge/docs-stable-blue.svg" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ml-indie-tools
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install ml-indie-tools
 </pre></div>
 </div>
 <p>This module contains of a collection of tools useable for researchers with limited access to compute-resources and
@@ -1137,7 +965,7 @@ Files that are downloaded are cached to prevent unnecessary load on Gutenberg’
 <p>If you plan to use a lot of files (hundreds or more) from Gutenberg, a local mirror might be the best
 solution. Have a look at <a class="reference external" href="https://www.gutenberg.org/help/mirroring.html">Project Gutenberg’s notes on mirrors</a>.</p>
 <p>A mirror image suitable for this project can be made with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rsync<span class="w"> </span>-zarv<span class="w"> </span>--dry-run<span class="w"> </span>--prune-empty-dirs<span class="w"> </span>--del<span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*/&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s1">&#39;*.&#39;</span><span class="o">{</span>txt,pdf,ALL<span class="o">}</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="w"> </span>aleph.gutenberg.org::gutenberg<span class="w"> </span>./gutenberg_mirror
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rsync -zarv --dry-run --prune-empty-dirs --del --include<span class="o">=</span><span class="s2">&quot;*/&quot;</span> --include<span class="o">=</span><span class="s1">&#39;*.&#39;</span><span class="o">{</span>txt,pdf,ALL<span class="o">}</span> --exclude<span class="o">=</span><span class="s2">&quot;*&quot;</span> aleph.gutenberg.org::gutenberg ./gutenberg_mirror
 </pre></div>
 </div>
 <p>It’s not mandatory to include <code class="docutils literal notranslate"><span class="pre">pdf</span></code>-files, since they are currently not used. Please review the <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> flag.</p>
@@ -1222,11 +1050,13 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/tensor-poet">tensor-poet</a></p></li>
 <li><p><a class="reference external" href="https://github.com/domschl/torch-poet">torch-poet</a></p></li>
 <li><p><a class="reference external" href="https://github.com/domschl/transformer-poet">transformer-poet</a></p></li>
+<li><p><a class="reference external" href="https://github.com/domschl/torch-transformer-poet">torch-transformer-poet</a>, using pytorch transformers from Andrej Karpathy’s nanoGPT as implemented in <cite>``ng-video-lecture`</cite> &lt;<a class="reference external" href="https://github.com/karpathy/ng-video-lecture">https://github.com/karpathy/ng-video-lecture</a>&gt;`_</p></li>
 </ul>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2023-01-26, 0.4.4) Add save/load tokenizer to Text_Dataset to enable reusing tokenizer data.</p></li>
 <li><p>(2023-01-22, 0.4.3) Add temperature parameter to generator.</p></li>
 <li><p>(2023-01-21, 0.4.2) Start of port of pytorch transformers from Andrej Karpathy’s nanoGPT as implemented in <cite>``ng-video-lecture`</cite> &lt;<a class="reference external" href="https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py">https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py</a>&gt;`_. Additional tests with Apple Silicon MPS and pytorch 2.0 nightly.</p></li>
 <li><p>(2022-12-13, 0.4.0) The great cleanup: neither recurrence nor gated memory improved the transformer architecture, so they are removed again.</p></li>
@@ -1253,7 +1083,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -1277,7 +1107,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><a class="reference internal" href="#module-Gutenberg_Dataset">Gutenberg_Dataset object</a></li>
 <li><a class="reference internal" href="#module-Text_Dataset">Text_Dataset object</a></li>
 <li><a class="reference internal" href="#module-ALU_Dataset">ALU_Dataset object</a></li>
-<li><a class="reference internal" href="#module-keras_custom_layers">ResidualBlock object</a></li>
+<li><a class="reference internal" href="#residualblock-object">ResidualBlock object</a></li>
 <li><a class="reference internal" href="#residualdense-object">ResidualDense object</a></li>
 <li><a class="reference internal" href="#residualdensestack-object">ResidualDenseStack object</a></li>
 <li><a class="reference internal" href="#parallelresidualdensestacks-object">ParallelResidualDenseStacks object</a></li>
@@ -1313,7 +1143,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1336,7 +1166,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>
