@@ -1,5 +1,6 @@
 import random
 import logging
+import json
 from collections import Counter
 
 try:
@@ -24,8 +25,10 @@ class Text_Dataset:
         # Now ls contains a valid list of text records:
         td = Text_Dataset(ls)
 
-    :param text_list: list of text-records of the form: {'author': 'author', 'title': 'title', 'language': 'some-language',
-    'text': 'the-long-text'}. Optinal parameters: 'weight': 1.0
+    If text_list at initialization is None, texts can be added later with the load_texts() method.
+
+    :param text_list: optional list of text-records of the form: {'author': 'author', 'title': 'title', 'language': 'some-language',
+    'text': 'the-long-text'}. Optional parameters: 'weight': 1.0
     :param sanitize_white_space: If True, white space is replaced by a single space.
     :param separate_punctuation: If True, punctuation is separated from words.
     :param preserve_case: If True, the case of the text is preserved.
@@ -33,7 +36,7 @@ class Text_Dataset:
 
     def __init__(
         self,
-        text_list,
+        text_list=None,
         sanitize_white_space=False,
         separate_punctuation=False,
         preserve_case=True,
@@ -46,8 +49,39 @@ class Text_Dataset:
         self.ngram_tokenizer_init = False
         self.getitem_init = False
         self.tokenizer_type = None
+        self.i2c = None
+        self.c2i = None
+        self.i2w = None
+        self.w2i = None
+        self.i2t = None
+        self.t2i = None
         self.special_words = ["<unk>", "<pad>", "<sos>", "<eos>", "<wsep>", "<subst>"]
+        if text_list is not None:
+            self.load_texts(
+                text_list,
+                sanitize_white_space=sanitize_white_space,
+                separate_punctuation=separate_punctuation,
+                preserve_case=preserve_case,
+            )
 
+    def load_texts(
+        self,
+        text_list,
+        sanitize_white_space=False,
+        separate_punctuation=False,
+        preserve_case=True,
+    ):
+        """
+        Load a list of texts into the Text_Dataset.
+
+        Note: if there are already texts in the Text_Dataset, the new texts are appended.
+
+        :param text_list: list of text-records of the form: {'author': 'author', 'title': 'title', 'language': 'some-language',
+        'text': 'the-long-text'}. Optional parameters: 'weight': 1.0
+        :param sanitize_white_space: If True, white space is replaced by a single space.
+        :param separate_punctuation: If True, punctuation is separated from words.
+        :param preserve_case: If True, the case of the text is preserved.
+        """
         req_attrs = ["title", "author", "language", "text"]
         for ind in range(0, len(text_list)):
             valid = True
@@ -57,7 +91,9 @@ class Text_Dataset:
                     valid = False
                     miss.append(attr)
             if valid is False:
-                self.log.error(f"Missing attribute(s) {miss} in text[{ind}], skipping")
+                self.log.error(
+                    f"Missing attribute(s) {miss} in text[{ind}], skipping this text."
+                )
                 continue
             text = text_list[ind]
             text["index"] = self.index
@@ -186,7 +222,7 @@ class Text_Dataset:
         )
 
     def init_tokenizer(
-        self, tokenizer="word", max_ngrams=5, word_separator=None, max_tokens=5000
+        self, tokenizer="ngram", max_ngrams=5, word_separator=None, max_tokens=5000
     ):
         """Initialize the tokenizer with the text_list.
 
@@ -209,11 +245,12 @@ class Text_Dataset:
         max_tokens should be significantly higher than the number of unique glyphs in the text_list.
         Using word_separator=None is usually significantly better than using a word_separator for ngrams.
 
-        :param tokenizer: 'word', 'char', or 'ngram'
+        :param tokenizer: 'word', 'char', or 'ngram' (default)
         :param max_ngrams: (ngram only) maximum n-gram length
         :param word_separator: (word, ngram) character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
         :param max_tokens: (ngram only) maximum number of tokens to use
         """
+        self.log.info(f"Starting tokenizer on {len(self.text_list)} texts...")
         if tokenizer == "word":
             self.tokenizer_type = "word"
             self.w2i = {}
@@ -293,6 +330,60 @@ class Text_Dataset:
             self.log.info(f"Encoding text {text['title']}...")
             text["text_encoded"] = self.encode(text["text"])
         self.log.info("Encoding text corpora as ngrams done.")
+
+    def save_tokenizer(self, file_path):
+        """Save tokenizer data and text library to JSON-file.
+
+        This json file can be loaded with load_tokenizer() and has all information needed
+        to use the tokenizer with trained models and new text.
+
+        :param file_path: path to file
+        """
+        self.log.info(f"Saving tokenizer to {file_path}")
+        with open(file_path, "w") as f:
+            json.dump(
+                {
+                    "tokenizer_type": self.tokenizer_type,
+                    "w2i": self.w2i,
+                    "i2w": self.i2w,
+                    "c2i": self.c2i,
+                    "i2c": self.i2c,
+                    "t2i": self.t2i,
+                    "i2t": self.i2t,
+                    "word_tokenizer_init": self.word_tokenizer_init,
+                    "char_tokenizer_init": self.char_tokenizer_init,
+                    "ngram_tokenizer_init": self.ngram_tokenizer_init,
+                    "index": self.index,
+                    "word_separator": self.word_separator,
+                    "max_ngrams": self.max_ngrams,
+                    "text_list": self.text_list,
+                },
+                f,
+            )
+
+    def load_tokenizer(self, file_path):
+        """Load tokenizer data and text library from JSON-file.
+
+        :param file_path: path to file
+        """
+        self.log.info(f"Loading tokenizer from {file_path}")
+        with open(file_path, "r") as f:
+            data = json.load(f)
+            self.tokenizer_type = data["tokenizer_type"]
+            self.w2i = data["w2i"]
+            self.i2w = data["i2w"]
+            self.c2i = data["c2i"]
+            self.i2c = data["i2c"]
+            self.t2i = data["t2i"]
+            self.i2t = data["i2t"]
+            self.word_tokenizer_init = data["word_tokenizer_init"]
+            self.char_tokenizer_init = data["char_tokenizer_init"]
+            self.ngram_tokenizer_init = data["ngram_tokenizer_init"]
+            self.index = data["index"]
+            self.word_separator = data["word_separator"]
+            self.max_ngrams = data["max_ngrams"]
+            self.text_list = data["text_list"]
+        self.log.info("Loading tokenizer done.")
 
     def tokenize(self, text):
         """Tokenize a text.
