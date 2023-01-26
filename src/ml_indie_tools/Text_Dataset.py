@@ -371,11 +371,11 @@ class Text_Dataset:
             data = json.load(f)
             self.tokenizer_type = data["tokenizer_type"]
             self.w2i = data["w2i"]
-            self.i2w = data["i2w"]
+            self.i2w = {int(k): v for k, v in data["i2w"].items()}
             self.c2i = data["c2i"]
-            self.i2c = data["i2c"]
+            self.i2c = {int(k): v for k, v in data["i2c"].items()}
             self.t2i = data["t2i"]
-            self.i2t = data["i2t"]
+            self.i2t = {int(k): v for k, v in data["i2t"].items()}
             self.word_tokenizer_init = data["word_tokenizer_init"]
             self.char_tokenizer_init = data["char_tokenizer_init"]
             self.ngram_tokenizer_init = data["ngram_tokenizer_init"]
