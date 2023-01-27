@@ -71,6 +71,7 @@
 <div class="viewcode-block" id="Folder_Dataset.load_index"><a class="viewcode-back" href="../index.html#Folder_Dataset.Folder_Dataset.load_index">[docs]</a>    <span class="k">def</span> <span class="nf">load_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This function loads the text files from the folder.&quot;&quot;&quot;</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_path</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
                 <span class="c1"># print(file)</span>
@@ -99,10 +100,12 @@
                         <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="n">language</span><span class="p">,</span>
                         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
                         <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+                        <span class="s2">&quot;alias&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;FL</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="p">}</span>
                     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                         <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">+=</span> <span class="p">[</span><span class="n">rec</span><span class="p">]</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">)</span><span class="si">}</span><span class="s2"> records from Folder.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">)</span></div>
 

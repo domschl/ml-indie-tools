@@ -241,6 +241,8 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2023-01-27, 0.5.1) Add `alias` field to local datasets to protect
+privacy of local document names.
 * (2023-01-27, 0.5.0) Acquire training data from Calibre library ([`Calibre_Dataset`](https://domschl.github.io/ml-indie-tools/_build/html/index.html#Calibre_Dataset.Calibre_Dataset)), the documents must be in text format in Calibre, or get training data from a folder containing text files ([`Folder_Dataset`](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Folder_Dataset)). Text_Dataset can now
 contain texts from Gutenberg, Calibre or a folder of text files.
 * (2023-01-26, 0.4.4) Add save/load tokenizer to Text_Dataset to enable reusing tokenizer data.
