@@ -12,10 +12,8 @@
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -54,7 +52,7 @@
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install ml-indie-tools
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ml-indie-tools
 </pre></div>
 </div>
 <p>This module contains of a collection of tools useable for researchers with limited access to compute-resources and
@@ -206,7 +204,7 @@ Files that are downloaded are cached to prevent unnecessary load on Gutenberg’
 <p>If you plan to use a lot of files (hundreds or more) from Gutenberg, a local mirror might be the best
 solution. Have a look at <a class="reference external" href="https://www.gutenberg.org/help/mirroring.html">Project Gutenberg’s notes on mirrors</a>.</p>
 <p>A mirror image suitable for this project can be made with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rsync -zarv --dry-run --prune-empty-dirs --del --include<span class="o">=</span><span class="s2">&quot;*/&quot;</span> --include<span class="o">=</span><span class="s1">&#39;*.&#39;</span><span class="o">{</span>txt,pdf,ALL<span class="o">}</span> --exclude<span class="o">=</span><span class="s2">&quot;*&quot;</span> aleph.gutenberg.org::gutenberg ./gutenberg_mirror
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rsync<span class="w"> </span>-zarv<span class="w"> </span>--dry-run<span class="w"> </span>--prune-empty-dirs<span class="w"> </span>--del<span class="w"> </span>--include<span class="o">=</span><span class="s2">&quot;*/&quot;</span><span class="w"> </span>--include<span class="o">=</span><span class="s1">&#39;*.&#39;</span><span class="o">{</span>txt,pdf,ALL<span class="o">}</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="w"> </span>aleph.gutenberg.org::gutenberg<span class="w"> </span>./gutenberg_mirror
 </pre></div>
 </div>
 <p>It’s not mandatory to include <code class="docutils literal notranslate"><span class="pre">pdf</span></code>-files, since they are currently not used. Please review the <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> flag.</p>
@@ -326,6 +324,9 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <section id="history">
 <h2>History<a class="headerlink" href="#history" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
+<li><p>(2023-01-27, 0.5.0) Aquire training data from Calibre library (<code class="docutils literal notranslate"><span class="pre">Calibre_Dataset</span></code>) or get
+training data from a folder containing text files (<code class="docutils literal notranslate"><span class="pre">Folder_Dataset</span></code>). Text_Dataset can now
+contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
 <li><p>(2023-01-26, 0.4.4) Add save/load tokenizer to Text_Dataset to enable reusing tokenizer data.</p></li>
 <li><p>(2023-01-22, 0.4.3) Add temperature parameter to generator.</p></li>
 <li><p>(2023-01-21, 0.4.2) Start of port of pytorch transformers from Andrej Karpathy’s nanoGPT as implemented in <cite>``ng-video-lecture`</cite> &lt;<a class="reference external" href="https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py">https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py</a>&gt;`_. Additional tests with Apple Silicon MPS and pytorch 2.0 nightly.</p></li>
@@ -426,7 +427,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>
