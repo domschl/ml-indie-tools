@@ -11,14 +11,14 @@ class Calibre_Dataset:
     """
 
     def __init__(self, library_path, verbose=True):
-
-        # old root, vanished: http://www.mirrorservice.org/sites/ftp.ibiblio.org/pub/docs/books/gutenberg
         self.log = logging.getLogger("CalibreLib")
+        library_path = os.path.expanduser(library_path)
         if os.path.exists(os.path.join(library_path, "metadata.db")) is False:
             raise FileNotFoundError("Calibre library not found at " + library_path)
 
         self.library_path = library_path
         self.verbose = verbose
+        self.records = []
 
     def load_index(self):
         """This function loads the Calibre library records that contain text-format books."""
@@ -27,21 +27,41 @@ class Calibre_Dataset:
         for root, dirs, files in os.walk(self.library_path):
             for file in files:
                 if file.endswith(".txt"):
-                    # self.records += [os.path.join(root, file)]
-                    # remove txt extension and add opf extension
-                    opf_file = os.path.splitext(os.path.join(root, file))[0] + ".opf"
+                    opf_file = os.path.join(root, "metadata.opf")
                     if os.path.exists(opf_file):
-                        tree = ET.parse(opf_file)
-                        title = tree.find(
-                            ".//{http://purl.org/dc/elements/1.1/}title"
-                        ).text
-                        author = tree.find(
-                            ".//{http://purl.org/dc/elements/1.1/}creator"
-                        ).text
-                        language = tree.find(
-                            ".//{http://purl.org/dc/elements/1.1/}language"
-                        ).text
-        # xxx
+                        try:
+                            tree = ET.parse(opf_file)
+                            title = tree.find(
+                                ".//{http://purl.org/dc/elements/1.1/}title"
+                            ).text
+                            author = tree.find(
+                                ".//{http://purl.org/dc/elements/1.1/}creator"
+                            ).text
+                            language = tree.find(
+                                ".//{http://purl.org/dc/elements/1.1/}language"
+                            ).text
+                            uuid_element = tree.find('.//dc:identifier[@opf:scheme="uuid"]', namespaces={'opf': 'http://www.idpf.org/2007/opf', 'dc': 'http://purl.org/dc/elements/1.1/'})
+                            if uuid_element is not None:
+                                ebook_id = uuid_element.text
+                            else:
+                                self.log.error(f"Error parsing {opf_file}: No UUID found")
+                                continue
+                        except Exception as e:
+                            self.log.error(f"Error parsing {opf_file}: {e}")
+                            continue
+                        filename = os.path.join(root, file)
+                        rec = {
+                            "ebook_id": ebook_id,
+                            "author": author,
+                            "language": language,
+                            "title": title,
+                            "filename": filename,
+                        }
+                        with open(filename, "r", encoding="utf-8") as f:
+                            rec["text"] = f.read()
+                        self.records += [rec]
+        self.log.info(f"Loaded {len(self.records)} records from Calibre library.")
+        return len(self.records)
 
     def search(self, search_dict):
         """Search for book record with key specific key values
@@ -79,21 +99,3 @@ class Calibre_Dataset:
             if found is True:
                 frecs += [rec]
         return frecs
-
-    def get_book(self, ebook_id: str):
-        """Get a book record metadata and text by its ebook_id
-
-        *Note:* :func:`~Calibre_Dataset.Calibre_Dataset.load_index` needs to be called once before this function can be used.
-
-        :param ebook_id: ebook_id (String, since some IDs contain letters) of the book to be retrieved
-        :returns: book record (dictionary with metadata and filtered text)
-        """
-        for rec in self.records:
-            if rec["ebook_id"] == ebook_id:
-                text, _, valid = self._load_book_ex(ebook_id)
-                if text is None or valid is False:
-                    self.log.Error(f"Download of book {ebook_id} failed!")
-                    return None
-                rec["text"] = self.filter_text(text)
-                return rec
-        return None
