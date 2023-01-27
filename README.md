@@ -241,6 +241,9 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2023-01-27, 0.5.0) Aquire training data from Calibre library (`Calibre_Dataset`) or get 
+training data from a folder containing text files (`Folder_Dataset`). Text_Dataset can now
+contain texts from Gutenberg, Calibre or a folder of text files.
 * (2023-01-26, 0.4.4) Add save/load tokenizer to Text_Dataset to enable reusing tokenizer data.
 * (2023-01-22, 0.4.3) Add temperature parameter to generator.
 * (2023-01-21, 0.4.2) Start of port of pytorch transformers from Andrej Karpathy's nanoGPT as implemented in [`ng-video-lecture`](https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py). Additional tests with Apple Silicon MPS and pytorch 2.0 nightly.
