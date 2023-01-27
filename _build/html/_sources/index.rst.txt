@@ -49,6 +49,32 @@ Gutenberg_Dataset object
    :undoc-members:
    :show-inheritance:
 
+.. currentmodule:: Calibre_Dataset
+
+========================
+Calibre_Dataset object
+========================
+
+.. automodule:: Calibre_Dataset
+
+.. autoclass:: Calibre_Dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. currentmodule:: Folder_Dataset
+
+========================
+Folder_Dataset object
+========================
+
+.. automodule:: Folder_Dataset
+
+.. autoclass:: Folder_Dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. currentmodule:: Text_Dataset
 
 ===================

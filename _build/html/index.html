@@ -471,6 +471,86 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </dd></dl>
 
 </section>
+<section id="module-Calibre_Dataset">
+<span id="calibre-dataset-object"></span><h2>Calibre_Dataset object<a class="headerlink" href="#module-Calibre_Dataset" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="Calibre_Dataset.Calibre_Dataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Calibre_Dataset.</span></span><span class="sig-name descname"><span class="pre">Calibre_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">library_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Calibre_Dataset.html#Calibre_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Calibre_Dataset.Calibre_Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to access and search text documents from a Calibre library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>library_path</strong> – Path to the Calibre library</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="Calibre_Dataset.Calibre_Dataset.load_index">
+<span class="sig-name descname"><span class="pre">load_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Calibre_Dataset.html#Calibre_Dataset.load_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Calibre_Dataset.Calibre_Dataset.load_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads the Calibre library records that contain text-format books.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Calibre_Dataset.Calibre_Dataset.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Calibre_Dataset.html#Calibre_Dataset.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Calibre_Dataset.Calibre_Dataset.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for book record with key specific key values
+For a list of valid keys, use <cite>get_record_keys()</cite>
+Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</cite>, <cite>title</cite></p>
+<p><em>Note:</em> <a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset.load_index" title="Calibre_Dataset.Calibre_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
+<p>Example: <cite>search({“title”: [“philosoph”,”phenomen”,”physic”,”hermeneu”,”logic”], “language”:”english”})</cite>
+Find all books whose titles contain at least one of the keywords, language english. Search keys can either be
+search for a single keyword (e.g. english), or an array of keywords.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of records</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-Folder_Dataset">
+<span id="folder-dataset-object"></span><h2>Folder_Dataset object<a class="headerlink" href="#module-Folder_Dataset" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="Folder_Dataset.Folder_Dataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Folder_Dataset.</span></span><span class="sig-name descname"><span class="pre">Folder_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Folder_Dataset.html#Folder_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Folder_Dataset.Folder_Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to access and search text documents from a folder.</p>
+<p>This loads the text files from a folder and creates some metadata from the filename.
+The filename format is expected to be: “Title - Author - Language.txt”</p>
+<p>the ‘ - Language’ part is optional, if a default_language is provided.
+For English, use default_language=’English’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folder_path</strong> – Path to a folder containing text files (.txt)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="Folder_Dataset.Folder_Dataset.load_index">
+<span class="sig-name descname"><span class="pre">load_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Folder_Dataset.html#Folder_Dataset.load_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Folder_Dataset.Folder_Dataset.load_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads the text files from the folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Folder_Dataset.Folder_Dataset.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Folder_Dataset.html#Folder_Dataset.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Folder_Dataset.Folder_Dataset.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for book record with key specific key values
+For a list of valid keys, use <cite>get_record_keys()</cite>
+Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</cite>, <cite>title</cite></p>
+<p><em>Note:</em> <a class="reference internal" href="#Folder_Dataset.Folder_Dataset.load_index" title="Folder_Dataset.Folder_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
+<p>Example: <cite>search({“title”: [“philosoph”,”phenomen”,”physic”,”hermeneu”,”logic”], “language”:”english”})</cite>
+Find all books whose titles contain at least one of the keywords, language english. Search keys can either be
+search for a single keyword (e.g. english), or an array of keywords.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of records</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-Text_Dataset">
 <span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -1362,6 +1442,22 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
 <li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_book"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.load_book()</span></code></a></li>
 <li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.load_index()</span></code></a></li>
 <li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.search"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-Calibre_Dataset">Calibre_Dataset object</a><ul>
+<li><a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset"><code class="docutils literal notranslate"><span class="pre">Calibre_Dataset</span></code></a><ul>
+<li><a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset.load_index"><code class="docutils literal notranslate"><span class="pre">Calibre_Dataset.load_index()</span></code></a></li>
+<li><a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset.search"><code class="docutils literal notranslate"><span class="pre">Calibre_Dataset.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-Folder_Dataset">Folder_Dataset object</a><ul>
+<li><a class="reference internal" href="#Folder_Dataset.Folder_Dataset"><code class="docutils literal notranslate"><span class="pre">Folder_Dataset</span></code></a><ul>
+<li><a class="reference internal" href="#Folder_Dataset.Folder_Dataset.load_index"><code class="docutils literal notranslate"><span class="pre">Folder_Dataset.load_index()</span></code></a></li>
+<li><a class="reference internal" href="#Folder_Dataset.Folder_Dataset.search"><code class="docutils literal notranslate"><span class="pre">Folder_Dataset.search()</span></code></a></li>
 </ul>
 </li>
 </ul>
