@@ -27,6 +27,7 @@ class Folder_Dataset:
     def load_index(self):
         """This function loads the text files from the folder.""" 
         self.records = []
+        index = 1
         for root, dirs, files in os.walk(self.folder_path):
             for file in files:
                 # print(file)
@@ -55,10 +56,12 @@ class Folder_Dataset:
                         "language": language,
                         "title": title,
                         "filename": filename,
+                        "alias": f"FL{index}",
                     }
                     with open(filename, "r", encoding="utf-8") as f:
                         rec["text"] = f.read()
                     self.records += [rec]
+                    index = index + 1
         self.log.info(f"Loaded {len(self.records)} records from Folder.")
         return len(self.records)
 

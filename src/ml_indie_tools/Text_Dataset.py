@@ -778,7 +778,10 @@ class Text_Dataset:
                     if p - 1 > mxQ:
                         mxQ = p - 1
                         mxI = text["index"]
-                        mxN = f"{text['author']}: {text['title']}"
+                        if 'alias' in text:
+                            mxN = f"{text['alias']}"
+                        else:
+                            mxN = f"{text['author']}: {text['title']}"
                         found = True
             if found:  # save longest quote for colorizing
                 if len(noquote) > 0:
