@@ -24,6 +24,7 @@ class Calibre_Dataset:
         """This function loads the Calibre library records that contain text-format books."""
         # Enumerate all txt-format books
         self.records = []
+        index = 1
         for root, dirs, files in os.walk(self.library_path):
             for file in files:
                 if file.endswith(".txt"):
@@ -56,10 +57,12 @@ class Calibre_Dataset:
                             "language": language,
                             "title": title,
                             "filename": filename,
+                            "alias": f"CL{index}",
                         }
                         with open(filename, "r", encoding="utf-8") as f:
                             rec["text"] = f.read()
                         self.records += [rec]
+                        index += 1
         self.log.info(f"Loaded {len(self.records)} records from Calibre library.")
         return len(self.records)
 
