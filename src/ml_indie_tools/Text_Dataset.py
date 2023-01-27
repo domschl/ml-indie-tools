@@ -327,7 +327,10 @@ class Text_Dataset:
             return
         self.log.info("Encoding text corpora as ngrams.")
         for text in self.text_list:
-            self.log.info(f"Encoding text {text['title']}...")
+            if 'alias' in text:
+                self.log.info(f"Encoding text {text['alias']}...")
+            else:
+                self.log.info(f"Encoding text {text['title']}...")
             text["text_encoded"] = self.encode(text["text"])
         self.log.info("Encoding text corpora as ngrams done.")
 
