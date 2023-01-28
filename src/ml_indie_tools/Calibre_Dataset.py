@@ -20,8 +20,12 @@ class Calibre_Dataset:
         self.verbose = verbose
         self.records = []
 
-    def load_index(self):
-        """This function loads the Calibre library records that contain text-format books."""
+    def load_index(self, use_aliases=True):
+        """This function loads the Calibre library records that contain text-format books.
+        
+        :param use_aliases: If True, books are not referenced by title and author, 
+        but by their numeric aliases, thus providing privacy.
+        """
         # Enumerate all txt-format books
         self.records = []
         index = 1
@@ -57,8 +61,9 @@ class Calibre_Dataset:
                             "language": language,
                             "title": title,
                             "filename": filename,
-                            "alias": f"CL{index}",
                         }
+                        if use_aliases is True:
+                            rec["alias"] = f"CL{index}"
                         with open(filename, "r", encoding="utf-8") as f:
                             rec["text"] = f.read()
                         self.records += [rec]
