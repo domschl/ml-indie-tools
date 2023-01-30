@@ -2,6 +2,7 @@ import logging
 import os
 import uuid
 
+
 class Folder_Dataset:
     """A class to access and search text documents from a folder.
 
@@ -19,13 +20,17 @@ class Folder_Dataset:
         folder_path = os.path.expanduser(folder_path)
         if os.path.exists(folder_path) is False:
             raise FileNotFoundError("Folder not found at " + folder_path)
-        
+
         self.folder_path = folder_path
         self.default_language = default_language
         self.records = []
 
-    def load_index(self):
-        """This function loads the text files from the folder.""" 
+    def load_index(self, use_aliases=False):
+        """This function loads the text files from the folder.
+
+        :param use_aliases: If True, documents are not referenced by filename (containing title and author),
+        but by their numeric aliases, thus providing privacy.
+        """
         self.records = []
         index = 1
         for root, dirs, files in os.walk(self.folder_path):
@@ -56,8 +61,10 @@ class Folder_Dataset:
                         "language": language,
                         "title": title,
                         "filename": filename,
-                        "alias": f"FL{index}",
                     }
+                    if use_aliases is True:
+                        rec["alias"] = f"FL{index}"
+
                     with open(filename, "r", encoding="utf-8") as f:
                         rec["text"] = f.read()
                     self.records += [rec]

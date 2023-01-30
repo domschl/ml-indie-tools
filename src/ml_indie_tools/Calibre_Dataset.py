@@ -1,6 +1,5 @@
 import logging
 import os
-import time
 from xml.etree import ElementTree as ET
 
 
@@ -20,8 +19,12 @@ class Calibre_Dataset:
         self.verbose = verbose
         self.records = []
 
-    def load_index(self):
-        """This function loads the Calibre library records that contain text-format books."""
+    def load_index(self, use_aliases=False):
+        """This function loads the Calibre library records that contain text-format books.
+
+        :param use_aliases: If True, books are not referenced by title and author,
+        but by their numeric aliases, thus providing privacy.
+        """
         # Enumerate all txt-format books
         self.records = []
         index = 1
@@ -41,11 +44,19 @@ class Calibre_Dataset:
                             language = tree.find(
                                 ".//{http://purl.org/dc/elements/1.1/}language"
                             ).text
-                            uuid_element = tree.find('.//dc:identifier[@opf:scheme="uuid"]', namespaces={'opf': 'http://www.idpf.org/2007/opf', 'dc': 'http://purl.org/dc/elements/1.1/'})
+                            uuid_element = tree.find(
+                                './/dc:identifier[@opf:scheme="uuid"]',
+                                namespaces={
+                                    "opf": "http://www.idpf.org/2007/opf",
+                                    "dc": "http://purl.org/dc/elements/1.1/",
+                                },
+                            )
                             if uuid_element is not None:
                                 ebook_id = uuid_element.text
                             else:
-                                self.log.error(f"Error parsing {opf_file}: No UUID found")
+                                self.log.error(
+                                    f"Error parsing {opf_file}: No UUID found"
+                                )
                                 continue
                         except Exception as e:
                             self.log.error(f"Error parsing {opf_file}: {e}")
@@ -57,8 +68,9 @@ class Calibre_Dataset:
                             "language": language,
                             "title": title,
                             "filename": filename,
-                            "alias": f"CL{index}",
                         }
+                        if use_aliases is True:
+                            rec["alias"] = f"CL{index}"
                         with open(filename, "r", encoding="utf-8") as f:
                             rec["text"] = f.read()
                         self.records += [rec]
