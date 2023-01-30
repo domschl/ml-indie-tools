@@ -241,6 +241,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2023-01-30, 0.5.3) Add `use_aliases` parameter to Folder- and Calibre datasets.
 * (2023-01-27, 0.5.2) Add `alias` field to local datasets to protect
 privacy of local document names.
 * (2023-01-27, 0.5.0) Acquire training data from Calibre library ([`Calibre_Dataset`](https://domschl.github.io/ml-indie-tools/_build/html/index.html#Calibre_Dataset.Calibre_Dataset)), the documents must be in text format in Calibre, or get training data from a folder containing text files ([`Folder_Dataset`](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Folder_Dataset)). Text_Dataset can now
