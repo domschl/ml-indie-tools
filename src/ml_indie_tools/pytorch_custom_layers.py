@@ -208,15 +208,28 @@ class MultiHeadSelfAttention(nn.Module):
 
         return logits, loss
 
-    def generate(self, idx, max_new_tokens, temperature=1.0):
+    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+        """Generate new tokens given a context
+
+        Note: for apple MPS, top_k is limited max 16! (Current (01/2023) implementation limitation)
+
+        :param idx: the context (B,T) tensor of indices
+        :param max_new_tokens: the maximum number of tokens to generate
+        :param temperature: the temperature to use for sampling
+        :param top_k: the number of top tokens to consider
+        """
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
             idx_cond = idx[:, -self.sequence_len :]
+            # print(idx_cond.shape)
             # get the predictions
             logits, loss = self(idx_cond)
             # focus only on the last time step
             logits = logits[:, -1, :]  # becomes (B, C)
+            if top_k is not None:
+                v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+                logits[logits < v[:, [-1]]] = -float("Inf")
             # apply temperature
             if temperature != 1.0 and temperature > 0.0:
                 logits = logits / temperature
