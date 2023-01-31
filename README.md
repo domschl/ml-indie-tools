@@ -195,6 +195,7 @@ tl.source_highlight("If we write anything that contains parts of the sources, li
 `INFO:Datasets:Loaded 5 texts`<br>
 If we writ**e anything t**[4]**hat contains**[1] **parts of the s**[4]ources, like: **that is t**[1]**heir motto**[4], then a highligh**t will be a**[1]pplied.<br>
 Sources: Julius Wellhausen: Prolegomena to the History of Israel[4], William Wallace and G. W. F. Hegel: Prolegomena to the Study of Hegel's Philosophy[1]
+
 ```python
 test_text="That would be a valid argument if we hadn't defeated it's assumptions way before."
 print(f"Text length {len(test_text)}, {test_text}")
@@ -203,18 +204,22 @@ tl.init_tokenizer(tokenizer=tokenizer)
 st = tl.tokenize(test_text)
 print(f"Token-count: {len(st)}, {st}")
 ```
+
 `Text length 81, That would be a valid argument if we hadn't defeated it's assumptions way before.
 Token-count: 27, [1447, 3688, 1722, 4711, 4880, 1210, 1393, 4393, 2382, 1352, 3655, 1972, 1939, 44, 23, 3333, 1871, 4975, 2967, 2884, 2216, 2382, 3048, 1546, 4589, 2272, 30]`
+
 ```python
 test2="ðƒ "+test_text
 print(f"Text length {len(test2)}, {test2}")
 el=tl.encode(test2)
 print(f"Token-count: {len(el)}, {el}")
 ```
+
 `Text length 84, ðƒ That would be a valid argument if we hadn't defeated it's assumptions way before.
 Token-count: 29, ['<unk>', '<unk>', 1397, 3688, 1722, 4711, 4880, 1210, 1393, 4393, 2382, 1352, 3655, 1972, 1939, 44, 23, 3333, 1871, 4975, 2967, 2884, 2216, 2382, 3048, 1546, 4589, 2272, 30]`
 
 See the [Text_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-Text_Dataset) for details.
+
 ### ALU_Dataset
 
 See the [ALU_Dataset API documentation](https://domschl.github.io/ml-indie-tools/_build/html/index.html#module-ALU_Dataset) for details.
@@ -231,16 +236,19 @@ See the [keras_custom_layers API documentation](https://domschl.github.io/ml-ind
 Checkout the following jupyter notebook based projects for example-usage:
 
 ### Text generation
+
 * [tensor-poet](https://github.com/domschl/tensor-poet)
 * [torch-poet](https://github.com/domschl/torch-poet)
 * [transformer-poet](https://github.com/domschl/transformer-poet)
 * [torch-transformer-poet](https://github.com/domschl/torch-transformer-poet), using pytorch transformers from Andrej Karpathy's nanoGPT as implemented in [`ng-video-lecture`](https://github.com/karpathy/ng-video-lecture)
 
 ### Arithmetic and logic operations
+
 * [ALU_Net](https://github.com/domschl/ALU_Net)
 
 ## History
 
+* (2023-01-31, 0.5.4) Add `top_k` parameter to generator. Apple MPS users beware, MPS [currently limits top_k to max 16](https://github.com/pytorch/pytorch/issues/78915).
 * (2023-01-30, 0.5.3) Add `use_aliases` parameter to Folder- and Calibre datasets.
 * (2023-01-27, 0.5.2) Add `alias` field to local datasets to protect
 privacy of local document names.

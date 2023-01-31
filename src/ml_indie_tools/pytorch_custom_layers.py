@@ -212,6 +212,7 @@ class MultiHeadSelfAttention(nn.Module):
         """Generate new tokens given a context
 
         Note: for apple MPS, top_k is limited max 16! (Current (01/2023) implementation limitation)
+        See: https://github.com/pytorch/pytorch/issues/78915
 
         :param idx: the context (B,T) tensor of indices
         :param max_new_tokens: the maximum number of tokens to generate
