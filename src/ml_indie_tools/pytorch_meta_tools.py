@@ -2,7 +2,7 @@ import os
 import torch
 
 
-def ml_metadata_compatible(current_params, saved_params, updatable_keys=[]):
+def metadata_compatible(current_params, saved_params, updatable_keys=[]):
     is_valid = True
     keys = set(list(current_params.keys()) + list(saved_params.keys()))
     for key in keys:
@@ -38,11 +38,11 @@ def ml_metadata_compatible(current_params, saved_params, updatable_keys=[]):
     return True
 
 
-def ml_get_model_filename(model_path, filename="model.pt"):
+def get_model_filename(model_path, filename="model.pt"):
     return os.path.join(model_path, filename)
 
 
-def ml_save_checkpoint(
+def save_checkpoint(
     params,
     model,
     optimizer,
@@ -60,7 +60,7 @@ def ml_save_checkpoint(
     torch.save(state, file_path)
 
 
-def ml_load_model_metadata_from_checkpoint(file_path, device=None):
+def load_model_metadata_from_checkpoint(file_path, device=None):
     if not os.path.exists(file_path):
         return None
     if device is None:
@@ -70,7 +70,7 @@ def ml_load_model_metadata_from_checkpoint(file_path, device=None):
     return state["params"]
 
 
-def ml_load_checkpoint(params, model, optimizer, file_path, device=None):
+def load_checkpoint(params, model, optimizer, file_path, device=None):
     if not os.path.exists(file_path):
         print(f"No saved state, no {file_path}, starting from scratch.")
         return None
@@ -79,7 +79,7 @@ def ml_load_checkpoint(params, model, optimizer, file_path, device=None):
     else:
         state = torch.load(file_path, map_location=device)
     params_new = state["params"]
-    if ml_metadata_compatible(params, params_new) is False:
+    if metadata_compatible(params, params_new) is False:
         print("Metadata incompatible, starting from scratch.")
         return None
     params = params_new
