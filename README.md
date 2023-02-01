@@ -248,7 +248,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
-* (2023-02-01, 0.5.5) `load_checkpoint()`, optionally only load `params`. Incompatible API-change for `load-` and `save_checkpoint()` methods!
+* (2023-02-01, 0.5.6) `load_checkpoint()`, optionally only load `params`. Incompatible API-change for `load-` and `save_checkpoint()` methods!
 * (2023-01-31, 0.5.4) Add `top_k` parameter to generator. Apple MPS users beware, MPS [currently limits top_k to max 16](https://github.com/pytorch/pytorch/issues/78915).
 * (2023-01-30, 0.5.3) Add `use_aliases` parameter to Folder- and Calibre datasets.
 * (2023-01-27, 0.5.2) Add `alias` field to local datasets to protect
