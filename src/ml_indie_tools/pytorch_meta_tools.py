@@ -138,6 +138,8 @@ class ModelJanitor:
         params = params_new
         model.load_state_dict(state["model_states"])
         optimizer.load_state_dict(state["optimizer_states"])
+        for g in optimizer.param_groups:  # Allow for different learning rates
+            g["lr"] = params["learning_rate"]
         epoch = params["current_epoch"]
         loss = params["current_loss"]
         model.train()
