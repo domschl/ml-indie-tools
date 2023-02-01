@@ -130,7 +130,7 @@ class ModelJanitor:
             print(load_file)
             print("No saved state, starting from scratch.")
             return 0, 0
-        if device is not None:
+        if device is None:
             state = torch.load(load_file)
         else:
             state = torch.load(load_file, map_location=device)
