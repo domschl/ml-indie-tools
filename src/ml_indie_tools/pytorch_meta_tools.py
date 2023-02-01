@@ -139,7 +139,7 @@ class ModelJanitor:
             self.log.warning("Metadata incompatible, starting from scratch.")
             return 0, 0
         params = params_new
-        model.load_state_dict(state["model_states"])
+        model.load_state_dict(state["model_states"], map_location=torch.device("cpu"))
         optimizer.load_state_dict(state["optimizer_states"])
         for g in optimizer.param_groups:  # Allow for different learning rates
             g["lr"] = params["learning_rate"]
