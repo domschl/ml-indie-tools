@@ -222,7 +222,7 @@ class MultiHeadSelfAttention(nn.Module):
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
-            idx_cond = idx[:, -self.sequence_len :]
+            idx_cond = idx[:, -self.sequence_len:]
             # print(idx_cond.shape)
             # get the predictions
             logits, loss = self(idx_cond)

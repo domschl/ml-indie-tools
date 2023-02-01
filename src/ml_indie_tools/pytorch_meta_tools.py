@@ -122,10 +122,21 @@ class ModelJanitor:
             start = history[-1]["timestamp"]
         return history, start
 
-    def load_checkpoint(self, params, model=None, optimizer=None, device=None):
+    def load_model_metadata_from_checkpoint(self, device=None):
         filename = "model.pt"
         load_file = os.path.join(self.model_path, filename)
         # latest = os.path.join(self.model_path, "latest.json")
+        if not os.path.exists(load_file):
+            return None
+        if device is None:
+            state = torch.load(load_file)
+        else:
+            state = torch.load(load_file, map_location=device)
+        return state["params"]
+
+    def load_checkpoint(self, params, model, optimizer, device=None):
+        filename = "model.pt"
+        load_file = os.path.join(self.model_path, filename)
         if not os.path.exists(load_file):
             print(load_file)
             print("No saved state, starting from scratch.")
@@ -135,10 +146,6 @@ class ModelJanitor:
         else:
             state = torch.load(load_file, map_location=device)
         params_new = state["params"]
-        if model is None or optimizer is None:
-            params = params_new
-            print(params)
-            return params
         if self.is_metadata_compatible(params, params_new) is False:
             self.log.warning("Metadata incompatible, starting from scratch.")
             return 0, 0
