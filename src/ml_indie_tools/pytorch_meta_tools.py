@@ -88,7 +88,7 @@ class ModelJanitor:
 
     # -----------------  Model Checkpointing -----------------
 
-    def save_checkpoint(self, model, optimizer, params, current_epoch, current_loss):
+    def save_checkpoint(self, params, model, optimizer, current_epoch, current_loss):
         params["current_epoch"] = current_epoch
         params["current_loss"] = current_loss
         state = {
@@ -122,7 +122,7 @@ class ModelJanitor:
             start = history[-1]["timestamp"]
         return history, start
 
-    def load_checkpoint(self, model, optimizer, params):
+    def load_checkpoint(self, params, model=None, optimizer=None):
         filename = "model.pt"
         load_file = os.path.join(self.model_path, filename)
         # latest = os.path.join(self.model_path, "latest.json")
@@ -132,6 +132,9 @@ class ModelJanitor:
             return 0, 0
         state = torch.load(load_file)
         params_new = state["params"]
+        if model is None or optimizer is None:
+            params = params_new
+            return 0, 0
         if self.is_metadata_compatible(params, params_new) is False:
             self.log.warning("Metadata incompatible, starting from scratch.")
             return 0, 0
