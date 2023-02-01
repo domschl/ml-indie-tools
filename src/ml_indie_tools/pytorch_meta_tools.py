@@ -42,12 +42,14 @@ def ml_get_model_filename(model_path, filename="model.pt"):
     return os.path.join(model_path, filename)
 
 
-def ml_checkpoint_available(model_path, filename="model.pt"):
-    load_file = ml_get_model_filename(model_path, filename=filename)
-    return os.path.exists(load_file)
-
-
-def ml_save_checkpoint(self, params, model, optimizer, current_epoch, current_loss):
+def ml_save_checkpoint(
+    params,
+    model,
+    optimizer,
+    current_epoch,
+    current_loss,
+    file_path,
+):
     params["current_epoch"] = current_epoch
     params["current_loss"] = current_loss
     state = {
@@ -55,35 +57,31 @@ def ml_save_checkpoint(self, params, model, optimizer, current_epoch, current_lo
         "model_states": model.state_dict(),
         "optimizer_states": optimizer.state_dict(),
     }
-    save_file = ml_get_model_filename(self.model_path)
-    torch.save(state, save_file)
+    torch.save(state, file_path)
 
 
-def ml_load_model_metadata_from_checkpoint(self, device=None):
-    load_file = ml_get_model_filename(self.model_path)
-    if not os.path.exists(load_file):
+def ml_load_model_metadata_from_checkpoint(file_path, device=None):
+    if not os.path.exists(file_path):
         return None
     if device is None:
-        state = torch.load(load_file)
+        state = torch.load(file_path)
     else:
-        state = torch.load(load_file, map_location=device)
+        state = torch.load(file_path, map_location=device)
     return state["params"]
 
 
-def ml_load_checkpoint(self, params, model, optimizer, device=None):
-    load_file = self.get_model_filename()
-    if not os.path.exists(load_file):
-        print(load_file)
-        print("No saved state, starting from scratch.")
-        return 0, 0
+def ml_load_checkpoint(params, model, optimizer, file_path, device=None):
+    if not os.path.exists(file_path):
+        print(f"No saved state, no {file_path}, starting from scratch.")
+        return None
     if device is None:
-        state = torch.load(load_file)
+        state = torch.load(file_path)
     else:
-        state = torch.load(load_file, map_location=device)
+        state = torch.load(file_path, map_location=device)
     params_new = state["params"]
-    if self.is_metadata_compatible(params, params_new) is False:
-        self.log.warning("Metadata incompatible, starting from scratch.")
-        return 0, 0
+    if ml_metadata_compatible(params, params_new) is False:
+        print("Metadata incompatible, starting from scratch.")
+        return None
     params = params_new
     model.load_state_dict(state["model_states"])
     optimizer.load_state_dict(state["optimizer_states"])
@@ -94,5 +92,4 @@ def ml_load_checkpoint(self, params, model, optimizer, device=None):
     print(
         f"Continuing from saved state epoch={epoch+1}, loss={loss:.3f}"
     )  # Save is not necessarily on epoch boundary, so that's approx.
-    self.log.info(f"Continuing from saved state epoch={epoch+1}, loss={loss:.3f}")
-    return epoch, loss
+    return params
