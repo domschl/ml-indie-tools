@@ -122,7 +122,7 @@ class ModelJanitor:
             start = history[-1]["timestamp"]
         return history, start
 
-    def load_checkpoint(self, params, model=None, optimizer=None):
+    def load_checkpoint(self, params, model=None, optimizer=None, device=None):
         filename = "model.pt"
         load_file = os.path.join(self.model_path, filename)
         # latest = os.path.join(self.model_path, "latest.json")
@@ -130,7 +130,10 @@ class ModelJanitor:
             print(load_file)
             print("No saved state, starting from scratch.")
             return 0, 0
-        state = torch.load(load_file)
+        if device is not None:
+            state = torch.load(load_file)
+        else:
+            state = torch.load(load_file, map_location=device)
         params_new = state["params"]
         if model is None or optimizer is None:
             params = params_new
@@ -139,7 +142,7 @@ class ModelJanitor:
             self.log.warning("Metadata incompatible, starting from scratch.")
             return 0, 0
         params = params_new
-        model.load_state_dict(state["model_states"], map_location=torch.device("cpu"))
+        model.load_state_dict(state["model_states"])
         optimizer.load_state_dict(state["optimizer_states"])
         for g in optimizer.param_groups:  # Allow for different learning rates
             g["lr"] = params["learning_rate"]
