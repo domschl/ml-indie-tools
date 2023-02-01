@@ -137,7 +137,8 @@ class ModelJanitor:
         params_new = state["params"]
         if model is None or optimizer is None:
             params = params_new
-            return 0, 0
+            print(params)
+            return params
         if self.is_metadata_compatible(params, params_new) is False:
             self.log.warning("Metadata incompatible, starting from scratch.")
             return 0, 0
