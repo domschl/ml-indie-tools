@@ -166,6 +166,7 @@ class MultiHeadSelfAttention(nn.Module):
     :param num_heads: the number of attention heads
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
+    :param sigma_compressor: whether to use sigma-compression in the block layer, if dropout > 1.0: sigma-compression uses max  compression in the middle layer, and no compression in the first and last layers.
     :param device: the device to use for training
     """
 
@@ -178,6 +179,7 @@ class MultiHeadSelfAttention(nn.Module):
         num_heads,
         num_layers,
         causal,
+        sigma_compressor,
         device,
     ):
         self.device = device
@@ -186,18 +188,35 @@ class MultiHeadSelfAttention(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        self.blocks = nn.Sequential(
-            *[
-                Block(
-                    embedding_size,
+        if dropout <= 1.0 or sigma_compressor==False:
+            self.blocks = nn.Sequential(
+                *[
+                    Block(
+                        embedding_size,
+                        sequence_len=sequence_len,
+                        dropout=dropout,
+                        num_heads=num_heads,
+                        causal=causal,
+                    )
+                    for _ in range(num_layers)
+                ]
+            )
+        else:
+            blks=[]
+            for i in range(num_layers):
+                if i>num_layers/2:
+                    j= num_layers-i
+                else:
+                    j=i
+                drop = 4.0 + j * (dropout - 4.0) / (num_layers / 2)
+                blks.append(Block(
+                    embedding_size=embedding_size,
                     sequence_len=sequence_len,
-                    dropout=dropout,
+                    dropout=drop,
                     num_heads=num_heads,
                     causal=causal,
-                )
-                for _ in range(num_layers)
-            ]
-        )
+                ))
+            self.blocks = nn.Sequential(*blks)
         self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
         self.lm_head = nn.Linear(embedding_size, vocab_size)
 
