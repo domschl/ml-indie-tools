@@ -30,7 +30,9 @@ class SelfAttentionHead(nn.Module):
             self.register_buffer(
                 "tril", torch.tril(torch.ones(sequence_len, sequence_len))
             )
-        self.dropout = nn.Dropout(dropout)
+        self.dropout_val = dropout
+        if (self.dropout_val < 1.0):
+            self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         B, T, C = x.shape
@@ -41,7 +43,8 @@ class SelfAttentionHead(nn.Module):
         if self.causal is True:
             wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))  # (B, T, T)
             wei = F.softmax(wei, dim=-1)  # (B, T, T)
-        wei = self.dropout(wei)
+        if (self.dropout_val < 1.0):
+            wei = self.dropout(wei)
         # perform the weighted aggregation of the values
         v = self.value(x)  # (B,T,C)
         out = wei @ v  # (B, T, T) @ (B, T, C) -> (B, T, C)
@@ -78,11 +81,16 @@ class MultiHeadAttention(nn.Module):
             ]
         )
         self.proj = nn.Linear(embedding_size, embedding_size)
-        self.dropout = nn.Dropout(dropout)
+        self.dropout_val = dropout
+        if (self.dropout_val < 1.0):
+            self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         out = torch.cat([h(x) for h in self.heads], dim=-1)
-        out = self.dropout(self.proj(out))
+        if (self.dropout_val < 1.0):
+            out = self.dropout(self.proj(out))
+        else:
+            out = self.proj(out)
         return out
 
 
@@ -95,12 +103,21 @@ class FeedFoward(nn.Module):
 
     def __init__(self, embedding_size, dropout):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(embedding_size, 4 * embedding_size),
-            nn.ReLU(),
-            nn.Linear(4 * embedding_size, embedding_size),
-            nn.Dropout(dropout),
-        )
+        self.dropout_val = dropout
+        if (self.dropout_val < 1.0):
+            self.net = nn.Sequential(
+                nn.Linear(embedding_size, 4 * embedding_size),
+                nn.ReLU(),
+                nn.Linear(4 * embedding_size, embedding_size),
+                nn.Dropout(dropout),
+            )
+        else:
+            compressor = int(embedding_size / dropout * 4.0)
+            self.net = nn.Sequential(
+                nn.Linear(embedding_size, compressor),
+                nn.ReLU(),
+                nn.Linear(compressor, embedding_size),
+            )
 
     def forward(self, x):
         return self.net(x)
@@ -143,7 +160,9 @@ class MultiHeadSelfAttention(nn.Module):
     :param vocab_size: the size of the vocabulary
     :param embedding_size: the size of the input embedding
     :param sequence_len: the length of the input sequence
-    :param dropout: the dropout rate
+    :param dropout: the dropout rate, if dropout < 1.0. If dropout >= 1.0,
+    then dropout is used as a compression factor in the block layer,
+    compressing the embedding size to embedding_size / dropout * 4.0. [Experimental!]
     :param num_heads: the number of attention heads
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
