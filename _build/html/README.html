@@ -334,6 +334,9 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <section id="history">
 <h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
+<li><p>(2023-03-28, 0.6.0) Add <code class="docutils literal notranslate"><span class="pre">dropout&gt;1.0</span></code> paramater to MultiHeadSelfAttention (torch): replaces ‘normal’ dropout with a linear compression by 4.0/dropout. The linear layers no longer
+map n -&gt; 4n -&gt; n, but n -&gt; 4n/dropout -&gt; n. This reduces the amount of information, the net can propagate, forcing compression. Sigma_compression uses different compressions rates:
+max in the middle layers, and non at start end end layers, linearly interpolating between them.</p></li>
 <li><p>(2023-02-01, 0.5.6) <code class="docutils literal notranslate"><span class="pre">load_checkpoint()</span></code>, optionally only load <code class="docutils literal notranslate"><span class="pre">params</span></code>. Incompatible API-change for <code class="docutils literal notranslate"><span class="pre">load-</span></code> and <code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code> methods!</p></li>
 <li><p>(2023-01-31, 0.5.4) Add <code class="docutils literal notranslate"><span class="pre">top_k</span></code> parameter to generator. Apple MPS users beware, MPS <a class="reference external" href="https://github.com/pytorch/pytorch/issues/78915">currently limits top_k to max 16</a>.</p></li>
 <li><p>(2023-01-30, 0.5.3) Add <code class="docutils literal notranslate"><span class="pre">use_aliases</span></code> parameter to Folder- and Calibre datasets.</p></li>
