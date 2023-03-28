@@ -2,18 +2,19 @@
 
 <!doctype html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Welcome to ml-indie-tools’s documentation! &#8212; ml-indie-tools 0.3.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,11 +47,11 @@
           <div class="body" role="main">
             
   <section id="welcome-to-ml-indie-tools-s-documentation">
-<h1>Welcome to ml-indie-tools’s documentation!<a class="headerlink" href="#welcome-to-ml-indie-tools-s-documentation" title="Permalink to this heading">¶</a></h1>
+<h1>Welcome to ml-indie-tools’s documentation!<a class="headerlink" href="#welcome-to-ml-indie-tools-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <section id="module-env_tools">
-<span id="mlenv-object"></span><h2>MLEnv object<a class="headerlink" href="#module-env_tools" title="Permalink to this heading">¶</a></h2>
+<span id="mlenv-object"></span><h2>MLEnv object<a class="headerlink" href="#module-env_tools" title="Permalink to this headline">¶</a></h2>
 <p>Tools to configure ML environment for Tensorflow, Pytorch or JAX and
 optional notebook/colab environment</p>
 <dl class="py class">
@@ -66,7 +67,7 @@ indicating that the ml environment is available for Tensorflow, Pytorch or JAX r
 environment is a TPU environment, and <cite>self.is_cpu</cite> that no accelerator is available.</p>
 <p>The logger <cite>MLEnv</cite> provdides details about the hardware and ml environment.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>platform</strong> – Known platforms are: <cite>‘tf’</cite> (tensorflow), <cite>‘pt’</cite> (pytorch), and <cite>‘jax’</cite></p></li>
 <li><p><strong>accelerator</strong> – known accelerators are: <cite>‘fastest’</cite> (pick best available hardware), <cite>‘cpu’</cite>, <cite>‘gpu’</cite>, <cite>‘tpu’</cite>.</p></li>
@@ -116,13 +117,13 @@ is lost, once the Colab session is closed.</p>
 </div>
 <p>Note that log_path is always local, since Colab Google drive caching prevents useful logs to Google drive.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project_name</strong> – name of the project. Only used for Colab environments. Is always current directory for non-Colab environments.</p></li>
 <li><p><strong>model_name</strong> – name of the model. Optional name for model subdirectory to allow support for multiple models.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>(root_path, project_path, model_path, data_path, log_path)</p>
 </dd>
 </dl>
@@ -227,7 +228,7 @@ is lost, once the Colab session is closed.</p>
 
 </section>
 <section id="module-tuner">
-<span id="mltuner-object"></span><h2>MLTuner object<a class="headerlink" href="#module-tuner" title="Permalink to this heading">¶</a></h2>
+<span id="mltuner-object"></span><h2>MLTuner object<a class="headerlink" href="#module-tuner" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tuner.MLTuner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tuner.</span></span><span class="sig-name descname"><span class="pre">MLTuner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tuner.html#MLTuner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tuner.MLTuner" title="Permalink to this definition">¶</a></dt>
@@ -243,7 +244,7 @@ is lost, once the Colab session is closed.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>search_space</strong> – Dictionary defining the search space.</p></li>
 <li><p><strong>progress_callback</strong> – Callback function that is called after each iteration with updated search space as parameter.</p></li>
@@ -273,7 +274,7 @@ is lost, once the Colab session is closed.</p>
 </pre></div>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param_space</strong> – Dictionary defining the search space.</p></li>
 <li><p><strong>eval_func</strong> – Function that is called to evaluate the hyper parameters.</p></li>
@@ -286,7 +287,7 @@ is lost, once the Colab session is closed.</p>
 
 </section>
 <section id="module-Gutenberg_Dataset">
-<span id="gutenberg-dataset-object"></span><h2>Gutenberg_Dataset object<a class="headerlink" href="#module-Gutenberg_Dataset" title="Permalink to this heading">¶</a></h2>
+<span id="gutenberg-dataset-object"></span><h2>Gutenberg_Dataset object<a class="headerlink" href="#module-Gutenberg_Dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Gutenberg_Dataset.</span></span><span class="sig-name descname"><span class="pre">Gutenberg_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://www.gutenberg.org/dirs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gutenberg'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -303,7 +304,7 @@ sub-directories <cite>0</cite> ,.. <cite>n</cite> .</p>
 <p>You can remove the PDF files, since they are currently not used, and need to review the <cite>–dry-run</cite> option.</p>
 <p>Note: <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called before any other methods.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>root_url</strong> – url of Project Gutenberg or any mirror URL, or a local directory containing a Gutenberg mirror.</p></li>
 <li><p><strong>cache_dir</strong> – path to a directory that will be used to cache the Gutenberg index and already downloaded texts.</p></li>
@@ -326,7 +327,7 @@ tokens as parameter to this function.</p>
 to heuristically prevent false positives.</p>
 <p><em>Note:</em> Use logging via <cite>logging.basicConfig(level=logging.DEBUG)</cite> to analyze the filtering process.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>book_text</strong> – text of the book (string)</p></li>
 <li><p><strong>add_start_tokens</strong> – additional start tokens (list of strings)</p></li>
@@ -334,7 +335,7 @@ to heuristically prevent false positives.</p>
 <li><p><strong>add_end_tokens</strong> – additional end tokens (list of strings)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>filtered text (string)</p>
 </dd>
 </dl>
@@ -346,7 +347,7 @@ to heuristically prevent false positives.</p>
 <dd><p>Search of an arbitrary number of keywords in a book record</p>
 <p><em>Note:</em> <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>list of records that contain all keywords in any field.</p>
 </dd>
 </dl>
@@ -360,10 +361,10 @@ to heuristically prevent false positives.</p>
 to get the raw unfiltered text.</p>
 <p><em>Note:</em> <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>ebook_id</strong> – ebook_id (String, since some IDs contain letters) of the book to be retrieved</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>book record (dictionary with metadata and filtered text)</p>
 </dd>
 </dl>
@@ -376,7 +377,7 @@ to get the raw unfiltered text.</p>
 Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</cite>, <cite>title</cite>.</p>
 <p><em>Note:</em> <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>list of all different keys that are somehow used.</p>
 </dd>
 </dl>
@@ -389,10 +390,10 @@ Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</c
 <p><em>Note:</em> <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index" title="Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_index()</span></code></a> needs to be called once before this function can be used.</p>
 <p>Example: <cite>get_unique_records_values(‘language’)</cite> returns all languages in Gutenberg.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>key</strong> – key to search for.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of all unique values for a given key.</p>
 </dd>
 </dl>
@@ -407,13 +408,13 @@ Downloaded books are cached and cached books are not counted towards the downloa
 function again will download books that have not been downloaded yet. The filtered book content is inserted
 into the dictionary with the key <cite>text</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>search_dict</strong> – search array of dictionaries that at least contain the key <cite>ebook_id</cite>.</p></li>
 <li><p><strong>download_count_limit</strong> – maximum number of books to download, if no local mirror is used. No limits apply for local mirrors.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of records including filtered book text-based in the <cite>text</cite> field.</p>
 </dd>
 </dl>
@@ -426,10 +427,10 @@ into the dictionary with the key <cite>text</cite>.</p>
 <p>This function returns the unfiltered raw text including all Gutenberg headers and footers.
 Use <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.get_book" title="Gutenberg_Dataset.Gutenberg_Dataset.get_book"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_book()</span></code></a> to retrieve a dictionary with metadata and filtered text.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>ebook_id</strong> – Gutenberg id (Note: string, since this sometimes contains a character!)</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>book text as string, unfiltered. Can be filtered with <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.filter_text" title="Gutenberg_Dataset.Gutenberg_Dataset.filter_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">filter_text()</span></code></a></p>
 </dd>
 </dl>
@@ -441,7 +442,7 @@ Use <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.get
 <dd><p>This function loads the Gutenberg record index, either from cache, or from a website</p>
 <p>This should be the first method being used, since many other methods rely on the index being loaded.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>cache</strong> – default <cite>True</cite>, use the cache directory to cache both index and text files.</p>
 </dd>
 </dl>
@@ -461,7 +462,7 @@ Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</c
 Find all books whose titles contain at least one of the keywords, language english. Search keys can either be
 search for a single keyword (e.g. english), or an array of keywords.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>list of records</p>
 </dd>
 </dl>
@@ -471,14 +472,14 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 
 </section>
 <section id="module-Calibre_Dataset">
-<span id="calibre-dataset-object"></span><h2>Calibre_Dataset object<a class="headerlink" href="#module-Calibre_Dataset" title="Permalink to this heading">¶</a></h2>
+<span id="calibre-dataset-object"></span><h2>Calibre_Dataset object<a class="headerlink" href="#module-Calibre_Dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Calibre_Dataset.Calibre_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Calibre_Dataset.</span></span><span class="sig-name descname"><span class="pre">Calibre_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">library_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Calibre_Dataset.html#Calibre_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Calibre_Dataset.Calibre_Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to access and search text documents from a Calibre library.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>library_path</strong> – Path to the Calibre library</p>
 </dd>
 </dl>
@@ -487,7 +488,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="sig-name descname"><span class="pre">load_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_aliases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Calibre_Dataset.html#Calibre_Dataset.load_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Calibre_Dataset.Calibre_Dataset.load_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function loads the Calibre library records that contain text-format books.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>use_aliases</strong> – If True, books are not referenced by title and author,</p>
 </dd>
 </dl>
@@ -505,7 +506,7 @@ Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</c
 Find all books whose titles contain at least one of the keywords, language english. Search keys can either be
 search for a single keyword (e.g. english), or an array of keywords.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>list of records</p>
 </dd>
 </dl>
@@ -515,7 +516,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 
 </section>
 <section id="module-Folder_Dataset">
-<span id="folder-dataset-object"></span><h2>Folder_Dataset object<a class="headerlink" href="#module-Folder_Dataset" title="Permalink to this heading">¶</a></h2>
+<span id="folder-dataset-object"></span><h2>Folder_Dataset object<a class="headerlink" href="#module-Folder_Dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Folder_Dataset.Folder_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Folder_Dataset.</span></span><span class="sig-name descname"><span class="pre">Folder_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Folder_Dataset.html#Folder_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Folder_Dataset.Folder_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -526,7 +527,7 @@ The filename format is expected to be: “Title - Author - Language.txt”</p>
 <p>the ‘ - Language’ part is optional, if a default_language is provided.
 For English, use default_language=’English’.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>folder_path</strong> – Path to a folder containing text files (.txt)</p>
 </dd>
 </dl>
@@ -535,7 +536,7 @@ For English, use default_language=’English’.</p>
 <span class="sig-name descname"><span class="pre">load_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_aliases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Folder_Dataset.html#Folder_Dataset.load_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Folder_Dataset.Folder_Dataset.load_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function loads the text files from the folder.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>use_aliases</strong> – If True, documents are not referenced by filename (containing title and author),</p>
 </dd>
 </dl>
@@ -553,7 +554,7 @@ Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</c
 Find all books whose titles contain at least one of the keywords, language english. Search keys can either be
 search for a single keyword (e.g. english), or an array of keywords.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>list of records</p>
 </dd>
 </dl>
@@ -563,7 +564,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 
 </section>
 <section id="module-Text_Dataset">
-<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this heading">¶</a></h2>
+<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="Text_Dataset.Text_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Text_Dataset.</span></span><span class="sig-name descname"><span class="pre">Text_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -582,7 +583,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </div>
 <p>If text_list at initialization is None, texts can be added later with the load_texts() method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>text_list</strong> – optional list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
 </dd>
 </dl>
@@ -595,13 +596,13 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode a list of encoded tokens.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>encoded</strong> – list of encoded tokens</p></li>
 <li><p><strong>mark_separator</strong> – (ngram only) if True, add a separator between tokens for debug</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>text</p>
 </dd>
 </dl>
@@ -612,10 +613,10 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode a text.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>text</strong> – text to encode</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of encoded tokens</p>
 </dd>
 </dl>
@@ -626,7 +627,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="sig-name descname"><span class="pre">filter_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.filter_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.filter_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter a text.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>text</strong> – text to filter</p></li>
 <li><p><strong>sanitize_white_space</strong> – If True, white space is replaced by a single space.</p></li>
@@ -634,7 +635,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <li><p><strong>preserve_case</strong> – If True, the case of the text is preserved.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>filtered text</p>
 </dd>
 </dl>
@@ -645,7 +646,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="sig-name descname"><span class="pre">get_random_item</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_random_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_random_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a random sample from the dataset.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
 </dd>
 </dl>
@@ -656,7 +657,7 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 <span class="sig-name descname"><span class="pre">get_unique_token_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_unique_token_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_unique_token_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of unique tokens.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>number of unique tokens</p>
 </dd>
 </dl>
@@ -682,7 +683,7 @@ of encoding is returned on index-access.</p>
 <p>The method of tokenization (char, word, ngram) for ‘encoded’ sample_type is determined by
 the tokenizer_type in call to init_tokenizer().</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sample_type</strong> – ‘text’ (text-string of length sample_length), ‘encoded’ (encoded sample_length tokens)</p></li>
 <li><p><strong>sample_length</strong> – length of a sample (either character count (type text) or token count (type encoded))</p></li>
@@ -712,7 +713,7 @@ used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually a
 max_tokens should be significantly higher than the number of unique glyphs in the text_list.
 Using word_separator=None is usually significantly better than using a word_separator for ngrams.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tokenizer</strong> – ‘word’, ‘char’, or ‘ngram’ (default)</p></li>
 <li><p><strong>max_ngrams</strong> – (ngram only) maximum n-gram length</p></li>
@@ -729,7 +730,7 @@ Using word_separator=None is usually significantly better than using a word_sepa
 <dd><p>Load a list of texts into the Text_Dataset.</p>
 <p>Note: if there are already texts in the Text_Dataset, the new texts are appended.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>text_list</strong> – list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
 </dd>
 </dl>
@@ -744,7 +745,7 @@ Using word_separator=None is usually significantly better than using a word_sepa
 <span class="sig-name descname"><span class="pre">load_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.load_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.load_tokenizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load tokenizer data and text library from JSON-file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>file_path</strong> – path to file</p>
 </dd>
 </dl>
@@ -757,7 +758,7 @@ Using word_separator=None is usually significantly better than using a word_sepa
 <p>This json file can be loaded with load_tokenizer() and has all information needed
 to use the tokenizer with trained models and new text.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>file_path</strong> – path to file</p>
 </dd>
 </dl>
@@ -769,7 +770,7 @@ to use the tokenizer with trained models and new text.</p>
 <dd><p>Analyse which parts of <cite>ref_txt</cite> are cited from the texts in the Text_Dataset.</p>
 <p>Note: this function requires a jupyter notebook in order to display HTML with markup.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref_txt</strong> – the reference text to be analysed for plagiarised parts</p></li>
 <li><p><strong>min_quote_size</strong> – minimum size of a quote to be considered plagiarised</p></li>
@@ -785,10 +786,10 @@ to use the tokenizer with trained models and new text.</p>
 <span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.tokenize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tokenize a text.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>text</strong> – text to tokenize</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>list of tokens</p>
 </dd>
 </dl>
@@ -798,7 +799,7 @@ to use the tokenizer with trained models and new text.</p>
 
 </section>
 <section id="module-ALU_Dataset">
-<span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Permalink to this heading">¶</a></h2>
+<span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ALU_Dataset.ALU_Dataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ALU_Dataset.</span></span><span class="sig-name descname"><span class="pre">ALU_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">31</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ALU_Dataset.html#ALU_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ALU_Dataset.ALU_Dataset" title="Permalink to this definition">¶</a></dt>
@@ -811,7 +812,7 @@ arbitrary op1, op2 (positive integers, <cite>0..2**bit_count - 1</cite>) and
 the twelve supported ops:
 <cite>[“+”, “-”, “*”, “/”, “%”, “AND”, “OR”, “XOR”, “&gt;”, “&lt;”, “=”, “!=”]</cite></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bit_count</strong> – number of bits for each of the two operands, default 31 (mult uses 15 bits)</p></li>
 <li><p><strong>pre_weight</strong> – if True, the model_dis will be reweighted to generate samples for ‘difficult’ ops</p></li>
@@ -853,7 +854,7 @@ the twelve supported ops:
 <span class="sig-name descname"><span class="pre">get_data_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equal_distrib</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_ops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positional_encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ALU_Dataset.html#ALU_Dataset.get_data_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ALU_Dataset.ALU_Dataset.get_data_point" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a random example for on ALU operation for training</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>equal_distrib</strong> – if False, more ‘difficult’ ops will be generated more often.</p></li>
 <li><p><strong>valid_ops</strong> – if not None, only the ops in valid_ops will be used</p></li>
@@ -874,10 +875,10 @@ the twelve supported ops:
 <span class="sig-name descname"><span class="pre">op_string_to_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ALU_Dataset.html#ALU_Dataset.op_string_to_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ALU_Dataset.ALU_Dataset.op_string_to_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>transform op_string (e.g. ‘+’ -&gt; 0) into corresponding index</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>op_string</strong> – string of op to transform</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>index of op_string</p>
 </dd>
 </dl>
@@ -887,32 +888,32 @@ the twelve supported ops:
 
 </section>
 <section id="residualblock-object">
-<h2>ResidualBlock object<a class="headerlink" href="#residualblock-object" title="Permalink to this heading">¶</a></h2>
+<h2>ResidualBlock object<a class="headerlink" href="#residualblock-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="residualdense-object">
-<h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this heading">¶</a></h2>
+<h2>ResidualDense object<a class="headerlink" href="#residualdense-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="residualdensestack-object">
-<h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this heading">¶</a></h2>
+<h2>ResidualDenseStack object<a class="headerlink" href="#residualdensestack-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="parallelresidualdensestacks-object">
-<h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this heading">¶</a></h2>
+<h2>ParallelResidualDenseStacks object<a class="headerlink" href="#parallelresidualdensestacks-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="selfattention-object">
-<h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this heading">¶</a></h2>
+<h2>SelfAttention object<a class="headerlink" href="#selfattention-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="multiheadselfattention-object">
-<h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this heading">¶</a></h2>
+<h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="positionalencoding-object">
-<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this heading">¶</a></h2>
+<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="readme-file">
-<h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this heading">¶</a></h2>
+<h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h2>
 </section>
 </section>
 <section id="a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments">
-<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this heading">¶</a></h1>
+<h1>A collection of machine learning tools for low-resource research and experiments<a class="headerlink" href="#a-collection-of-machine-learning-tools-for-low-resource-research-and-experiments" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="LICENSE"><img alt="License" src="http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat" /></a>
 <a class="reference external image-reference" href="https://domschl.github.io/ml-indie-tools/index.html"><img alt="Docs" src="https://img.shields.io/badge/docs-stable-blue.svg" /></a>
 <a class="reference external image-reference" href="https://pypi.python.org/pypi/ml-indie-tools/"><img alt="PyPI version fury.io" src="https://badge.fury.io/py/ml-indie-tools.svg" /></a>
@@ -926,6 +927,15 @@ environment and available accelerator hardware. For Colab instances, it provides
 persistent data- and model-storage.</p>
 <p>The usage scenarios are:</p>
 <table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Env</p></th>
 <th class="head"><p>Tensorflow TPU</p></th>
@@ -1146,6 +1156,8 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2023-02-01, 0.5.6) <code class="docutils literal notranslate"><span class="pre">load_checkpoint()</span></code>, optionally only load <code class="docutils literal notranslate"><span class="pre">params</span></code>. Incompatible API-change for <code class="docutils literal notranslate"><span class="pre">load-</span></code> and <code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code> methods!</p></li>
+<li><p>(2023-01-31, 0.5.4) Add <code class="docutils literal notranslate"><span class="pre">top_k</span></code> parameter to generator. Apple MPS users beware, MPS <a class="reference external" href="https://github.com/pytorch/pytorch/issues/78915">currently limits top_k to max 16</a>.</p></li>
 <li><p>(2023-01-30, 0.5.3) Add <code class="docutils literal notranslate"><span class="pre">use_aliases</span></code> parameter to Folder- and Calibre datasets.</p></li>
 <li><p>(2023-01-27, 0.5.2) Add <code class="docutils literal notranslate"><span class="pre">alias</span></code> field to local datasets to protect
 privacy of local document names.</p></li>
@@ -1178,7 +1190,7 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -1197,103 +1209,13 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
     <h3><a href="#">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Welcome to ml-indie-tools’s documentation!</a><ul>
-<li><a class="reference internal" href="#module-env_tools">MLEnv object</a><ul>
-<li><a class="reference internal" href="#env_tools.MLEnv"><code class="docutils literal notranslate"><span class="pre">MLEnv</span></code></a><ul>
-<li><a class="reference internal" href="#env_tools.MLEnv.describe"><code class="docutils literal notranslate"><span class="pre">MLEnv.describe()</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.describe_mlenv"><code class="docutils literal notranslate"><span class="pre">MLEnv.describe_mlenv()</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.describe_osenv"><code class="docutils literal notranslate"><span class="pre">MLEnv.describe_osenv()</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.gpu_type"><code class="docutils literal notranslate"><span class="pre">MLEnv.gpu_type</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.init_paths"><code class="docutils literal notranslate"><span class="pre">MLEnv.init_paths()</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_colab"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_colab</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_conda"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_conda</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_cpu"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_cpu</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_gpu"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_gpu</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_jax"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_jax</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_notebook"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_notebook</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_pytorch"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_pytorch</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_tensorflow"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_tensorflow</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.is_tpu"><code class="docutils literal notranslate"><span class="pre">MLEnv.is_tpu</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.jax_version"><code class="docutils literal notranslate"><span class="pre">MLEnv.jax_version</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.mount_gdrive"><code class="docutils literal notranslate"><span class="pre">MLEnv.mount_gdrive()</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.os_type"><code class="docutils literal notranslate"><span class="pre">MLEnv.os_type</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.pt_version"><code class="docutils literal notranslate"><span class="pre">MLEnv.pt_version</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.py_version"><code class="docutils literal notranslate"><span class="pre">MLEnv.py_version</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.tf_version"><code class="docutils literal notranslate"><span class="pre">MLEnv.tf_version</span></code></a></li>
-<li><a class="reference internal" href="#env_tools.MLEnv.tpu_type"><code class="docutils literal notranslate"><span class="pre">MLEnv.tpu_type</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-tuner">MLTuner object</a><ul>
-<li><a class="reference internal" href="#tuner.MLTuner"><code class="docutils literal notranslate"><span class="pre">MLTuner</span></code></a><ul>
-<li><a class="reference internal" href="#tuner.MLTuner.tune"><code class="docutils literal notranslate"><span class="pre">MLTuner.tune()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-Gutenberg_Dataset">Gutenberg_Dataset object</a><ul>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset</span></code></a><ul>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.filter_text"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.filter_text()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.find_keywords"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.find_keywords()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.get_book"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.get_book()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.get_record_keys"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.get_record_keys()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.get_unique_record_values"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.get_unique_record_values()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.insert_book_texts()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_book"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.load_book()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.load_index"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.load_index()</span></code></a></li>
-<li><a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.search"><code class="docutils literal notranslate"><span class="pre">Gutenberg_Dataset.search()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-Calibre_Dataset">Calibre_Dataset object</a><ul>
-<li><a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset"><code class="docutils literal notranslate"><span class="pre">Calibre_Dataset</span></code></a><ul>
-<li><a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset.load_index"><code class="docutils literal notranslate"><span class="pre">Calibre_Dataset.load_index()</span></code></a></li>
-<li><a class="reference internal" href="#Calibre_Dataset.Calibre_Dataset.search"><code class="docutils literal notranslate"><span class="pre">Calibre_Dataset.search()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-Folder_Dataset">Folder_Dataset object</a><ul>
-<li><a class="reference internal" href="#Folder_Dataset.Folder_Dataset"><code class="docutils literal notranslate"><span class="pre">Folder_Dataset</span></code></a><ul>
-<li><a class="reference internal" href="#Folder_Dataset.Folder_Dataset.load_index"><code class="docutils literal notranslate"><span class="pre">Folder_Dataset.load_index()</span></code></a></li>
-<li><a class="reference internal" href="#Folder_Dataset.Folder_Dataset.search"><code class="docutils literal notranslate"><span class="pre">Folder_Dataset.search()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-Text_Dataset">Text_Dataset object</a><ul>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset"><code class="docutils literal notranslate"><span class="pre">Text_Dataset</span></code></a><ul>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.decode"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.decode()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.encode"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.encode()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.filter_text"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.filter_text()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.get_random_item"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.get_random_item()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.get_unique_token_count"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.get_unique_token_count()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.init_getitem"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.init_getitem()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.init_tokenizer"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.init_tokenizer()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.load_texts"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.load_texts()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.load_tokenizer"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.load_tokenizer()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.save_tokenizer"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.save_tokenizer()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.source_highlight"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.source_highlight()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.tokenize"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.tokenize()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-ALU_Dataset">ALU_Dataset object</a><ul>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset</span></code></a><ul>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.check_results"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.check_results()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.create_data_point"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.create_data_point()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.create_training_data"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.create_training_data()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.create_vector_training_data"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.create_vector_training_data()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.decode_results"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.decode_results()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.get_data_point"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.get_data_point()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.get_datasets"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.get_datasets()</span></code></a></li>
-<li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.op_string_to_index"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.op_string_to_index()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-env_tools">MLEnv object</a></li>
+<li><a class="reference internal" href="#module-tuner">MLTuner object</a></li>
+<li><a class="reference internal" href="#module-Gutenberg_Dataset">Gutenberg_Dataset object</a></li>
+<li><a class="reference internal" href="#module-Calibre_Dataset">Calibre_Dataset object</a></li>
+<li><a class="reference internal" href="#module-Folder_Dataset">Folder_Dataset object</a></li>
+<li><a class="reference internal" href="#module-Text_Dataset">Text_Dataset object</a></li>
+<li><a class="reference internal" href="#module-ALU_Dataset">ALU_Dataset object</a></li>
 <li><a class="reference internal" href="#residualblock-object">ResidualBlock object</a></li>
 <li><a class="reference internal" href="#residualdense-object">ResidualDense object</a></li>
 <li><a class="reference internal" href="#residualdensestack-object">ResidualDenseStack object</a></li>
@@ -1330,7 +1252,7 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1353,7 +1275,7 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
