@@ -58,7 +58,8 @@ def save_checkpoint(
         "optimizer_states": optimizer.state_dict(),
     }
     torch.save(state, file_path)
-
+    if log is not None:
+        log.info(f"Saved model to {file_path}")
 
 def load_model_metadata_from_checkpoint(file_path, device=None):
     if not os.path.exists(file_path):
@@ -70,9 +71,11 @@ def load_model_metadata_from_checkpoint(file_path, device=None):
     return state["params"]
 
 
-def load_checkpoint(params, model, optimizer, file_path, device=None):
+def load_checkpoint(params, model, optimizer, file_path, device=None, log=None):
     if not os.path.exists(file_path):
         print(f"No saved state, no {file_path}, starting from scratch.")
+        if log is not None:
+            log.info(f"No saved state, no {file_path}, starting new model from scratch.")
         return None
     if device is None:
         state = torch.load(file_path)
@@ -81,6 +84,9 @@ def load_checkpoint(params, model, optimizer, file_path, device=None):
     params_new = state["params"]
     if metadata_compatible(params, params_new) is False:
         print("Metadata incompatible, starting from scratch.")
+        del state  # Free memory
+        if log is not None:
+            log.info(f"Metadata incompatible, starting new model from scratch.")
         return None
     params = params_new
     model.load_state_dict(state["model_states"])
@@ -92,4 +98,7 @@ def load_checkpoint(params, model, optimizer, file_path, device=None):
     print(
         f"Continuing from saved state epoch={epoch+1}, loss={loss:.3f}"
     )  # Save is not necessarily on epoch boundary, so that's approx.
+    del state  # Free memory 
+    if log is not None:
+        log.info(f"Continuing from saved state epoch={epoch+1}, loss={loss:.3f}")
     return params
