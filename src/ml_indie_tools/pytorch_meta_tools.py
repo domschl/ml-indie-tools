@@ -75,6 +75,7 @@ def save_checkpoint(
     current_epoch,
     current_loss,
     file_path,
+    log=None
 ):
     params["current_epoch"] = current_epoch
     params["current_loss"] = current_loss
