@@ -211,7 +211,10 @@ class MultiHeadSelfAttention(nn.Module):
                     j = num_layers - i - 1
                 else:
                     j = i
-                drop = 4.0 + j * (dropout - 4.0) / (num_layers / 2)
+                divd = (num_layers / 2) - 1
+                if divd <= 0:
+                    divd = 1
+                drop = 4.0 + j * (dropout - 4.0) / divd
                 blks.append(
                     Block(
                         embedding_size=embedding_size,
