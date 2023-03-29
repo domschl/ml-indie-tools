@@ -2,7 +2,7 @@ import os
 import torch
 
 
-def metadata_compatible(current_params, saved_params, updatable_keys=[]):
+def metadata_compatible(current_params, saved_params, updatable_keys=[], log=None):
     is_valid = True
     keys = set(list(current_params.keys()) + list(saved_params.keys()))
     for key in keys:
@@ -15,6 +15,13 @@ def metadata_compatible(current_params, saved_params, updatable_keys=[]):
             print(
                 "cannot import incompatible model. Put key in `updatable_keys` list, if irrelevant."
             )
+            if log is not None:
+                log.info(
+                    f"Key {key} not available in last checkpoint model_meta, current_params[{key}]: {current_params[key]},"
+                )
+                log.info(
+                    "cannot import incompatible model. Put key in `updatable_keys` list, if irrelevant."
+                )
             is_valid = False
         elif key not in current_params:
             print(
@@ -23,6 +30,13 @@ def metadata_compatible(current_params, saved_params, updatable_keys=[]):
             print(
                 "cannot import incompatible model. Put key in `updatable_keys` list, if irrelevant."
             )
+            if log is not None:
+                log.info(
+                    f"Key {key} not available in params, last checkpoint saved_params[{key}]: {saved_params[key]},"
+                )
+                log.info(
+                    "cannot import incompatible model. Put key in `updatable_keys` list, if irrelevant."
+                )
             is_valid = False
         elif saved_params[key] != current_params[key]:
             print(
@@ -31,10 +45,22 @@ def metadata_compatible(current_params, saved_params, updatable_keys=[]):
             print(
                 "cannot import incompatible model. Put key in `updatable_keys` list, if irrelevant."
             )
+            if log is not None:
+                log.info(
+                    f"Last checkpoint saved_params[{key}]: {saved_params[key]} != current_params[{key}]: {current_params[key]},"
+                )
+                log.info(
+                    "cannot import incompatible model. Put key in `updatable_keys` list, if irrelevant."
+                )
             is_valid = False
     if is_valid is False:
         print("Incompatible metadata.")
+        if log is not None:
+            log.info("Incompatible metadata.")
         return False
+    else:
+        if log is not None:
+            log.info("Compatible metadata.")
     return True
 
 
@@ -61,17 +87,21 @@ def save_checkpoint(
     if log is not None:
         log.info(f"Saved model to {file_path}")
 
-def load_model_metadata_from_checkpoint(file_path, device=None):
+def load_model_metadata_from_checkpoint(file_path, device=None, log=None):
     if not os.path.exists(file_path):
+        if log is not None:
+            log.info(f"No saved state, no {file_path}, starting with default state.")
         return None
     if device is None:
         state = torch.load(file_path)
     else:
         state = torch.load(file_path, map_location=device)
+    if log is not None:
+        log.info(f"Loaded model metadata from {file_path}, meta_name_template: {state['params']['meta_name_template']}]")
     return state["params"]
 
 
-def load_checkpoint(params, model, optimizer, file_path, device=None, log=None):
+def load_checkpoint(params, model, optimizer, file_path, updatable_keys, device=None, log=None):
     if not os.path.exists(file_path):
         print(f"No saved state, no {file_path}, starting from scratch.")
         if log is not None:
@@ -82,7 +112,7 @@ def load_checkpoint(params, model, optimizer, file_path, device=None, log=None):
     else:
         state = torch.load(file_path, map_location=device)
     params_new = state["params"]
-    if metadata_compatible(params, params_new) is False:
+    if metadata_compatible(params, params_new, updatable_keys, log) is False:
         print("Metadata incompatible, starting from scratch.")
         del state  # Free memory
         if log is not None:
