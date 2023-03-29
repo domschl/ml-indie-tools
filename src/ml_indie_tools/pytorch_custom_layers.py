@@ -109,8 +109,8 @@ class FeedFoward(nn.Module):
             linear_compressor = embedding_size * 4
         self.net = nn.Sequential(
             nn.Linear(embedding_size, linear_compressor),
-            # nn.ReLU(),
-            nn.LeakyReLU(),
+            nn.ReLU(),
+            # nn.LeakyReLU(),
             nn.Linear(linear_compressor, embedding_size),
             nn.Dropout(dropout),
         )
