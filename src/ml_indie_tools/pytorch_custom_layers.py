@@ -167,7 +167,9 @@ class MultiHeadSelfAttention(nn.Module):
     :param num_heads: the number of attention heads
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
-    :param sigma_compressor: whether to use sigma-compression in the block layer, if dropout > 1.0: sigma-compression uses max  compression in the middle layer, and no compression in the first and last layers.
+    :param sigma_compressor: whether to use sigma-compression in the block layer,
+    if dropout > 1.0: sigma-compression uses max  compression in the middle layer,
+    and no compression in the first and last layers.
     :param device: the device to use for training
     """
 
@@ -189,7 +191,7 @@ class MultiHeadSelfAttention(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        if dropout <= 1.0 or sigma_compressor == False:
+        if dropout <= 1.0 or sigma_compressor is False:
             self.blocks = nn.Sequential(
                 *[
                     Block(
@@ -205,8 +207,8 @@ class MultiHeadSelfAttention(nn.Module):
         else:
             blks = []
             for i in range(num_layers):
-                if i > num_layers / 2:
-                    j = num_layers - i
+                if i >= num_layers / 2:
+                    j = num_layers - i - 1
                 else:
                     j = i
                 drop = 4.0 + j * (dropout - 4.0) / (num_layers / 2)
