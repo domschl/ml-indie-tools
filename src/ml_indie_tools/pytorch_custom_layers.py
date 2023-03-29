@@ -109,7 +109,8 @@ class FeedFoward(nn.Module):
             linear_compressor = embedding_size * 4
         self.net = nn.Sequential(
             nn.Linear(embedding_size, linear_compressor),
-            nn.ReLU(),
+            # nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(linear_compressor, embedding_size),
             nn.Dropout(dropout),
         )
@@ -127,8 +128,8 @@ class Block(nn.Module):
     :param sequence_len: the length of the input sequence
     :param dropout: the dropout rate
     :param num_heads: the number of attention heads
-    :param linear_compressor: the size of the linear layer in the feed-forward network, if None, use embedding_size*4
     :param causal: whether to use causal masking
+    :param linear_compressor: the size of the linear layer in the feed-forward network, if None, use embedding_size*4
     """
 
     def __init__(
@@ -137,8 +138,8 @@ class Block(nn.Module):
         sequence_len,
         dropout,
         num_heads,
-        linear_compressor,
         causal,
+        linear_compressor,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
@@ -203,8 +204,8 @@ class MultiHeadSelfAttention(nn.Module):
                         sequence_len=sequence_len,
                         dropout=dropout,
                         num_heads=num_heads,
-                        linear_compressor=embedding_size * 4,
                         causal=causal,
+                        linear_compressor=embedding_size * 4,
                     )
                     for _ in range(num_layers)
                 ]
@@ -218,8 +219,8 @@ class MultiHeadSelfAttention(nn.Module):
                         sequence_len=sequence_len,
                         dropout=dropout,
                         num_heads=num_heads,
-                        linear_compressor=sigma_compressor[i],
                         causal=causal,
+                        linear_compressor=sigma_compressor[i],
                     )
                 )
             self.blocks = nn.Sequential(*blks)
