@@ -195,7 +195,7 @@ class MultiHeadSelfAttention(nn.Module):
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
         if sigma_compressor is None:
             sigma_compressor = []
-        if dropout <= 1.0 or len(sigma_compressor) != num_layers:
+        if len(sigma_compressor) != num_layers:
             self.blocks = nn.Sequential(
                 *[
                     Block(
