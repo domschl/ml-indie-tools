@@ -149,7 +149,11 @@ class Block(nn.Module):
         )
         if linear_compressor is None:
             linear_compressor = embedding_size * 4
-        self.ffwd = FeedFoward(embedding_size, linear_compressor, dropout)
+        self.ffwd = FeedFoward(
+            embedding_size=embedding_size,
+            linear_compressor=linear_compressor,
+            dropout=dropout,
+        )
         self.ln1 = nn.LayerNorm(embedding_size)
         self.ln2 = nn.LayerNorm(embedding_size)
 
@@ -200,7 +204,7 @@ class MultiHeadSelfAttention(nn.Module):
             self.blocks = nn.Sequential(
                 *[
                     Block(
-                        embedding_size,
+                        embedding_size=embedding_size,
                         sequence_len=sequence_len,
                         dropout=dropout,
                         num_heads=num_heads,
