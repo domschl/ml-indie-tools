@@ -113,6 +113,7 @@ class FeedFoward(nn.Module):
             )
         else:
             compressor = int(embedding_size / dropout * 4.0)
+            compressor = (compressor + 7) // 16 * 16
             self.net = nn.Sequential(
                 nn.Linear(embedding_size, compressor),
                 nn.ReLU(),
@@ -208,11 +209,6 @@ class MultiHeadSelfAttention(nn.Module):
                     j = num_layers - i
                 else:
                     j = i
-                j = (
-                    (j + 8) // 16
-                ) * 16  # make sure matrices have sane dimensions (multiple of 16)
-                if j < 16:
-                    j = 16
                 drop = 4.0 + j * (dropout - 4.0) / (num_layers / 2)
                 blks.append(
                     Block(
