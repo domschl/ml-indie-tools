@@ -31,7 +31,7 @@ class SelfAttentionHead(nn.Module):
                 "tril", torch.tril(torch.ones(sequence_len, sequence_len))
             )
         self.dropout_val = dropout
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
@@ -43,7 +43,7 @@ class SelfAttentionHead(nn.Module):
         if self.causal is True:
             wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))  # (B, T, T)
             wei = F.softmax(wei, dim=-1)  # (B, T, T)
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             wei = self.dropout(wei)
         # perform the weighted aggregation of the values
         v = self.value(x)  # (B,T,C)
@@ -82,12 +82,12 @@ class MultiHeadAttention(nn.Module):
         )
         self.proj = nn.Linear(embedding_size, embedding_size)
         self.dropout_val = dropout
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         out = torch.cat([h(x) for h in self.heads], dim=-1)
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             out = self.dropout(self.proj(out))
         else:
             out = self.proj(out)
@@ -104,7 +104,7 @@ class FeedFoward(nn.Module):
     def __init__(self, embedding_size, dropout):
         super().__init__()
         self.dropout_val = dropout
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             self.net = nn.Sequential(
                 nn.Linear(embedding_size, 4 * embedding_size),
                 nn.ReLU(),
@@ -188,7 +188,7 @@ class MultiHeadSelfAttention(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        if dropout <= 1.0 or sigma_compressor==False:
+        if dropout <= 1.0 or sigma_compressor == False:
             self.blocks = nn.Sequential(
                 *[
                     Block(
@@ -202,20 +202,27 @@ class MultiHeadSelfAttention(nn.Module):
                 ]
             )
         else:
-            blks=[]
+            blks = []
             for i in range(num_layers):
-                if i>num_layers/2:
-                    j= num_layers-i
+                if i > num_layers / 2:
+                    j = num_layers - i
                 else:
-                    j=i
+                    j = i
+                j = (
+                    (j + 8) // 16
+                ) * 16  # make sure matrices have sane dimensions (multiple of 16)
+                if j < 16:
+                    j = 16
                 drop = 4.0 + j * (dropout - 4.0) / (num_layers / 2)
-                blks.append(Block(
-                    embedding_size=embedding_size,
-                    sequence_len=sequence_len,
-                    dropout=drop,
-                    num_heads=num_heads,
-                    causal=causal,
-                ))
+                blks.append(
+                    Block(
+                        embedding_size=embedding_size,
+                        sequence_len=sequence_len,
+                        dropout=drop,
+                        num_heads=num_heads,
+                        causal=causal,
+                    )
+                )
             self.blocks = nn.Sequential(*blks)
         self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
         self.lm_head = nn.Linear(embedding_size, vocab_size)
@@ -260,7 +267,7 @@ class MultiHeadSelfAttention(nn.Module):
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
-            idx_cond = idx[:, -self.sequence_len:]
+            idx_cond = idx[:, -self.sequence_len :]
             # print(idx_cond.shape)
             # get the predictions
             logits, loss = self(idx_cond)
