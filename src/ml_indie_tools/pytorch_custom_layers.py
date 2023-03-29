@@ -98,27 +98,21 @@ class FeedFoward(nn.Module):
     """Simple linear layer followed by a non-linearity
 
     :param embedding_size: the size of the input embedding
+    :param linear_compressor: the size of the linear layer in the feed-forward network, if None, use embedding_size*4
     :param dropout: the dropout rate
     """
 
-    def __init__(self, embedding_size, dropout):
+    def __init__(self, embedding_size, linear_compressor, dropout):
         super().__init__()
         self.dropout_val = dropout
-        if self.dropout_val < 1.0:
-            self.net = nn.Sequential(
-                nn.Linear(embedding_size, 4 * embedding_size),
-                nn.ReLU(),
-                nn.Linear(4 * embedding_size, embedding_size),
-                nn.Dropout(dropout),
-            )
-        else:
-            compressor = int(embedding_size / dropout * 4.0)
-            compressor = (compressor + 7) // 16 * 16
-            self.net = nn.Sequential(
-                nn.Linear(embedding_size, compressor),
-                nn.ReLU(),
-                nn.Linear(compressor, embedding_size),
-            )
+        if linear_compressor is None:
+            linear_compressor = embedding_size * 4
+        self.net = nn.Sequential(
+            nn.Linear(embedding_size, linear_compressor),
+            nn.ReLU(),
+            nn.Linear(linear_compressor, embedding_size),
+            nn.Dropout(dropout),
+        )
 
     def forward(self, x):
         return self.net(x)
@@ -133,17 +127,28 @@ class Block(nn.Module):
     :param sequence_len: the length of the input sequence
     :param dropout: the dropout rate
     :param num_heads: the number of attention heads
+    :param linear_compressor: the size of the linear layer in the feed-forward network, if None, use embedding_size*4
     :param causal: whether to use causal masking
     """
 
-    def __init__(self, embedding_size, sequence_len, dropout, num_heads, causal):
+    def __init__(
+        self,
+        embedding_size,
+        sequence_len,
+        dropout,
+        num_heads,
+        linear_compressor,
+        causal,
+    ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
             embedding_size, sequence_len, dropout, num_heads, head_size, causal
         )
-        self.ffwd = FeedFoward(embedding_size, dropout)
+        if linear_compressor is None:
+            linear_compressor = embedding_size * 4
+        self.ffwd = FeedFoward(embedding_size, linear_compressor, dropout)
         self.ln1 = nn.LayerNorm(embedding_size)
         self.ln2 = nn.LayerNorm(embedding_size)
 
@@ -161,14 +166,11 @@ class MultiHeadSelfAttention(nn.Module):
     :param vocab_size: the size of the vocabulary
     :param embedding_size: the size of the input embedding
     :param sequence_len: the length of the input sequence
-    :param dropout: the dropout rate, if dropout < 1.0. If dropout >= 1.0,
-    then dropout is used as a compression factor in the block layer,
-    compressing the embedding size to embedding_size / dropout * 4.0. [Experimental!]
+    :param dropout: the dropout rate
     :param num_heads: the number of attention heads
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
-    :param sigma_compressor: whether to use sigma-compression in the block layer,
-    if dropout > 1.0: sigma-compression uses max  compression in the middle layer,
+    :param sigma_compressor: array of number of neurons for linear (sigma) compressor) layers (or None), dimension must be num_layers, if not None.
     and no compression in the first and last layers.
     :param device: the device to use for training
     """
@@ -191,7 +193,9 @@ class MultiHeadSelfAttention(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        if dropout <= 1.0 or sigma_compressor is False:
+        if sigma_compressor is None:
+            sigma_compressor = []
+        if dropout <= 1.0 or len(sigma_compressor) != num_layers:
             self.blocks = nn.Sequential(
                 *[
                     Block(
@@ -199,6 +203,7 @@ class MultiHeadSelfAttention(nn.Module):
                         sequence_len=sequence_len,
                         dropout=dropout,
                         num_heads=num_heads,
+                        linear_compressor=embedding_size * 4,
                         causal=causal,
                     )
                     for _ in range(num_layers)
@@ -207,20 +212,13 @@ class MultiHeadSelfAttention(nn.Module):
         else:
             blks = []
             for i in range(num_layers):
-                if i >= num_layers / 2:
-                    j = num_layers - i - 1
-                else:
-                    j = i
-                divd = (num_layers / 2) - 1
-                if divd <= 0:
-                    divd = 1
-                drop = 4.0 + j * (dropout - 4.0) / divd
                 blks.append(
                     Block(
                         embedding_size=embedding_size,
                         sequence_len=sequence_len,
-                        dropout=drop,
+                        dropout=dropout,
                         num_heads=num_heads,
+                        linear_compressor=sigma_compressor[i],
                         causal=causal,
                     )
                 )
