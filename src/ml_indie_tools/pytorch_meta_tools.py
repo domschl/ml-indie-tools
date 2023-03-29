@@ -103,7 +103,8 @@ def load_model_metadata_from_checkpoint(
             log.info(f"Metadata incompatible, starting with default state: {params}")
         return params
     for key in updatable_params:
-        new_params[key] = params[key]
+        if key in params:
+            new_params[key] = params[key]
     if log is not None:
         log.info(f"Loaded model metadata from {file_path}, {new_params}")
     return new_params
