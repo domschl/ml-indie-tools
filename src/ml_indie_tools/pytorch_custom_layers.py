@@ -118,7 +118,7 @@ class FeedFoward(nn.Module):
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
         self.rec = False
-        if dropout is not None and dropout != 0:
+        if dropout is not None and dropout != 0 and non_linearity != "LSTM":
             self.net = nn.Sequential(
                 nn.Linear(input_size, hidden_size),
                 self.non_linearity,
