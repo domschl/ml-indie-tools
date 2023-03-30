@@ -117,6 +117,7 @@ class FeedFoward(nn.Module):
             self.non_linearity = nn.Tanh()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
+        self.rec = False
         if dropout is not None and dropout != 0:
             self.net = nn.Sequential(
                 nn.Linear(input_size, hidden_size),
@@ -125,14 +126,26 @@ class FeedFoward(nn.Module):
                 nn.Dropout(dropout),
             )
         else:
-            self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
-                self.non_linearity,
-                nn.Linear(hidden_size, input_size),
-            )
+            if non_linearity == "LSTM":
+                self.net = nn.LSTM(
+                    input_size, hidden_size, num_layers=2, batch_first=True
+                )
+                self.c = torch.randn(1, hidden_size)
+                self.h = torch.randn(1, hidden_size)
+                self.rec = True
+            else:
+                self.net = nn.Sequential(
+                    nn.Linear(input_size, hidden_size),
+                    self.non_linearity,
+                    nn.Linear(hidden_size, input_size),
+                )
 
     def forward(self, x):
-        return self.net(x)
+        if self.rec is True:
+            out, (self.h, self.c) = self.net(x, (self.h, self.c))
+            return out
+        else:
+            return self.net(x)
 
 
 class Block(nn.Module):
@@ -206,8 +219,8 @@ class MultiHeadSelfAttention(nn.Module):
     respective hidden sizes (or None for default 4*embedding_size), dimension must be num_layers,
     if not None.
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
-    :param device: the device to use for training
     :param linear_residual: whether to use linear residual connection, default True (False is only active, if hidden_sizes[i] != embedding_size*4)
+    :param device: the device to use for training
     """
 
     def __init__(
