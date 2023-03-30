@@ -31,7 +31,7 @@ class SelfAttentionHead(nn.Module):
                 "tril", torch.tril(torch.ones(sequence_len, sequence_len))
             )
         self.dropout_val = dropout
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
@@ -43,7 +43,7 @@ class SelfAttentionHead(nn.Module):
         if self.causal is True:
             wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))  # (B, T, T)
             wei = F.softmax(wei, dim=-1)  # (B, T, T)
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             wei = self.dropout(wei)
         # perform the weighted aggregation of the values
         v = self.value(x)  # (B,T,C)
@@ -82,12 +82,12 @@ class MultiHeadAttention(nn.Module):
         )
         self.proj = nn.Linear(embedding_size, embedding_size)
         self.dropout_val = dropout
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         out = torch.cat([h(x) for h in self.heads], dim=-1)
-        if (self.dropout_val < 1.0):
+        if self.dropout_val < 1.0:
             out = self.dropout(self.proj(out))
         else:
             out = self.proj(out)
@@ -95,28 +95,40 @@ class MultiHeadAttention(nn.Module):
 
 
 class FeedFoward(nn.Module):
-    """Simple linear layer followed by a non-linearity
+    """Dual linear layers separated by a non-linearity
 
-    :param embedding_size: the size of the input embedding
-    :param dropout: the dropout rate
+    :param input_size: the size of the input embedding
+    :param hidden_size: the size of the 'hidden' linear layer in the feed-forward network,
+    if None, use default input_size*4
+    :param dropout: the dropout rate (default None, don't use dropout layer)
+    :param non_linearity: the non-linearity to use, one of "relu" (default), "leaky_relu", "tanh"
     """
 
-    def __init__(self, embedding_size, dropout):
+    def __init__(
+        self, input_size, hidden_size=None, dropout=None, non_linearity="relu"
+    ):
         super().__init__()
         self.dropout_val = dropout
-        if (self.dropout_val < 1.0):
+        if non_linearity == "relu":
+            self.non_linearity = nn.ReLU()
+        elif non_linearity == "leaky_relu":
+            self.non_linearity = nn.LeakyReLU()
+        elif non_linearity == "tanh":
+            self.non_linearity = nn.Tanh()
+        if hidden_size is None or hidden_size == 0:
+            hidden_size = input_size * 4
+        if dropout is not None and dropout != 0:
             self.net = nn.Sequential(
-                nn.Linear(embedding_size, 4 * embedding_size),
-                nn.ReLU(),
-                nn.Linear(4 * embedding_size, embedding_size),
+                nn.Linear(input_size, hidden_size),
+                self.non_linearity,
+                nn.Linear(hidden_size, input_size),
                 nn.Dropout(dropout),
             )
         else:
-            compressor = int(embedding_size / dropout * 4.0)
             self.net = nn.Sequential(
-                nn.Linear(embedding_size, compressor),
-                nn.ReLU(),
-                nn.Linear(compressor, embedding_size),
+                nn.Linear(input_size, hidden_size),
+                self.non_linearity,
+                nn.Linear(hidden_size, input_size),
             )
 
     def forward(self, x):
@@ -133,16 +145,36 @@ class Block(nn.Module):
     :param dropout: the dropout rate
     :param num_heads: the number of attention heads
     :param causal: whether to use causal masking
+    :param linear_hidden_size: the size of hidden layer in the dual-linear layer
+    of the feed-forward network, if None, use embedding_size*4
+    :param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
+    one of "relu" (default), "leaky_relu", "tanh"
     """
 
-    def __init__(self, embedding_size, sequence_len, dropout, num_heads, causal):
+    def __init__(
+        self,
+        embedding_size,
+        sequence_len,
+        dropout,
+        num_heads,
+        causal,
+        linear_hidden_size=None,
+        linear_non_linearity="relu",
+    ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
             embedding_size, sequence_len, dropout, num_heads, head_size, causal
         )
-        self.ffwd = FeedFoward(embedding_size, dropout)
+        if linear_hidden_size is None:
+            linear_hidden_size = embedding_size * 4
+        self.ffwd = FeedFoward(
+            input_size=embedding_size,
+            hidden_size=linear_hidden_size,
+            dropout=dropout,
+            non_linearity=linear_non_linearity,
+        )
         self.ln1 = nn.LayerNorm(embedding_size)
         self.ln2 = nn.LayerNorm(embedding_size)
 
@@ -160,13 +192,14 @@ class MultiHeadSelfAttention(nn.Module):
     :param vocab_size: the size of the vocabulary
     :param embedding_size: the size of the input embedding
     :param sequence_len: the length of the input sequence
-    :param dropout: the dropout rate, if dropout < 1.0. If dropout >= 1.0,
-    then dropout is used as a compression factor in the block layer,
-    compressing the embedding size to embedding_size / dropout * 4.0. [Experimental!]
+    :param dropout: the dropout rate
     :param num_heads: the number of attention heads
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
-    :param sigma_compressor: whether to use sigma-compression in the block layer, if dropout > 1.0: sigma-compression uses max  compression in the middle layer, and no compression in the first and last layers.
+    :param linear_hidden_sizes: array of number of neurons for the dual-linear layers
+    respective hidden sizes (or None for default 4*embedding_size), dimension must be num_layers,
+    if not None.
+    :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
     :param device: the device to use for training
     """
 
@@ -179,8 +212,9 @@ class MultiHeadSelfAttention(nn.Module):
         num_heads,
         num_layers,
         causal,
-        sigma_compressor,
-        device,
+        linear_hidden_sizes=None,
+        linear_non_linearity="relu",
+        device=None,
     ):
         self.device = device
         self.sequence_len = sequence_len
@@ -188,34 +222,37 @@ class MultiHeadSelfAttention(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        if dropout <= 1.0 or sigma_compressor==False:
+        if linear_hidden_sizes is None:
+            linear_hidden_sizes = []
+        if len(linear_hidden_sizes) != num_layers:
             self.blocks = nn.Sequential(
                 *[
                     Block(
-                        embedding_size,
+                        embedding_size=embedding_size,
                         sequence_len=sequence_len,
                         dropout=dropout,
                         num_heads=num_heads,
                         causal=causal,
+                        linear_hidden_size=embedding_size * 4,
+                        linear_non_linearity=linear_non_linearity,
                     )
                     for _ in range(num_layers)
                 ]
             )
         else:
-            blks=[]
+            blks = []
             for i in range(num_layers):
-                if i>num_layers/2:
-                    j= num_layers-i
-                else:
-                    j=i
-                drop = 4.0 + j * (dropout - 4.0) / (num_layers / 2)
-                blks.append(Block(
-                    embedding_size=embedding_size,
-                    sequence_len=sequence_len,
-                    dropout=drop,
-                    num_heads=num_heads,
-                    causal=causal,
-                ))
+                blks.append(
+                    Block(
+                        embedding_size=embedding_size,
+                        sequence_len=sequence_len,
+                        dropout=dropout,
+                        num_heads=num_heads,
+                        causal=causal,
+                        linear_hidden_size=linear_hidden_sizes[i],
+                        linear_non_linearity=linear_non_linearity,
+                    )
+                )
             self.blocks = nn.Sequential(*blks)
         self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
         self.lm_head = nn.Linear(embedding_size, vocab_size)
@@ -227,9 +264,12 @@ class MultiHeadSelfAttention(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
 
         # XXX: move to init, make not trainable:
-        pos_emb = self.position_embedding_table(
-            torch.arange(T, device=self.device)
-        )  # (T,C)
+        if self.device is None:
+            pos_emb = self.position_embedding_table(torch.arange(T))
+        else:
+            pos_emb = self.position_embedding_table(
+                torch.arange(T, device=self.device)
+            )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
         x = self.blocks(x)  # (B,T,C)
@@ -260,7 +300,7 @@ class MultiHeadSelfAttention(nn.Module):
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
-            idx_cond = idx[:, -self.sequence_len:]
+            idx_cond = idx[:, -self.sequence_len :]
             # print(idx_cond.shape)
             # get the predictions
             logits, loss = self(idx_cond)

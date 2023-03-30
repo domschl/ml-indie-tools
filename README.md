@@ -248,6 +248,8 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2023-03-30, 0.7.0) Cleanup of bottleneck mechanism to force abstraction. Dropout behave again normal
+(hacks removed).
 * (2023-03-28, 0.6.0) Add `dropout>1.0` paramater to MultiHeadSelfAttention (torch): replaces 'normal' dropout with a linear compression by 4.0/dropout. The linear layers no longer
 map n -> 4n -> n, but n -> 4n/dropout -> n. This reduces the amount of information, the net can propagate, forcing compression. Sigma_compression uses different compressions rates:
 max in the middle layers, and non at start end end layers, linearly interpolating between them.
