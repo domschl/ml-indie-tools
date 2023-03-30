@@ -149,6 +149,7 @@ class Block(nn.Module):
     of the feed-forward network, if None, use embedding_size*4
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
     one of "relu" (default), "leaky_relu", "tanh"
+    :param linear_residual: whether to use linear residual connection, default True
     """
 
     def __init__(
@@ -160,6 +161,7 @@ class Block(nn.Module):
         causal,
         linear_hidden_size=None,
         linear_non_linearity="relu",
+        linear_residual=True,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
@@ -177,10 +179,14 @@ class Block(nn.Module):
         )
         self.ln1 = nn.LayerNorm(embedding_size)
         self.ln2 = nn.LayerNorm(embedding_size)
+        if linear_residual is True:
+            self.fRes = 1.0
+        else:
+            self.fRes = 0.0
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
-        x = x + self.ffwd(self.ln2(x))
+        x = x * self.fRes + self.ffwd(self.ln2(x))
         return x
 
 
@@ -201,6 +207,7 @@ class MultiHeadSelfAttention(nn.Module):
     if not None.
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
     :param device: the device to use for training
+    :param linear_residual: whether to use linear residual connection, default True (False is only active, if hidden_sizes[i] != embedding_size*4)
     """
 
     def __init__(
@@ -214,6 +221,7 @@ class MultiHeadSelfAttention(nn.Module):
         causal,
         linear_hidden_sizes=None,
         linear_non_linearity="relu",
+        linear_residual=True,
         device=None,
     ):
         self.device = device
@@ -242,6 +250,11 @@ class MultiHeadSelfAttention(nn.Module):
         else:
             blks = []
             for i in range(num_layers):
+                if linear_residual is False:
+                    if embedding_size * 4 != linear_hidden_sizes[i]:
+                        bRes = False
+                    else:
+                        bRes = True
                 blks.append(
                     Block(
                         embedding_size=embedding_size,
@@ -251,6 +264,7 @@ class MultiHeadSelfAttention(nn.Module):
                         causal=causal,
                         linear_hidden_size=linear_hidden_sizes[i],
                         linear_non_linearity=linear_non_linearity,
+                        linear_residual=bRes,
                     )
                 )
             self.blocks = nn.Sequential(*blks)
