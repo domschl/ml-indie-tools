@@ -127,8 +127,10 @@ class FeedFoward(nn.Module):
             )
         else:
             if non_linearity == "LSTM":
-                self.net = nn.LSTM(
-                    input_size, hidden_size, num_layers=2, batch_first=True
+                self.net = nn.Sequential(
+                    nn.Linear(input_size, hidden_size),
+                    nn.LSTM(hidden_size, hidden_size, num_layers=2),
+                    nn.Linear(hidden_size, input_size),
                 )
                 self.c = torch.randn(1, hidden_size)
                 self.h = torch.randn(1, hidden_size)
