@@ -117,8 +117,7 @@ class FeedFoward(nn.Module):
             self.non_linearity = nn.Tanh()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
-        self.rec = False
-        if dropout is not None and dropout != 0 and non_linearity != "LSTM":
+        if dropout is not None and dropout != 0:
             self.net = nn.Sequential(
                 nn.Linear(input_size, hidden_size),
                 self.non_linearity,
@@ -126,31 +125,14 @@ class FeedFoward(nn.Module):
                 nn.Dropout(dropout),
             )
         else:
-            if non_linearity == "LSTM":
-                self.net1 = nn.Linear(input_size, hidden_size)
-                self.net2 = nn.LSTM(hidden_size, hidden_size, num_layers=2)
-                self.net3 = nn.Linear(hidden_size, input_size)
-                self.lstm_lyr = 2
-                self.c = torch.randn(self.lstm_lyr, 128, hidden_size, device="mps")
-                self.c.requires_grad = False
-                self.h = torch.randn(self.lstm_lyr, 128, hidden_size, device="mps")
-                self.h.requires_grad = False
-                self.rec = True
-            else:
-                self.net = nn.Sequential(
-                    nn.Linear(input_size, hidden_size),
-                    self.non_linearity,
-                    nn.Linear(hidden_size, input_size),
-                )
+            self.net = nn.Sequential(
+                nn.Linear(input_size, hidden_size),
+                self.non_linearity,
+                nn.Linear(hidden_size, input_size),
+            )
 
     def forward(self, x):
-        if self.rec is True:
-            x = self.net1(x)
-            x, (self.h, self.c) = self.net2(x, (self.h, self.c))
-            out = self.net3(x)
-            return out
-        else:
-            return self.net(x)
+        return self.net(x)
 
 
 class Block(nn.Module):
