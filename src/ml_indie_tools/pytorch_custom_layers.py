@@ -127,9 +127,9 @@ class FeedFoward(nn.Module):
             )
         else:
             if non_linearity == "LSTM":
-                self.net1 = (nn.Linear(input_size, hidden_size),)
-                self.net2 = (nn.LSTM(hidden_size, hidden_size, num_layers=2),)
-                self.net3 = (nn.Linear(hidden_size, input_size),)
+                self.net1 = nn.Linear(input_size, hidden_size)
+                self.net2 = nn.LSTM(hidden_size, hidden_size, num_layers=2)
+                self.net3 = nn.Linear(hidden_size, input_size)
                 self.c = torch.randn(1, hidden_size)
                 self.h = torch.randn(1, hidden_size)
                 self.rec = True
