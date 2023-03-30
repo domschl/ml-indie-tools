@@ -131,12 +131,10 @@ class FeedFoward(nn.Module):
                 self.net2 = nn.LSTM(hidden_size, hidden_size, num_layers=2)
                 self.net3 = nn.Linear(hidden_size, input_size)
                 self.lstm_lyr = 2
-                self.c = torch.randn(
-                    self.lstm_lyr, 128, hidden_size, device="mps"
-                ).requires_grad(False)
-                self.h = torch.randn(
-                    self.lstm_lyr, 128, hidden_size, device="mps"
-                ).requires_grad(False)
+                self.c = torch.randn(self.lstm_lyr, 128, hidden_size, device="mps")
+                self.c.requires_grad(False)
+                self.h = torch.randn(self.lstm_lyr, 128, hidden_size, device="mps")
+                self.h.requires_grad(False)
                 self.rec = True
             else:
                 self.net = nn.Sequential(
