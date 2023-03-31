@@ -94,7 +94,7 @@ class MultiHeadAttention(nn.Module):
         return out
 
 
-class FeedFoward(nn.Module):
+class FeedFowardWithCompression(nn.Module):
     """Dual linear layers separated by a non-linearity
 
     :param input_size: the size of the input embedding
@@ -135,7 +135,7 @@ class FeedFoward(nn.Module):
         return self.net(x)
 
 
-class Block(nn.Module):
+class BlockWithCompression(nn.Module):
     """Transformer block: communication followed by computation
 
     Note: the embedding size must be divisible by the number of heads
@@ -145,11 +145,9 @@ class Block(nn.Module):
     :param dropout: the dropout rate
     :param num_heads: the number of attention heads
     :param causal: whether to use causal masking
-    :param linear_hidden_size: the size of hidden layer in the dual-linear layer
-    of the feed-forward network, if None, use embedding_size*4
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
     one of "relu" (default), "leaky_relu", "tanh"
-    :param linear_residual: whether to use linear residual connection, default True
+    :param linear_hidden_size: the size of the 'hidden' linear layer in the feed-forward network, None for default 4*embedding_size
     """
 
     def __init__(
@@ -159,9 +157,8 @@ class Block(nn.Module):
         dropout,
         num_heads,
         causal,
-        linear_hidden_size=None,
         linear_non_linearity="relu",
-        linear_residual=True,
+        linear_hidden_size=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
@@ -171,7 +168,8 @@ class Block(nn.Module):
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
-        self.ffwd = FeedFoward(
+
+        self.ffwd = FeedFowardWithCompression(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
@@ -179,18 +177,14 @@ class Block(nn.Module):
         )
         self.ln1 = nn.LayerNorm(embedding_size)
         self.ln2 = nn.LayerNorm(embedding_size)
-        if linear_residual is True:
-            self.fRes = 1.0
-        else:
-            self.fRes = 0.0
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
-        x = x * self.fRes + self.ffwd(self.ln2(x))
+        x = x + self.ffwd(self.ln2(x))
         return x
 
 
-class MultiHeadSelfAttention(nn.Module):
+class MultiHeadSelfAttentionWithCompression(nn.Module):
     """MultiHeadSelfAttention transformer model (Karpathy nanoGPT derivative)
 
     Note: the embedding size must be divisible by the number of heads
@@ -202,11 +196,8 @@ class MultiHeadSelfAttention(nn.Module):
     :param num_heads: the number of attention heads
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
-    :param linear_hidden_sizes: array of number of neurons for the dual-linear layers
-    respective hidden sizes (or None for default 4*embedding_size), dimension must be num_layers,
-    if not None.
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
-    :param linear_residual: whether to use linear residual connection, default True (False is only active, if hidden_sizes[i] != embedding_size*4)
+    :param linear_yoke: Tuple (layer_index, hidden_size) to yoke the linear layer, or None
     :param device: the device to use for training
     """
 
@@ -219,9 +210,8 @@ class MultiHeadSelfAttention(nn.Module):
         num_heads,
         num_layers,
         causal,
-        linear_hidden_sizes=None,
         linear_non_linearity="relu",
-        linear_residual=True,
+        linear_yoke=None,
         device=None,
     ):
         self.device = device
@@ -230,44 +220,24 @@ class MultiHeadSelfAttention(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        if linear_hidden_sizes is None:
-            linear_hidden_sizes = []
-        if len(linear_hidden_sizes) != num_layers:
-            self.blocks = nn.Sequential(
-                *[
-                    Block(
-                        embedding_size=embedding_size,
-                        sequence_len=sequence_len,
-                        dropout=dropout,
-                        num_heads=num_heads,
-                        causal=causal,
-                        linear_hidden_size=embedding_size * 4,
-                        linear_non_linearity=linear_non_linearity,
-                    )
-                    for _ in range(num_layers)
-                ]
-            )
-        else:
-            blks = []
-            for i in range(num_layers):
-                if linear_residual is False:
-                    if embedding_size * 4 != linear_hidden_sizes[i]:
-                        bRes = False
-                    else:
-                        bRes = True
-                blks.append(
-                    Block(
-                        embedding_size=embedding_size,
-                        sequence_len=sequence_len,
-                        dropout=dropout,
-                        num_heads=num_heads,
-                        causal=causal,
-                        linear_hidden_size=linear_hidden_sizes[i],
-                        linear_non_linearity=linear_non_linearity,
-                        linear_residual=bRes,
-                    )
+        blks = []
+        for i in range(num_layers):
+            if linear_yoke is not None and linear_yoke[0] == i:
+                linear_hidden_size = linear_yoke[1]
+            else:
+                linear_hidden_size = None
+            blks.append(
+                BlockWithCompression(
+                    embedding_size=embedding_size,
+                    sequence_len=sequence_len,
+                    dropout=dropout,
+                    num_heads=num_heads,
+                    causal=causal,
+                    linear_non_linearity=linear_non_linearity,
+                    linear_hidden_size=linear_hidden_size,
                 )
-            self.blocks = nn.Sequential(*blks)
+            )
+        self.blocks = nn.Sequential(*blks)
         self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
         self.lm_head = nn.Linear(embedding_size, vocab_size)
 
