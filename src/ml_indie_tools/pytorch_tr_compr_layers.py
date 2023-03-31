@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from pytorch_custom_layers import MultiHeadAttention
+from ml_indie_tools.pytorch_custom_layers import MultiHeadAttention
 
 #
 # Many parts are taken from https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py
