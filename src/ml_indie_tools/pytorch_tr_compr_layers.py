@@ -84,6 +84,56 @@ class BlockWithCompression(nn.Module):
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
+
+        self.ffwd = FeedFowardWithCompression(
+            input_size=embedding_size,
+            hidden_size=linear_hidden_size,
+            dropout=dropout,
+            non_linearity=linear_non_linearity,
+        )
+        self.ln1 = nn.LayerNorm(embedding_size)
+        self.ln2 = nn.LayerNorm(embedding_size)
+
+    def forward(self, x):
+        x = x + self.sa(self.ln1(x))
+        x = x + self.ffwd(self.ln2(x))
+        return x
+
+
+class BlockWithCompressionNoYokeResidual(nn.Module):
+    """Transformer block: communication followed by computation
+
+    Note: the embedding size must be divisible by the number of heads
+
+    :param embedding_size: the size of the input embedding
+    :param sequence_len: the length of the input sequence
+    :param dropout: the dropout rate
+    :param num_heads: the number of attention heads
+    :param causal: whether to use causal masking
+    :param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
+    one of "relu" (default), "leaky_relu", "tanh"
+    :param linear_hidden_size: the size of the 'hidden' linear layer in the feed-forward network, None for default 4*embedding_size
+    """
+
+    def __init__(
+        self,
+        embedding_size,
+        sequence_len,
+        dropout,
+        num_heads,
+        causal,
+        linear_non_linearity="relu",
+        linear_hidden_size=None,
+        yoke_residual=True,
+    ):
+        # embedding_size: embedding dimension, num_heads: the number of heads we'd like
+        super().__init__()
+        head_size = embedding_size // num_heads
+        self.sa = MultiHeadAttention(
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+        )
+        if linear_hidden_size is None:
+            linear_hidden_size = embedding_size * 4
             self.use_residual = True
         else:
             self.use_residual = False
@@ -99,10 +149,7 @@ class BlockWithCompression(nn.Module):
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
-        if self.use_residual:
-            x = x + self.ffwd(self.ln2(x))
-        else:
-            x = self.ffwd(self.ln2(x))
+        x = self.ffwd(self.ln2(x))
         return x
 
 
@@ -120,6 +167,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
     :param causal: whether to use causal masking
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
     :param linear_yoke: Tuple (layer_index, hidden_size) to yoke the linear layer, or None
+    :param yoke_residual: wether the yoke gets a residual connection, default False
     :param device: the device to use for training
     """
 
@@ -134,6 +182,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         causal,
         linear_non_linearity="relu",
         linear_yoke=None,
+        yoke_residual=False,
         device=None,
     ):
         self.device = device
@@ -146,19 +195,34 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
                 linear_hidden_size = linear_yoke[1]
+                yoke_residual = yoke_residual
             else:
                 linear_hidden_size = None
-            blks.append(
-                BlockWithCompression(
-                    embedding_size=embedding_size,
-                    sequence_len=sequence_len,
-                    dropout=dropout,
-                    num_heads=num_heads,
-                    causal=causal,
-                    linear_non_linearity=linear_non_linearity,
-                    linear_hidden_size=linear_hidden_size,
+                yoke_residual = True
+            if yoke_residual is True:
+                blks.append(
+                    BlockWithCompression(
+                        embedding_size=embedding_size,
+                        sequence_len=sequence_len,
+                        dropout=dropout,
+                        num_heads=num_heads,
+                        causal=causal,
+                        linear_non_linearity=linear_non_linearity,
+                        linear_hidden_size=linear_hidden_size,
+                    )
                 )
-            )
+            else:
+                blks.append(
+                    BlockWithCompressionNoYokeResidual(
+                        embedding_size=embedding_size,
+                        sequence_len=sequence_len,
+                        dropout=dropout,
+                        num_heads=num_heads,
+                        causal=causal,
+                        linear_non_linearity=linear_non_linearity,
+                        linear_hidden_size=linear_hidden_size,
+                    )
+                )
         self.blocks = nn.Sequential(*blks)
         self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
         self.lm_head = nn.Linear(embedding_size, vocab_size)
