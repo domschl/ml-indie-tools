@@ -166,7 +166,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
     :param num_layers: the number of transformer blocks
     :param causal: whether to use causal masking
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
-    :param linear_yoke: Tuple (layer_index, hidden_size) to yoke the linear layer, or None
+    :param linear_yoke: Tuple (layer_index, hidden_size, linear_yoke_residual) to yoke the linear layer, or None
     :param yoke_residual: wether the yoke gets a residual connection, default False
     :param device: the device to use for training
     """
@@ -182,7 +182,6 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         causal,
         linear_non_linearity="relu",
         linear_yoke=None,
-        yoke_residual=False,
         device=None,
     ):
         self.device = device
@@ -195,7 +194,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
                 linear_hidden_size = linear_yoke[1]
-                yoke_residual = yoke_residual
+                yoke_residual = linear_yoke[2]
             else:
                 linear_hidden_size = None
                 yoke_residual = True
