@@ -2,96 +2,12 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+from pytorch_custom_layers import SelfAttentionHead, MultiHeadAttention
+
 #
-# This part is taken from https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py
+# Many parts are taken from https://github.com/karpathy/ng-video-lecture/blob/master/gpt.py
 # A video lecture on GPT by Andrej Karpathy
 #
-
-
-class SelfAttentionHead(nn.Module):
-    """Single head self-attention, optionally with causal masking.
-    taken from https://github.com/karpathy/ng-video-lecture,
-    the explanation of nano-gpt
-
-    :param embedding_size: the size of the input embedding
-    :param sequence_len: the length of the input sequence
-    :param dropout: the dropout rate
-    :param head_size: the size of the attention head
-    :param causal: whether to use causal masking
-    """
-
-    def __init__(self, embedding_size, sequence_len, dropout, head_size, causal):
-        super().__init__()
-        self.key = nn.Linear(embedding_size, head_size, bias=False)
-        self.query = nn.Linear(embedding_size, head_size, bias=False)
-        self.value = nn.Linear(embedding_size, head_size, bias=False)
-        self.causal = causal
-        if self.causal is True:
-            self.register_buffer(
-                "tril", torch.tril(torch.ones(sequence_len, sequence_len))
-            )
-        self.dropout_val = dropout
-        if self.dropout_val < 1.0:
-            self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x):
-        B, T, C = x.shape
-        k = self.key(x)  # (B,T,C)
-        q = self.query(x)  # (B,T,C)
-        # compute attention scores ("affinities")
-        wei = q @ k.transpose(-2, -1) * C**-0.5  # (B, T, C) @ (B, C, T) -> (B, T, T)
-        if self.causal is True:
-            wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))  # (B, T, T)
-            wei = F.softmax(wei, dim=-1)  # (B, T, T)
-        if self.dropout_val < 1.0:
-            wei = self.dropout(wei)
-        # perform the weighted aggregation of the values
-        v = self.value(x)  # (B,T,C)
-        out = wei @ v  # (B, T, T) @ (B, T, C) -> (B, T, C)
-        return out
-
-
-class MultiHeadAttention(nn.Module):
-    """Multiple heads of self-attention in parallel
-
-    Note: the embedding size must be divisible by the number of heads
-
-    :param embedding_size: the size of the input embedding
-    :param sequence_len: the length of the input sequence
-    :param dropout: the dropout rate
-    :param num_heads: the number of attention heads
-    :param head_size: the size of the attention head
-    :param causal: whether to use causal masking
-    """
-
-    def __init__(
-        self, embedding_size, sequence_len, dropout, num_heads, head_size, causal
-    ):
-        super().__init__()
-        if embedding_size % num_heads != 0:
-            raise ValueError(
-                f"embedding_size ({embedding_size}) must be divisible by num_heads ({num_heads})"
-            )
-        self.heads = nn.ModuleList(
-            [
-                SelfAttentionHead(
-                    embedding_size, sequence_len, dropout, head_size, causal
-                )
-                for _ in range(num_heads)
-            ]
-        )
-        self.proj = nn.Linear(embedding_size, embedding_size)
-        self.dropout_val = dropout
-        if self.dropout_val < 1.0:
-            self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x):
-        out = torch.cat([h(x) for h in self.heads], dim=-1)
-        if self.dropout_val < 1.0:
-            out = self.dropout(self.proj(out))
-        else:
-            out = self.proj(out)
-        return out
 
 
 class FeedFowardWithCompression(nn.Module):
