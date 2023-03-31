@@ -168,6 +168,9 @@ class BlockWithCompression(nn.Module):
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
+            self.fRes = nn.Identity()
+        else:
+            self.fRes = nn.Zeros_like()
 
         self.ffwd = FeedFowardWithCompression(
             input_size=embedding_size,
@@ -180,7 +183,7 @@ class BlockWithCompression(nn.Module):
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
-        x = x + self.ffwd(self.ln2(x))
+        x = self.fRes(x) + self.ffwd(self.ln2(x))
         return x
 
 
