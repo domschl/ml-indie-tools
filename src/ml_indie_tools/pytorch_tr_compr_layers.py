@@ -220,8 +220,13 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         # each token directly reads off the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
-        self.blocks = nn.Sequential(
-            *[
+        blks = []
+        for i in range(num_layers):
+            if linear_yoke is not None and linear_yoke[0] == i:
+                linear_hidden_size = linear_yoke[1]
+            else:
+                linear_hidden_size = None
+            blks.append(
                 BlockWithCompression(
                     embedding_size=embedding_size,
                     sequence_len=sequence_len,
@@ -229,11 +234,10 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
                     num_heads=num_heads,
                     causal=causal,
                     linear_non_linearity=linear_non_linearity,
-                    linear_yoke=linear_yoke,
+                    linear_hidden_size=linear_hidden_size,
                 )
-                for _ in range(num_layers)
-            ]
-        )
+            )
+        self.blocks = nn.Sequential(*blks)
         self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
         self.lm_head = nn.Linear(embedding_size, vocab_size)
 
