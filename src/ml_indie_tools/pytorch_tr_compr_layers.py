@@ -84,10 +84,10 @@ class FeedFowardWithCompressionState(nn.Module):
             self.net4 = nn.Identity()
 
     def forward(self, x, state):
-        x = self.net1(x)
+        x = self.net1(x) + state
         x = self.net2(x)
-        x = self.net3(x) + state
         state = x
+        x = self.net3(x)
         x = self.net4(x)
         return x, state
 
@@ -152,7 +152,7 @@ class BlockWithCompressionState(nn.Module):
     :param num_heads: the number of attention heads
     :param causal: whether to use causal masking
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
-    one of "relu" (default), "leaky_relu", "tanh"
+    one of "relu", "leaky_relu", "tanh" (default)
     :param linear_hidden_size: the size of the 'hidden' linear layer in the feed-forward network, None for default 4*embedding_size
     """
 
@@ -163,7 +163,7 @@ class BlockWithCompressionState(nn.Module):
         dropout,
         num_heads,
         causal,
-        linear_non_linearity="relu",
+        linear_non_linearity="tanh",
         linear_hidden_size=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
@@ -253,7 +253,7 @@ class BlockWithCompressionStateNoYokeResidual(nn.Module):
     :param num_heads: the number of attention heads
     :param causal: whether to use causal masking
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
-    one of "relu" (default), "leaky_relu", "tanh"
+    one of "relu", "leaky_relu", "tanh" (default)
     :param linear_hidden_size: the size of the 'hidden' linear layer in the feed-forward network, None for default 4*embedding_size
     """
 
@@ -264,7 +264,7 @@ class BlockWithCompressionStateNoYokeResidual(nn.Module):
         dropout,
         num_heads,
         causal,
-        linear_non_linearity="relu",
+        linear_non_linearity="tanh",
         linear_hidden_size=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
@@ -459,7 +459,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         num_heads,
         num_layers,
         causal,
-        linear_non_linearity="relu",
+        linear_non_linearity="tanh",
         linear_yoke=None,
         device=None,
     ):
