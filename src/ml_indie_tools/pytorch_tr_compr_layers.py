@@ -623,7 +623,9 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             idx_cond = idx[:, -self.sequence_len :]
             # print(idx_cond.shape)
             # get the predictions
-            logits, loss, state = self(idx_cond, state=state)
+            logits, loss, state = self(
+                idx_cond, state=state[:, -idx_cond.shape[1] :, :]
+            )
             # focus only on the last time step
             logits = logits[:, -1, :]  # becomes (B, C)
             if top_k is not None:
@@ -638,4 +640,5 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
             # append sampled index to the running sequence
             idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
+            state = torch.cat((state, state[:, -1:, :]), dim=1)
         return idx, state
