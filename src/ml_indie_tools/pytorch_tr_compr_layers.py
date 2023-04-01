@@ -471,7 +471,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
         blks = []
         self.yoke_index = None
-        self.zero_state = torch.zeros_like([]).to(device)
+        self.zero_state = torch.zeros([]).to(device)
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
                 self.yoke_index = i
