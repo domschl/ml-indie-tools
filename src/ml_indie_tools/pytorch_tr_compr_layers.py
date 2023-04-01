@@ -521,7 +521,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
 
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
-            x, state = blk(x, state)
+            x, state = blk(x, targets, state)
         # x = self.blocks(x)  # (B,T,C)
         x = self.ln_f(x)  # (B,T,C)
         logits = self.lm_head(x)  # (B,T,vocab_size)
@@ -536,7 +536,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
 
         return logits, loss, state
 
-    def generate(self, idx, max_new_tokens, state=None, temperature=1.0, top_k=None):
+    def generate(self, idx, max_new_tokens, state, temperature=1.0, top_k=None):
         """Generate new tokens given a context
 
         Note: for apple MPS, top_k is limited max 16 vor older torchs! ((01/2023) implementation limitation)
