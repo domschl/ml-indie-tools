@@ -10,7 +10,7 @@ from ml_indie_tools.pytorch_custom_layers import MultiHeadAttention
 #
 
 
-class FeedFowardWithCompression(nn.Module):
+class FeedForwardWithCompression(nn.Module):
     """Dual linear layers separated by a non-linearity
 
     :param input_size: the size of the input embedding
@@ -30,7 +30,7 @@ class FeedFowardWithCompression(nn.Module):
     ):
         super().__init__()
         if device is None:
-            raise ValueError("Device None at FeedFowardWithCompression")
+            raise ValueError("Device None at FeedForwardWithCompression")
         self.dropout_val = dropout
         if non_linearity == "relu":
             self.non_linearity = nn.ReLU()
@@ -58,7 +58,7 @@ class FeedFowardWithCompression(nn.Module):
         return self.net(x)
 
 
-class FeedFowardWithCompressionState(nn.Module):
+class FeedForwardWithCompressionState(nn.Module):
     """Dual linear layers separated by a non-linearity
 
     :param input_size: the size of the input embedding
@@ -69,11 +69,18 @@ class FeedFowardWithCompressionState(nn.Module):
     """
 
     def __init__(
-        self, input_size, hidden_size=None, dropout=None, non_linearity="relu"
+        self,
+        input_size,
+        hidden_size=None,
+        dropout=None,
+        non_linearity="relu",
+        device=None,
     ):
         super().__init__()
+        if device is None:
+            raise ValueError("Device None at FeedForwardWithCompressionState")
         self.dropout_val = dropout
-        self.net1 = nn.Linear(input_size, hidden_size)
+        self.net1 = nn.Linear(input_size, hidden_size, device=device)
         if non_linearity == "relu":
             self.net2 = nn.ReLU()
         elif non_linearity == "leaky_relu":
@@ -84,13 +91,14 @@ class FeedFowardWithCompressionState(nn.Module):
             self.net2 = nn.ReLU()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
-        self.net3 = nn.Linear(hidden_size, input_size)
+        self.net3 = nn.Linear(hidden_size, input_size, device=device)
         if dropout is not None and dropout != 0:
             self.net4 = nn.Dropout(dropout)
         else:
             self.net4 = nn.Identity()
 
     def forward(self, x, state):
+        # print(f"state: {state.shape}, x: {x.shape}")
         x = self.net1(x) + state
         x = self.net2(x)
         state = x
@@ -137,7 +145,7 @@ class BlockWithCompression(nn.Module):
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
 
-        self.ffwd = FeedFowardWithCompression(
+        self.ffwd = FeedForwardWithCompression(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
@@ -190,7 +198,7 @@ class BlockWithCompressionState(nn.Module):
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
-        self.ffwd = FeedFowardWithCompressionState(
+        self.ffwd = FeedForwardWithCompressionState(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
@@ -201,8 +209,8 @@ class BlockWithCompressionState(nn.Module):
         self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x, state):
-        x = x.to(self.device)
-        state = state.to(self.device)
+        # x = x.to(self.device)
+        # state = state.to(self.device)
         x = x + self.sa(self.ln1(x))
         y, state = self.ffwd(self.ln2(x), state)
         x = x + y
@@ -250,7 +258,7 @@ class BlockWithCompressionNoYokeResidual(nn.Module):
         else:
             self.use_residual = False
 
-        self.ffwd = FeedFowardWithCompression(
+        self.ffwd = FeedForwardWithCompression(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
@@ -309,18 +317,19 @@ class BlockWithCompressionStateNoYokeResidual(nn.Module):
             self.use_residual = True
         else:
             self.use_residual = False
-        self.ffwd = FeedFowardWithCompressionState(
+        self.ffwd = FeedForwardWithCompressionState(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
         self.ln1 = nn.LayerNorm(embedding_size, device=device)
         self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x, state):
-        x = x.to(self.device)
-        state = state.to(self.device)
+        # x = x.to(self.device)
+        # state = state.to(self.device)
         x = x + self.sa(self.ln1(x))
         x, state = self.ffwd(self.ln2(x), state)
         return x, state
@@ -421,7 +430,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
-        x = x.to(self.device)
+        # x = x.to(self.device)
         for i, blk in enumerate(self.blocks):
             x = blk(x)
         # x = self.blocks(x)  # (B,T,C)
@@ -520,7 +529,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             sequence_len, embedding_size, device=device
         )
         blks = []
-        self.yoke_index = None
+        self.yoke_index = -1
         self.zero_state = torch.zeros([]).to(device)
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
@@ -577,10 +586,10 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
             if i != self.yoke_index:
-                x = x.to(self.device)
+                # x = x.to(self.device)
                 x, _ = blk(x, self.zero_state)
             else:
-                x = x.to(self.device)
+                # x = x.to(self.device)
                 x, state = blk(x, state)
         # x = self.blocks(x)  # (B,T,C)
         x = self.ln_f(x)  # (B,T,C)
