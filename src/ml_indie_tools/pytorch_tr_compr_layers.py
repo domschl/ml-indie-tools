@@ -623,7 +623,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             idx_cond = idx[:, -self.sequence_len :]
             # print(idx_cond.shape)
             # get the predictions
-            logits, loss, state = self(idx_cond, state)
+            logits, loss, state = self(idx_cond, state=state)
             # focus only on the last time step
             logits = logits[:, -1, :]  # becomes (B, C)
             if top_k is not None:
