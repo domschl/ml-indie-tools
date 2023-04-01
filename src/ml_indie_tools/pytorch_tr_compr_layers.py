@@ -372,12 +372,12 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
 
         # XXX: move to init, make not trainable:
-        if self.device is None:
-            pos_emb = self.position_embedding_table(torch.arange(T))
-        else:
-            pos_emb = self.position_embedding_table(
-                torch.arange(T, device=self.device)
-            )  # (T,C)
+        # if self.device is None:
+        #     pos_emb = self.position_embedding_table(torch.arange(T))
+        # else:
+        pos_emb = self.position_embedding_table(
+            torch.arange(T, device=self.device)
+        )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
@@ -524,7 +524,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
 
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
-            if i == self.yoke_index:
+            if i != self.yoke_index:
                 x, _ = blk(x, self.zero_state)
             else:
                 x, state = blk(x, state)
