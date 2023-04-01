@@ -185,7 +185,7 @@ class BlockWithCompressionState(nn.Module):
 
     def forward(self, x, state):
         x = x + self.sa(self.ln1(x))
-        state, y = self.ffwd(self.ln2(x), state)
+        y, state = self.ffwd(self.ln2(x), state)
         x = x + y
         return x, state
 
