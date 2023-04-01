@@ -642,4 +642,5 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             # append sampled index to the running sequence
             idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
             state = torch.cat((state, state[:, -1:, :]), dim=1)
+            state[:, -1, :] = 0
         return idx, state
