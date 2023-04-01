@@ -621,6 +621,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
             idx_cond = idx[:, -self.sequence_len :]
+            state = state[:, -self.sequence_len :, :]
             # print(idx_cond.shape)
             # get the predictions
             logits, loss, state = self(
