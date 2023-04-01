@@ -521,7 +521,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
 
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
-            x, state = blk(x, targets, state)
+            x, state = blk(x, state)
         # x = self.blocks(x)  # (B,T,C)
         x = self.ln_f(x)  # (B,T,C)
         logits = self.lm_head(x)  # (B,T,vocab_size)
