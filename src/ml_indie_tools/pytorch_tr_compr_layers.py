@@ -470,8 +470,11 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
         self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
         blks = []
+        self.yoke_index = None
+        self.zero_state = torch.zeros_like([]).to(device)
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
+                self.yoke_index = i
                 linear_hidden_size = linear_yoke[1]
                 yoke_residual = linear_yoke[2]
             else:
@@ -512,16 +515,19 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
 
         # XXX: move to init, make not trainable:
-        if self.device is None:
-            pos_emb = self.position_embedding_table(torch.arange(T))
-        else:
-            pos_emb = self.position_embedding_table(
-                torch.arange(T, device=self.device)
-            )  # (T,C)
+        # if self.device is None:
+        #     pos_emb = self.position_embedding_table(torch.arange(T))
+        # else:
+        pos_emb = self.position_embedding_table(
+            torch.arange(T, device=self.device)
+        )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
-            x, state = blk(x, state)
+            if i == self.yoke_index:
+                x, _ = blk(x, self.zero_state)
+            else:
+                x, state = blk(x, state)
         # x = self.blocks(x)  # (B,T,C)
         x = self.ln_f(x)  # (B,T,C)
         logits = self.lm_head(x)  # (B,T,vocab_size)
