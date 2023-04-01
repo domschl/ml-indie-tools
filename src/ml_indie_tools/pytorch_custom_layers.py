@@ -20,15 +20,18 @@ class SelfAttentionHead(nn.Module):
     :param causal: whether to use causal masking
     """
 
-    def __init__(self, embedding_size, sequence_len, dropout, head_size, causal):
+    def __init__(
+        self, embedding_size, sequence_len, dropout, head_size, causal, device
+    ):
         super().__init__()
-        self.key = nn.Linear(embedding_size, head_size, bias=False)
-        self.query = nn.Linear(embedding_size, head_size, bias=False)
-        self.value = nn.Linear(embedding_size, head_size, bias=False)
+        self.key = nn.Linear(embedding_size, head_size, bias=False, device=device)
+        self.query = nn.Linear(embedding_size, head_size, bias=False, device=device)
+        self.value = nn.Linear(embedding_size, head_size, bias=False, device=device)
         self.causal = causal
         if self.causal is True:
             self.register_buffer(
-                "tril", torch.tril(torch.ones(sequence_len, sequence_len))
+                "tril",
+                torch.tril(torch.ones(sequence_len, sequence_len, device=device)),
             )
         self.dropout_val = dropout
         if self.dropout_val < 1.0:
@@ -65,7 +68,14 @@ class MultiHeadAttention(nn.Module):
     """
 
     def __init__(
-        self, embedding_size, sequence_len, dropout, num_heads, head_size, causal
+        self,
+        embedding_size,
+        sequence_len,
+        dropout,
+        num_heads,
+        head_size,
+        causal,
+        device,
     ):
         super().__init__()
         if embedding_size % num_heads != 0:
@@ -75,12 +85,17 @@ class MultiHeadAttention(nn.Module):
         self.heads = nn.ModuleList(
             [
                 SelfAttentionHead(
-                    embedding_size, sequence_len, dropout, head_size, causal
+                    embedding_size,
+                    sequence_len,
+                    dropout,
+                    head_size,
+                    causal,
+                    device=device,
                 )
                 for _ in range(num_heads)
             ]
         )
-        self.proj = nn.Linear(embedding_size, embedding_size)
+        self.proj = nn.Linear(embedding_size, embedding_size, device=device)
         self.dropout_val = dropout
         if self.dropout_val < 1.0:
             self.dropout = nn.Dropout(dropout)

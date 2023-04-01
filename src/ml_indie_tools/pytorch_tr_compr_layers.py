@@ -21,9 +21,16 @@ class FeedFowardWithCompression(nn.Module):
     """
 
     def __init__(
-        self, input_size, hidden_size=None, dropout=None, non_linearity="relu"
+        self,
+        input_size,
+        hidden_size=None,
+        dropout=None,
+        non_linearity="relu",
+        device=None,
     ):
         super().__init__()
+        if device is None:
+            raise ValueError("Device None at FeedFowardWithCompression")
         self.dropout_val = dropout
         if non_linearity == "relu":
             self.non_linearity = nn.ReLU()
@@ -35,20 +42,20 @@ class FeedFowardWithCompression(nn.Module):
             hidden_size = input_size * 4
         if dropout is not None and dropout != 0:
             self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
+                nn.Linear(input_size, hidden_size, device=device),
                 self.non_linearity,
-                nn.Linear(hidden_size, input_size),
+                nn.Linear(hidden_size, input_size, device=device),
                 nn.Dropout(dropout),
             )
         else:
             self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
+                nn.Linear(input_size, hidden_size, device=device),
                 self.non_linearity,
-                nn.Linear(hidden_size, input_size),
+                nn.Linear(hidden_size, input_size, device=device),
             )
 
-    def forward(self, x, state=None):
-        return self.net(x), state
+    def forward(self, x):
+        return self.net(x)
 
 
 class FeedFowardWithCompressionState(nn.Module):
@@ -116,12 +123,16 @@ class BlockWithCompression(nn.Module):
         causal,
         linear_non_linearity="relu",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at BlockWithCompression")
+        self.device = device
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
@@ -131,9 +142,10 @@ class BlockWithCompression(nn.Module):
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
@@ -165,12 +177,16 @@ class BlockWithCompressionState(nn.Module):
         causal,
         linear_non_linearity="tanh",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at BlockWithCompressionState.")
+        self.device = device
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
@@ -179,11 +195,14 @@ class BlockWithCompressionState(nn.Module):
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x, state):
+        x = x.to(self.device)
+        state = state.to(self.device)
         x = x + self.sa(self.ln1(x))
         y, state = self.ffwd(self.ln2(x), state)
         x = x + y
@@ -214,12 +233,16 @@ class BlockWithCompressionNoYokeResidual(nn.Module):
         causal,
         linear_non_linearity="relu",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at BlockWithCompressionNoYokeResidual.")
+
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
@@ -232,9 +255,10 @@ class BlockWithCompressionNoYokeResidual(nn.Module):
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
@@ -266,12 +290,19 @@ class BlockWithCompressionStateNoYokeResidual(nn.Module):
         causal,
         linear_non_linearity="tanh",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError(
+                "Device is None at BlockWithCompressionStateNoYokeResidual."
+            )
+
+        self.device = device
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
@@ -284,10 +315,12 @@ class BlockWithCompressionStateNoYokeResidual(nn.Module):
             dropout=dropout,
             non_linearity=linear_non_linearity,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x, state):
+        x = x.to(self.device)
+        state = state.to(self.device)
         x = x + self.sa(self.ln1(x))
         x, state = self.ffwd(self.ln2(x), state)
         return x, state
@@ -323,12 +356,18 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         linear_yoke=None,
         device=None,
     ):
+        super().__init__()
+        if device is None:
+            raise ValueError("Device is None at MultiHeadSelfAttentionWithCompression.")
         self.device = device
         self.sequence_len = sequence_len
-        super().__init__()
         # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
-        self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
+        self.token_embedding_table = nn.Embedding(
+            vocab_size, embedding_size, device=device
+        )
+        self.position_embedding_table = nn.Embedding(
+            sequence_len, embedding_size, device=device
+        )
         blks = []
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
@@ -347,6 +386,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=self.device,
                     )
                 )
             else:
@@ -359,11 +399,12 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=self.device,
                     )
                 )
         self.blocks = blks  # nn.Sequential(*blks)
-        self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
-        self.lm_head = nn.Linear(embedding_size, vocab_size)
+        self.ln_f = nn.LayerNorm(embedding_size, device=device)  # final layer norm
+        self.lm_head = nn.Linear(embedding_size, vocab_size, device=device)
 
     def forward(self, idx, targets=None):
         B, T = idx.shape
@@ -380,6 +421,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
+        x = x.to(self.device)
         for i, blk in enumerate(self.blocks):
             x = blk(x)
         # x = self.blocks(x)  # (B,T,C)
@@ -463,12 +505,20 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         linear_yoke=None,
         device=None,
     ):
+        super().__init__()
+        if device is None:
+            raise ValueError(
+                "Device is None at MultiHeadSelfAttentionWithCompressionState"
+            )
         self.device = device
         self.sequence_len = sequence_len
-        super().__init__()
         # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
-        self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
+        self.token_embedding_table = nn.Embedding(
+            vocab_size, embedding_size, device=device
+        )
+        self.position_embedding_table = nn.Embedding(
+            sequence_len, embedding_size, device=device
+        )
         blks = []
         self.yoke_index = None
         self.zero_state = torch.zeros([]).to(device)
@@ -490,6 +540,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=device,
                     )
                 )
             else:
@@ -502,11 +553,12 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=device,
                     )
                 )
         self.blocks = blks  # nn.Sequential(*blks)
-        self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
-        self.lm_head = nn.Linear(embedding_size, vocab_size)
+        self.ln_f = nn.LayerNorm(embedding_size, device=device)  # final layer norm
+        self.lm_head = nn.Linear(embedding_size, vocab_size, device=device)
 
     def forward(self, idx, targets=None, state=None):
         B, T = idx.shape
@@ -525,8 +577,10 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
             if i != self.yoke_index:
+                x = x.to(self.device)
                 x, _ = blk(x, self.zero_state)
             else:
+                x = x.to(self.device)
                 x, state = blk(x, state)
         # x = self.blocks(x)  # (B,T,C)
         x = self.ln_f(x)  # (B,T,C)
