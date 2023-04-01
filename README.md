@@ -248,6 +248,8 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2023-04-01, 0.8.90) API changes: WIP!
+* (2023-03-31, 0.8.0) Put compression/state experiments in separate model.
 * (2023-03-30, 0.7.0) Cleanup of bottleneck mechanism to force abstraction. Dropout behave again normal
 (hacks removed).
 * (2023-03-28, 0.6.0) Add `dropout>1.0` paramater to MultiHeadSelfAttention (torch): replaces 'normal' dropout with a linear compression by 4.0/dropout. The linear layers no longer
