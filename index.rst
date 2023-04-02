@@ -164,46 +164,46 @@ PositionalEncoding object
 .. currentmodule:: pytorch_custom_layers
 .. automodule:: pytorch_custom_layers
 
-====================
+=================
 SelfAttentionHead
-====================
+=================
 .. autoclass:: SelfAttentionHead
    :undoc-members:
    :show-inheritance:
 
-====================
+==================
 MultiHeadAttention
-====================
+==================
 .. autoclass:: MultiHeadAttention
    :undoc-members:
    :show-inheritance:
 
-====================
+==========
 FeedFoward
-====================
+==========
 .. autoclass:: FeedFoward
    :undoc-members:
    :show-inheritance:
 
-====================
+=====
 Block
-====================
+=====
 .. autoclass:: Block
    :undoc-members:
    :show-inheritance:
 
-====================
+======================
 MultiHeadSelfAttention
-====================
+======================
 .. autoclass:: MultiHeadSelfAttention
    :undoc-members:
    :show-inheritance:
 
 .. currentmodule:: pytorch_tr_compr_layers
 
-====================
+==========================
 FeedForwardWithCompression
-====================
+==========================
 
 .. automodule:: pytorch_tr_compr_layers
 
@@ -211,9 +211,9 @@ FeedForwardWithCompression
    :undoc-members:
    :show-inheritance:
 
-====================
+===============================
 FeedForwardWithCompressionState
-====================
+===============================
 .. autoclass:: FeedForwardWithCompressionState
    :undoc-members:
    :show-inheritance:
@@ -225,37 +225,37 @@ BlockWithCompression
    :undoc-members:
    :show-inheritance:
 
-====================
+=========================
 BlockWithCompressionState
-====================
+=========================
 .. autoclass:: BlockWithCompressionState
    :undoc-members:
    :show-inheritance:
 
-====================
+==================================
 BlockWithCompressionNoYokeResidual
-====================
+==================================
 .. autoclass:: BlockWithCompressionNoYokeResidual
    :undoc-members:
    :show-inheritance:
 
-====================
+=======================================
 BlockWithCompressionStateNoYokeResidual
-====================
+=======================================
 .. autoclass:: BlockWithCompressionStateNoYokeResidual
    :undoc-members:
    :show-inheritance:
 
-====================
+=====================================
 MultiHeadSelfAttentionWithCompression
-====================
+=====================================
 .. autoclass:: MultiHeadSelfAttentionWithCompression
    :undoc-members:
    :show-inheritance:
 
-====================
+==========================================
 MultiHeadSelfAttentionWithCompressionState
-====================
+==========================================
 .. autoclass:: MultiHeadSelfAttentionWithCompressionState
    :undoc-members:
    :show-inheritance:
