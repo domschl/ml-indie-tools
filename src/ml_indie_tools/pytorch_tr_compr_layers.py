@@ -96,11 +96,12 @@ class FeedForwardWithCompressionState(nn.Module):
             self.net4 = nn.Dropout(dropout)
         else:
             self.net4 = nn.Identity()
-        # self.state_zero = torch.zeros((1, input_size, hidden_size), device=device)
+        self.gatenet = nn.Linear(hidden_size, hidden_size, device=device)
+        self.state_zero = torch.zeros((1, input_size, hidden_size), device=device)
 
     def forward(self, x, state):
         x = self.net1(x)
-        state = x + state / 100.0
+        state = x + self.gatenet(self.state_zero[:, -x.shape[1] :, :] + state)
         x = self.net2(x)
         x = self.net3(x)
         x = self.net4(x)
