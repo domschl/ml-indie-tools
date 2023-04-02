@@ -102,7 +102,7 @@ class FeedForwardWithCompressionState(nn.Module):
 
     def forward(self, x, state):
         x = self.net1(x)
-        state = self.gatenet(self.state_zero[:, -x.shape[1] :, :] + state))
+        state = self.gatenet(self.state_zero[:, -x.shape[1] :, :] + state)
         # state = self.gateact(state)
         x = x + state
         state = x
