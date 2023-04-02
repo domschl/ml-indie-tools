@@ -10,7 +10,7 @@ from ml_indie_tools.pytorch_custom_layers import MultiHeadAttention
 #
 
 
-class FeedFowardWithCompression(nn.Module):
+class FeedForwardWithCompression(nn.Module):
     """Dual linear layers separated by a non-linearity
 
     :param input_size: the size of the input embedding
@@ -21,9 +21,16 @@ class FeedFowardWithCompression(nn.Module):
     """
 
     def __init__(
-        self, input_size, hidden_size=None, dropout=None, non_linearity="relu"
+        self,
+        input_size,
+        hidden_size=None,
+        dropout=None,
+        non_linearity="relu",
+        device=None,
     ):
         super().__init__()
+        if device is None:
+            raise ValueError("Device None at FeedForwardWithCompression")
         self.dropout_val = dropout
         if non_linearity == "relu":
             self.non_linearity = nn.ReLU()
@@ -31,27 +38,29 @@ class FeedFowardWithCompression(nn.Module):
             self.non_linearity = nn.LeakyReLU()
         elif non_linearity == "tanh":
             self.non_linearity = nn.Tanh()
+        else:
+            self.non_linearity = nn.ReLU()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
         if dropout is not None and dropout != 0:
             self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
+                nn.Linear(input_size, hidden_size, device=device),
                 self.non_linearity,
-                nn.Linear(hidden_size, input_size),
+                nn.Linear(hidden_size, input_size, device=device),
                 nn.Dropout(dropout),
             )
         else:
             self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
+                nn.Linear(input_size, hidden_size, device=device),
                 self.non_linearity,
-                nn.Linear(hidden_size, input_size),
+                nn.Linear(hidden_size, input_size, device=device),
             )
 
-    def forward(self, x, state=None):
-        return self.net(x), state
+    def forward(self, x):
+        return self.net(x)
 
 
-class FeedFowardWithCompressionState(nn.Module):
+class FeedForwardWithCompressionState(nn.Module):
     """Dual linear layers separated by a non-linearity
 
     :param input_size: the size of the input embedding
@@ -62,29 +71,54 @@ class FeedFowardWithCompressionState(nn.Module):
     """
 
     def __init__(
-        self, input_size, hidden_size=None, dropout=None, non_linearity="relu"
+        self,
+        input_size,
+        hidden_size=None,
+        dropout=None,
+        non_linearity="relu",
+        device=None,
     ):
         super().__init__()
+        if device is None:
+            raise ValueError("Device None at FeedForwardWithCompressionState")
         self.dropout_val = dropout
-        self.net1 = nn.Linear(input_size, hidden_size)
+        self.net1 = nn.Linear(input_size, hidden_size, device=device)
         if non_linearity == "relu":
             self.net2 = nn.ReLU()
+            # self.gateact = nn.Identity()
         elif non_linearity == "leaky_relu":
             self.net2 = nn.LeakyReLU()
+            # self.gateact = nn.Identity()
         elif non_linearity == "tanh":
             self.net2 = nn.Tanh()
+            # self.gateact = nn.Identity()
+        elif non_linearity == "relurelu":
+            self.net2 = nn.ReLU()
+            # self.gateact = nn.ReLU()
+        elif non_linearity == "leaky_relurelu":
+            self.net2 = nn.LeakyReLU()
+            # self.gateact = nn.LeakyReLU()
+        elif non_linearity == "tanhhanh":
+            self.net2 = nn.Tanh()
+            # self.gateact = nn.Tanh()
         else:
             self.net2 = nn.ReLU()
+            # self.gateact = nn.Identity()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
-        self.net3 = nn.Linear(hidden_size, input_size)
+        self.net3 = nn.Linear(hidden_size, input_size, device=device)
         if dropout is not None and dropout != 0:
             self.net4 = nn.Dropout(dropout)
         else:
             self.net4 = nn.Identity()
+        self.gatenet = nn.Linear(hidden_size, hidden_size, device=device)
+        self.state_zero = torch.zeros((1, input_size, hidden_size), device=device)
 
     def forward(self, x, state):
-        x = self.net1(x) + state
+        x = self.net1(x)
+        state = self.gatenet(self.state_zero[:, -x.shape[1] :, :] + state)
+        # state = self.gateact(state)
+        x = x + state
         x = self.net2(x)
         state = x
         x = self.net3(x)
@@ -116,24 +150,29 @@ class BlockWithCompression(nn.Module):
         causal,
         linear_non_linearity="relu",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at BlockWithCompression")
+        self.device = device
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
 
-        self.ffwd = FeedFowardWithCompression(
+        self.ffwd = FeedForwardWithCompression(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
@@ -165,27 +204,34 @@ class BlockWithCompressionState(nn.Module):
         causal,
         linear_non_linearity="tanh",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at BlockWithCompressionState.")
+        self.device = device
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
-        self.ffwd = FeedFowardWithCompressionState(
+        self.ffwd = FeedForwardWithCompressionState(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x, state):
+        # x = x.to(self.device)
+        # state = state.to(self.device)
         x = x + self.sa(self.ln1(x))
-        state, y = self.ffwd(self.ln2(x), state)
+        y, state = self.ffwd(self.ln2(x), state)
         x = x + y
         return x, state
 
@@ -214,12 +260,16 @@ class BlockWithCompressionNoYokeResidual(nn.Module):
         causal,
         linear_non_linearity="relu",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at BlockWithCompressionNoYokeResidual.")
+
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
@@ -227,14 +277,15 @@ class BlockWithCompressionNoYokeResidual(nn.Module):
         else:
             self.use_residual = False
 
-        self.ffwd = FeedFowardWithCompression(
+        self.ffwd = FeedForwardWithCompression(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x):
         x = x + self.sa(self.ln1(x))
@@ -266,28 +317,38 @@ class BlockWithCompressionStateNoYokeResidual(nn.Module):
         causal,
         linear_non_linearity="tanh",
         linear_hidden_size=None,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError(
+                "Device is None at BlockWithCompressionStateNoYokeResidual."
+            )
+
+        self.device = device
         head_size = embedding_size // num_heads
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
             self.use_residual = True
         else:
             self.use_residual = False
-        self.ffwd = FeedFowardWithCompressionState(
+        self.ffwd = FeedForwardWithCompressionState(
             input_size=embedding_size,
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
 
     def forward(self, x, state):
+        # x = x.to(self.device)
+        # state = state.to(self.device)
         x = x + self.sa(self.ln1(x))
         x, state = self.ffwd(self.ln2(x), state)
         return x, state
@@ -323,12 +384,18 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         linear_yoke=None,
         device=None,
     ):
+        super().__init__()
+        if device is None:
+            raise ValueError("Device is None at MultiHeadSelfAttentionWithCompression.")
         self.device = device
         self.sequence_len = sequence_len
-        super().__init__()
         # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
-        self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
+        self.token_embedding_table = nn.Embedding(
+            vocab_size, embedding_size, device=device
+        )
+        self.position_embedding_table = nn.Embedding(
+            sequence_len, embedding_size, device=device
+        )
         blks = []
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
@@ -347,6 +414,7 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=self.device,
                     )
                 )
             else:
@@ -359,11 +427,12 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=self.device,
                     )
                 )
         self.blocks = blks  # nn.Sequential(*blks)
-        self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
-        self.lm_head = nn.Linear(embedding_size, vocab_size)
+        self.ln_f = nn.LayerNorm(embedding_size, device=device)  # final layer norm
+        self.lm_head = nn.Linear(embedding_size, vocab_size, device=device)
 
     def forward(self, idx, targets=None):
         B, T = idx.shape
@@ -372,14 +441,15 @@ class MultiHeadSelfAttentionWithCompression(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
 
         # XXX: move to init, make not trainable:
-        if self.device is None:
-            pos_emb = self.position_embedding_table(torch.arange(T))
-        else:
-            pos_emb = self.position_embedding_table(
-                torch.arange(T, device=self.device)
-            )  # (T,C)
+        # if self.device is None:
+        #     pos_emb = self.position_embedding_table(torch.arange(T))
+        # else:
+        pos_emb = self.position_embedding_table(
+            torch.arange(T, device=self.device)
+        )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
+        # x = x.to(self.device)
         for i, blk in enumerate(self.blocks):
             x = blk(x)
         # x = self.blocks(x)  # (B,T,C)
@@ -463,15 +533,26 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         linear_yoke=None,
         device=None,
     ):
+        super().__init__()
+        if device is None:
+            raise ValueError(
+                "Device is None at MultiHeadSelfAttentionWithCompressionState"
+            )
         self.device = device
         self.sequence_len = sequence_len
-        super().__init__()
         # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
-        self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
+        self.token_embedding_table = nn.Embedding(
+            vocab_size, embedding_size, device=device
+        )
+        self.position_embedding_table = nn.Embedding(
+            sequence_len, embedding_size, device=device
+        )
         blks = []
+        self.yoke_index = -1
+        self.zero_state = torch.zeros([]).to(device)
         for i in range(num_layers):
             if linear_yoke is not None and linear_yoke[0] == i:
+                self.yoke_index = i
                 linear_hidden_size = linear_yoke[1]
                 yoke_residual = linear_yoke[2]
             else:
@@ -487,6 +568,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=device,
                     )
                 )
             else:
@@ -499,11 +581,12 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
                         causal=causal,
                         linear_non_linearity=linear_non_linearity,
                         linear_hidden_size=linear_hidden_size,
+                        device=device,
                     )
                 )
         self.blocks = blks  # nn.Sequential(*blks)
-        self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
-        self.lm_head = nn.Linear(embedding_size, vocab_size)
+        self.ln_f = nn.LayerNorm(embedding_size, device=device)  # final layer norm
+        self.lm_head = nn.Linear(embedding_size, vocab_size, device=device)
 
     def forward(self, idx, targets=None, state=None):
         B, T = idx.shape
@@ -512,16 +595,21 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
 
         # XXX: move to init, make not trainable:
-        if self.device is None:
-            pos_emb = self.position_embedding_table(torch.arange(T))
-        else:
-            pos_emb = self.position_embedding_table(
-                torch.arange(T, device=self.device)
-            )  # (T,C)
+        # if self.device is None:
+        #     pos_emb = self.position_embedding_table(torch.arange(T))
+        # else:
+        pos_emb = self.position_embedding_table(
+            torch.arange(T, device=self.device)
+        )  # (T,C)
 
         x = tok_emb + pos_emb  # (B,T,C)
         for i, blk in enumerate(self.blocks):
-            x, state = blk(x, state)
+            if i != self.yoke_index:
+                # x = x.to(self.device)
+                x, _ = blk(x, self.zero_state)
+            else:
+                # x = x.to(self.device)
+                x, state = blk(x, state)
         # x = self.blocks(x)  # (B,T,C)
         x = self.ln_f(x)  # (B,T,C)
         logits = self.lm_head(x)  # (B,T,vocab_size)
@@ -536,7 +624,7 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
 
         return logits, loss, state
 
-    def generate(self, idx, max_new_tokens, state=None, temperature=1.0, top_k=None):
+    def generate(self, idx, max_new_tokens, state, temperature=1.0, top_k=None):
         """Generate new tokens given a context
 
         Note: for apple MPS, top_k is limited max 16 vor older torchs! ((01/2023) implementation limitation)
@@ -552,9 +640,12 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
             idx_cond = idx[:, -self.sequence_len :]
+            state = state[:, -self.sequence_len :, :]
             # print(idx_cond.shape)
             # get the predictions
-            logits, loss, state = self(idx_cond, state)
+            logits, loss, state = self(
+                idx_cond, state=state[:, -idx_cond.shape[1] :, :]
+            )
             # focus only on the last time step
             logits = logits[:, -1, :]  # becomes (B, C)
             if top_k is not None:
@@ -569,4 +660,6 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
             # append sampled index to the running sequence
             idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
+            state = torch.cat((state, state[:, -1:, :]), dim=1)
+            # state[:, -1, :] = 0
         return idx, state

@@ -20,15 +20,20 @@ class SelfAttentionHead(nn.Module):
     :param causal: whether to use causal masking
     """
 
-    def __init__(self, embedding_size, sequence_len, dropout, head_size, causal):
+    def __init__(
+        self, embedding_size, sequence_len, dropout, head_size, causal, device
+    ):
         super().__init__()
-        self.key = nn.Linear(embedding_size, head_size, bias=False)
-        self.query = nn.Linear(embedding_size, head_size, bias=False)
-        self.value = nn.Linear(embedding_size, head_size, bias=False)
+        if device is None:
+            raise ValueError("Device is None at SelfAttentionHead")
+        self.key = nn.Linear(embedding_size, head_size, bias=False, device=device)
+        self.query = nn.Linear(embedding_size, head_size, bias=False, device=device)
+        self.value = nn.Linear(embedding_size, head_size, bias=False, device=device)
         self.causal = causal
         if self.causal is True:
             self.register_buffer(
-                "tril", torch.tril(torch.ones(sequence_len, sequence_len))
+                "tril",
+                torch.tril(torch.ones(sequence_len, sequence_len, device=device)),
             )
         self.dropout_val = dropout
         if self.dropout_val < 1.0:
@@ -65,9 +70,18 @@ class MultiHeadAttention(nn.Module):
     """
 
     def __init__(
-        self, embedding_size, sequence_len, dropout, num_heads, head_size, causal
+        self,
+        embedding_size,
+        sequence_len,
+        dropout,
+        num_heads,
+        head_size,
+        causal,
+        device,
     ):
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at MultiHeadAttention")
         if embedding_size % num_heads != 0:
             raise ValueError(
                 f"embedding_size ({embedding_size}) must be divisible by num_heads ({num_heads})"
@@ -75,12 +89,17 @@ class MultiHeadAttention(nn.Module):
         self.heads = nn.ModuleList(
             [
                 SelfAttentionHead(
-                    embedding_size, sequence_len, dropout, head_size, causal
+                    embedding_size,
+                    sequence_len,
+                    dropout,
+                    head_size,
+                    causal,
+                    device=device,
                 )
                 for _ in range(num_heads)
             ]
         )
-        self.proj = nn.Linear(embedding_size, embedding_size)
+        self.proj = nn.Linear(embedding_size, embedding_size, device=device)
         self.dropout_val = dropout
         if self.dropout_val < 1.0:
             self.dropout = nn.Dropout(dropout)
@@ -105,9 +124,17 @@ class FeedFoward(nn.Module):
     """
 
     def __init__(
-        self, input_size, hidden_size=None, dropout=None, non_linearity="relu"
+        self,
+        input_size,
+        hidden_size=None,
+        dropout=None,
+        non_linearity="relu",
+        device=None,
     ):
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at FeedFoward")
+        self.device = device
         self.dropout_val = dropout
         if non_linearity == "relu":
             self.non_linearity = nn.ReLU()
@@ -119,16 +146,16 @@ class FeedFoward(nn.Module):
             hidden_size = input_size * 4
         if dropout is not None and dropout != 0:
             self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
+                nn.Linear(input_size, hidden_size, device=device),
                 self.non_linearity,
-                nn.Linear(hidden_size, input_size),
+                nn.Linear(hidden_size, input_size, device=device),
                 nn.Dropout(dropout),
             )
         else:
             self.net = nn.Sequential(
-                nn.Linear(input_size, hidden_size),
+                nn.Linear(input_size, hidden_size, device=device),
                 self.non_linearity,
-                nn.Linear(hidden_size, input_size),
+                nn.Linear(hidden_size, input_size, device=device),
             )
 
     def forward(self, x):
@@ -162,12 +189,16 @@ class Block(nn.Module):
         linear_hidden_size=None,
         linear_non_linearity="relu",
         linear_residual=True,
+        device=None,
     ):
         # embedding_size: embedding dimension, num_heads: the number of heads we'd like
         super().__init__()
+        if device is None:
+            raise ValueError("Device is None at Block")
         head_size = embedding_size // num_heads
+        self.device = device
         self.sa = MultiHeadAttention(
-            embedding_size, sequence_len, dropout, num_heads, head_size, causal
+            embedding_size, sequence_len, dropout, num_heads, head_size, causal, device
         )
         if linear_hidden_size is None:
             linear_hidden_size = embedding_size * 4
@@ -176,9 +207,10 @@ class Block(nn.Module):
             hidden_size=linear_hidden_size,
             dropout=dropout,
             non_linearity=linear_non_linearity,
+            device=device,
         )
-        self.ln1 = nn.LayerNorm(embedding_size)
-        self.ln2 = nn.LayerNorm(embedding_size)
+        self.ln1 = nn.LayerNorm(embedding_size, device=device)
+        self.ln2 = nn.LayerNorm(embedding_size, device=device)
         if linear_residual is True:
             self.fRes = 1.0
         else:
@@ -224,12 +256,18 @@ class MultiHeadSelfAttention(nn.Module):
         linear_residual=True,
         device=None,
     ):
+        super().__init__()
+        if device is None:
+            raise ValueError("Device is None at MultiHeadSelfAttention")
         self.device = device
         self.sequence_len = sequence_len
-        super().__init__()
         # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, embedding_size)
-        self.position_embedding_table = nn.Embedding(sequence_len, embedding_size)
+        self.token_embedding_table = nn.Embedding(
+            vocab_size, embedding_size, device=device
+        )
+        self.position_embedding_table = nn.Embedding(
+            sequence_len, embedding_size, device=device
+        )
         if linear_hidden_sizes is None:
             linear_hidden_sizes = []
         if len(linear_hidden_sizes) != num_layers:
@@ -243,6 +281,7 @@ class MultiHeadSelfAttention(nn.Module):
                         causal=causal,
                         linear_hidden_size=embedding_size * 4,
                         linear_non_linearity=linear_non_linearity,
+                        device=device,
                     )
                     for _ in range(num_layers)
                 ]
@@ -265,11 +304,12 @@ class MultiHeadSelfAttention(nn.Module):
                         linear_hidden_size=linear_hidden_sizes[i],
                         linear_non_linearity=linear_non_linearity,
                         linear_residual=bRes,
+                        device=device,
                     )
                 )
             self.blocks = nn.Sequential(*blks)
-        self.ln_f = nn.LayerNorm(embedding_size)  # final layer norm
-        self.lm_head = nn.Linear(embedding_size, vocab_size)
+        self.ln_f = nn.LayerNorm(embedding_size, device=device)  # final layer norm
+        self.lm_head = nn.Linear(embedding_size, vocab_size, device=device)
 
     def forward(self, idx, targets=None):
         B, T = idx.shape
