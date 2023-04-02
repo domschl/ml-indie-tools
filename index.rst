@@ -200,11 +200,13 @@ MultiHeadSelfAttention
    :show-inheritance:
 
 .. currentmodule:: pytorch_tr_compr_layers
-.. automodule:: pytorch_tr_compr_layers
 
 ====================
 FeedForwardWithCompression
 ====================
+
+.. automodule:: pytorch_tr_compr_layers
+
 .. autoclass:: FeedForwardWithCompression
    :undoc-members:
    :show-inheritance:
