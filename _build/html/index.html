@@ -1477,6 +1477,7 @@ A sample project is at <a class="reference external" href="https://github.com/do
 <li><p><a class="reference external" href="https://github.com/domschl/ALU_Net">ALU_Net</a></p></li>
 </ul>
 <ul class="simple">
+<li><p>(2023-04-2, 0.8.168) Two transformer variants: a transformer with ‘yoke’, <cite>``MultiHeadSelfAttentionWithCompression`</cite> &lt;<a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#multiheadselfattentionwithcompression">https://domschl.github.io/ml-indie-tools/_build/html/index.html#multiheadselfattentionwithcompression</a>&gt;`_ (a layer that compresses information, forcing abstraction), and version with state: <cite>``MultiHeadSelfAttentionWithCompressionState`</cite> &lt;<a class="reference external" href="https://domschl.github.io/ml-indie-tools/_build/html/index.html#multiheadselfattentionwithcompressionstate">https://domschl.github.io/ml-indie-tools/_build/html/index.html#multiheadselfattentionwithcompressionstate</a>&gt;`_, a state is combined with the yoke-layer, allowing the most ‘abstract’ information of the transformer to be maintained in a recurrent manner. See <a class="reference external" href="https://github.com/domschl/torch-transformer-poet">torch-transformer-poet</a> for examples.</p></li>
 <li><p>(2023-04-01, 0.8.90) API changes: WIP!</p></li>
 <li><p>(2023-03-31, 0.8.0) Put compression/state experiments in separate model.</p></li>
 <li><p>(2023-03-30, 0.7.0) Cleanup of bottleneck mechanism to force abstraction. Dropout behave again normal
