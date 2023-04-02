@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,6 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -52,7 +51,7 @@
 
 
 <div class="viewcode-block" id="ALU_Dataset"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset">[docs]</a><span class="k">class</span> <span class="nc">ALU_Dataset</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Generate training data for all ALU operations</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate training data for all ALU operations</span>
 
 <span class="sd">    The ALU takes two integers and applies one of the supported</span>
 <span class="sd">    model_ops. E.g. `op1=123, op2=100, op=&#39;-&#39; -&gt; result 23`</span>
@@ -131,7 +130,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_int_to_binary_vect</span><span class="p">(</span><span class="n">num_int</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;get a binary encoded vector of n of bit-lenght nm</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get a binary encoded vector of n of bit-lenght nm</span>
 
 <span class="sd">        :param num_int: integer to encoded</span>
 <span class="sd">        :param num_bits: number of bits to use for positional_encoding</span>
@@ -145,7 +144,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_int_to_onehot_vect</span><span class="p">(</span><span class="n">num_int</span><span class="p">,</span> <span class="n">num_bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;get a one-hot encoded vector of n of bit-lenght nm</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get a one-hot encoded vector of n of bit-lenght nm</span>
 
 <span class="sd">        :param num_int: integer to encoded</span>
 <span class="sd">        :param num_bits: number of bits to use for positional_encoding</span>
@@ -157,7 +156,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_random_bits</span><span class="p">(</span><span class="n">bits</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;get bits random int 0...2**bits-1</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get bits random int 0...2**bits-1</span>
 
 <span class="sd">        :param bits: number of bits to uses</span>
 <span class="sd">        :return: random int `0...2**bits-1`</span>
@@ -165,7 +164,7 @@
         <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">bits</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ALU_Dataset.op_string_to_index"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.op_string_to_index">[docs]</a>    <span class="k">def</span> <span class="nf">op_string_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_string</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;transform op_string (e.g. &#39;+&#39; -&gt; 0) into corresponding index</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;transform op_string (e.g. &#39;+&#39; -&gt; 0) into corresponding index</span>
 
 <span class="sd">        :param op_string: string of op to transform</span>
 <span class="sd">        :return: index of op_string</span>
@@ -182,7 +181,7 @@
         <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a random example for on ALU operation for training</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a random example for on ALU operation for training</span>
 
 <span class="sd">        :param equal_distrib: if False, more &#39;difficult&#39; ops will be generated more often.</span>
 <span class="sd">        :param valid_ops: if not None, only the ops in valid_ops will be used</span>
@@ -244,7 +243,7 @@
             <span class="k">yield</span> <span class="n">x</span><span class="p">,</span> <span class="n">Y</span>
 
     <span class="k">def</span> <span class="nf">_encode_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_index</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;turn two ints and operation into training data&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;turn two ints and operation into training data&quot;&quot;&quot;</span>
         <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_funcs</span><span class="p">[</span><span class="n">op_index</span><span class="p">](</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_is_boolean</span><span class="p">[</span><span class="n">op_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">false_vect</span><span class="p">:</span>
@@ -282,20 +281,20 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_add_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;addition training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;addition training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">+</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_diff_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;subtraction training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;subtraction training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op2</span> <span class="o">&gt;</span> <span class="n">op1</span><span class="p">:</span>
             <span class="n">op2</span><span class="p">,</span> <span class="n">op1</span> <span class="o">=</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">-</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_mult_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;multiplication training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;multiplication training example&quot;&quot;&quot;</span>
         <span class="n">modul</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">op1</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">%</span> <span class="n">modul</span>
         <span class="n">op2</span> <span class="o">=</span> <span class="n">op2</span> <span class="o">%</span> <span class="n">modul</span>
@@ -303,7 +302,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_div_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;integer division training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;integer division training example&quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="n">op2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&lt;</span> <span class="n">op2</span> <span class="ow">and</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -313,7 +312,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_mod_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;modulo (remainder) training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;modulo (remainder) training example&quot;&quot;&quot;</span>
         <span class="k">while</span> <span class="n">op2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bit_count</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&lt;</span> <span class="n">op2</span> <span class="ow">and</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -324,24 +323,24 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_and_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bitwise AND training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;bitwise AND training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">&amp;</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_bor_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bitwise OR training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;bitwise OR training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">|</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_xor_smpl</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bitwise XOR training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;bitwise XOR training example&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">op1</span> <span class="o">^</span> <span class="n">op2</span>
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_greater_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;integer comparisation &gt; training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;integer comparisation &gt; training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&gt;</span> <span class="n">op2</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span>
         <span class="k">else</span><span class="p">:</span>
@@ -349,7 +348,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_lesser_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;integer comparisation &lt; training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;integer comparisation &lt; training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">&lt;</span> <span class="n">op2</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_vect</span>
         <span class="k">else</span><span class="p">:</span>
@@ -357,7 +356,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_eq_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;integer comparisation == training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;integer comparisation == training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># create more cases</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="n">op1</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">==</span> <span class="n">op2</span><span class="p">:</span>
@@ -367,7 +366,7 @@
         <span class="k">return</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_neq_smpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;integer comparisation != training example&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;integer comparisation != training example&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># create more cases</span>
             <span class="n">op2</span> <span class="o">=</span> <span class="n">op1</span>
         <span class="k">if</span> <span class="n">op1</span> <span class="o">!=</span> <span class="n">op2</span><span class="p">:</span>
@@ -379,7 +378,7 @@
 <div class="viewcode-block" id="ALU_Dataset.create_data_point"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.create_data_point">[docs]</a>    <span class="k">def</span> <span class="nf">create_data_point</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">op_string</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positional_suffix</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;create training data from given ints op1, op2 and op_string&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;create training data from given ints op1, op2 and op_string&quot;&quot;&quot;</span>
         <span class="n">op_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_string_to_index</span><span class="p">(</span><span class="n">op_string</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">op_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid operation </span><span class="si">{</span><span class="n">op_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -394,7 +393,7 @@
         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;create a number of training samples&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;create a number of training samples&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">()</span>
         <span class="n">dpx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="n">dpy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
@@ -435,7 +434,7 @@
         <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">positional_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;create a number of training samples&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;create a number of training samples&quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_point</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">positional_encoding</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">+</span> <span class="mi">3</span>
@@ -659,7 +658,7 @@
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ALU_Dataset.decode_results"><a class="viewcode-back" href="../index.html#ALU_Dataset.ALU_Dataset.decode_results">[docs]</a>    <span class="k">def</span> <span class="nf">decode_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result_int_vects</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;take an array of 32-float results from neural net and convert to ints&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;take an array of 32-float results from neural net and convert to ints&quot;&quot;&quot;</span>
         <span class="n">result_vect_ints</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">vect</span> <span class="ow">in</span> <span class="n">result_int_vects</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vect</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">:</span>
@@ -681,7 +680,7 @@
         <span class="n">valid_ops</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run a number of tests on trained model&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a number of tests on trained model&quot;&quot;&quot;</span>
         <span class="n">ok</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">err</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">operr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_ops</span><span class="p">)</span>
@@ -756,7 +755,7 @@
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -777,7 +776,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>

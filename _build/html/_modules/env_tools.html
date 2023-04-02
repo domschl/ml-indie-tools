@@ -2,7 +2,7 @@
 
 <!doctype html>
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,6 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -54,7 +53,7 @@
 
 
 <div class="viewcode-block" id="MLEnv"><a class="viewcode-back" href="../index.html#env_tools.MLEnv">[docs]</a><span class="k">class</span> <span class="nc">MLEnv</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Initialize platform and accelerator.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize platform and accelerator.</span>
 
 <span class="sd">    This checks initialization and available accelerator hardware for different ml platforms.</span>
 <span class="sd">    At return, the following variables are set: `self.is_tensorflow`, `self.is_pytorch`, `self.is_jax`,</span>
@@ -384,7 +383,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">is_conda</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_check_notebook_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Internal function, use :func:`describe` instead</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function, use :func:`describe` instead</span>
 
 <span class="sd">        Note: for colab notebooks and tensorflow environemts, this function</span>
 <span class="sd">        will load tensorboard.</span>
@@ -446,7 +445,7 @@
         <span class="k">return</span> <span class="n">desc</span></div>
 
 <div class="viewcode-block" id="MLEnv.describe"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Prints a description of the machine environment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints a description of the machine environment.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: description of the machine environment.</span>
@@ -482,7 +481,7 @@
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span></div>
 
 <div class="viewcode-block" id="MLEnv.init_paths"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.init_paths">[docs]</a>    <span class="k">def</span> <span class="nf">init_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initializes the paths for the project.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the paths for the project.</span>
 
 <span class="sd">        Depending on if this is a Colab environment or not, persistent data will be stored in either</span>
 <span class="sd">        `project_path=&#39;/content/drive/My Drive/Colab Notebooks/&lt;project_name&gt;&#39;` or `project_path=&#39;.&#39;`.</span>
@@ -559,7 +558,7 @@
     </form>
     </div>
 </div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -580,7 +579,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
