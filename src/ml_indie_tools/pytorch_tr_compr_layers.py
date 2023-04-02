@@ -38,6 +38,8 @@ class FeedForwardWithCompression(nn.Module):
             self.non_linearity = nn.LeakyReLU()
         elif non_linearity == "tanh":
             self.non_linearity = nn.Tanh()
+        else:
+            self.non_linearity = nn.ReLU()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
         if dropout is not None and dropout != 0:
