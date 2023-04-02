@@ -905,8 +905,132 @@ the twelve supported ops:
 <section id="multiheadselfattention-object">
 <h2>MultiHeadSelfAttention object<a class="headerlink" href="#multiheadselfattention-object" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="positionalencoding-object">
-<h2>PositionalEncoding object<a class="headerlink" href="#positionalencoding-object" title="Permalink to this headline">¶</a></h2>
+<section id="module-pytorch_custom_layers">
+<span id="positionalencoding-object"></span><h2>PositionalEncoding object<a class="headerlink" href="#module-pytorch_custom_layers" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="selfattentionhead">
+<h2>SelfAttentionHead<a class="headerlink" href="#selfattentionhead" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_custom_layers.SelfAttentionHead">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_custom_layers.</span></span><span class="sig-name descname"><span class="pre">SelfAttentionHead</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">head_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_custom_layers.html#SelfAttentionHead"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_custom_layers.SelfAttentionHead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Single head self-attention, optionally with causal masking.
+taken from <a class="reference external" href="https://github.com/karpathy/ng-video-lecture">https://github.com/karpathy/ng-video-lecture</a>,
+the explanation of nano-gpt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>head_size</strong> – the size of the attention head</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="multiheadattention">
+<h2>MultiHeadAttention<a class="headerlink" href="#multiheadattention" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_custom_layers.MultiHeadAttention">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_custom_layers.</span></span><span class="sig-name descname"><span class="pre">MultiHeadAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">head_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_custom_layers.html#MultiHeadAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_custom_layers.MultiHeadAttention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Multiple heads of self-attention in parallel</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>head_size</strong> – the size of the attention head</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="feedfoward">
+<h2>FeedFoward<a class="headerlink" href="#feedfoward" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_custom_layers.FeedFoward">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_custom_layers.</span></span><span class="sig-name descname"><span class="pre">FeedFoward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_custom_layers.html#FeedFoward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_custom_layers.FeedFoward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Dual linear layers separated by a non-linearity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>hidden_size</strong> – the size of the ‘hidden’ linear layer in the feed-forward network,</p></li>
+</ul>
+</dd>
+</dl>
+<p>if None, use default input_size*4
+:param dropout: the dropout rate (default None, don’t use dropout layer)
+:param non_linearity: the non-linearity to use, one of “relu” (default), “leaky_relu”, “tanh”</p>
+</dd></dl>
+
+</section>
+<section id="block">
+<h2>Block<a class="headerlink" href="#block" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_custom_layers.Block">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_custom_layers.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_residual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_custom_layers.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_custom_layers.Block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Transformer block: communication followed by computation</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_hidden_size</strong> – the size of hidden layer in the dual-linear layer</p></li>
+</ul>
+</dd>
+</dl>
+<p>of the feed-forward network, if None, use embedding_size*4
+:param linear_non_linearity: the non-linearity to use in between the dual-linear layer,
+one of “relu” (default), “leaky_relu”, “tanh”
+:param linear_residual: whether to use linear residual connection, default True</p>
+</dd></dl>
+
+</section>
+<section id="multiheadselfattention">
+<h2>MultiHeadSelfAttention<a class="headerlink" href="#multiheadselfattention" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_custom_layers.MultiHeadSelfAttention">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_custom_layers.</span></span><span class="sig-name descname"><span class="pre">MultiHeadSelfAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_hidden_sizes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_residual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_custom_layers.html#MultiHeadSelfAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_custom_layers.MultiHeadSelfAttention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MultiHeadSelfAttention transformer model (Karpathy nanoGPT derivative)</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_size</strong> – the size of the vocabulary</p></li>
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>num_layers</strong> – the number of transformer blocks</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_hidden_sizes</strong> – array of number of neurons for the dual-linear layers</p></li>
+</ul>
+</dd>
+</dl>
+<p>respective hidden sizes (or None for default 4*embedding_size), dimension must be num_layers,
+if not None.
+:param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
+:param linear_residual: whether to use linear residual connection, default True (False is only active, if hidden_sizes[i] != embedding_size*4)
+:param device: the device to use for training</p>
+</dd></dl>
+
 </section>
 <section id="readme-file">
 <h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h2>
@@ -1229,7 +1353,12 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
 <li><a class="reference internal" href="#parallelresidualdensestacks-object">ParallelResidualDenseStacks object</a></li>
 <li><a class="reference internal" href="#selfattention-object">SelfAttention object</a></li>
 <li><a class="reference internal" href="#multiheadselfattention-object">MultiHeadSelfAttention object</a></li>
-<li><a class="reference internal" href="#positionalencoding-object">PositionalEncoding object</a></li>
+<li><a class="reference internal" href="#module-pytorch_custom_layers">PositionalEncoding object</a></li>
+<li><a class="reference internal" href="#selfattentionhead">SelfAttentionHead</a></li>
+<li><a class="reference internal" href="#multiheadattention">MultiHeadAttention</a></li>
+<li><a class="reference internal" href="#feedfoward">FeedFoward</a></li>
+<li><a class="reference internal" href="#block">Block</a></li>
+<li><a class="reference internal" href="#multiheadselfattention">MultiHeadSelfAttention</a></li>
 <li><a class="reference internal" href="#readme-file">Readme File</a></li>
 </ul>
 </li>

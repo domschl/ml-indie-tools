@@ -161,6 +161,45 @@ PositionalEncoding object
    :undoc-members:
    :show-inheritance:
 
+.. currentmodule:: pytorch_custom_layers
+.. automodule:: pytorch_custom_layers
+
+====================
+SelfAttentionHead
+====================
+.. autoclass:: SelfAttentionHead
+   :undoc-members:
+   :show-inheritance:
+
+====================
+MultiHeadAttention
+====================
+.. autoclass:: MultiHeadAttention
+   :undoc-members:
+   :show-inheritance:
+
+====================
+FeedFoward
+====================
+.. autoclass:: FeedFoward
+   :undoc-members:
+   :show-inheritance:
+
+====================
+Block
+====================
+.. autoclass:: Block
+   :undoc-members:
+   :show-inheritance:
+
+====================
+MultiHeadSelfAttention
+====================
+.. autoclass:: MultiHeadSelfAttention
+   :undoc-members:
+   :show-inheritance:
+
+   
 .. currentmodule:: README
 
 ===========
