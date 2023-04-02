@@ -96,12 +96,12 @@ class FeedForwardWithCompressionState(nn.Module):
             self.net4 = nn.Dropout(dropout)
         else:
             self.net4 = nn.Identity()
+        # self.state_zero = torch.zeros((1, input_size, hidden_size), device=device)
 
     def forward(self, x, state):
-        # print(f"state: {state.shape}, x: {x.shape}")
-        x = self.net1(x) + state
+        x = self.net1(x)
+        state = x + state / 100.0
         x = self.net2(x)
-        state = x
         x = self.net3(x)
         x = self.net4(x)
         return x, state
@@ -642,5 +642,5 @@ class MultiHeadSelfAttentionWithCompressionState(nn.Module):
             # append sampled index to the running sequence
             idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
             state = torch.cat((state, state[:, -1:, :]), dim=1)
-            state[:, -1, :] = 0
+            # state[:, -1, :] = 0
         return idx, state
