@@ -83,16 +83,25 @@ class FeedForwardWithCompressionState(nn.Module):
         self.net1 = nn.Linear(input_size, hidden_size, device=device)
         if non_linearity == "relu":
             self.net2 = nn.ReLU()
-            # self.gateact = nn.ReLU()
+            self.gateact = nn.Identity()
         elif non_linearity == "leaky_relu":
             self.net2 = nn.LeakyReLU()
-            # self.gateact = nn.LeakyReLU()
+            self.gateact = nn.Identity()
         elif non_linearity == "tanh":
             self.net2 = nn.Tanh()
-            # self.gateact = nn.Tanh()
+            self.gateact = nn.Identity()
+        elif non_linearity == "relurelu":
+            self.net2 = nn.ReLU()
+            self.gateact = nn.ReLU()
+        elif non_linearity == "leaky_relurelu":
+            self.net2 = nn.LeakyReLU()
+            self.gateact = nn.LeakyReLU()
+        elif non_linearity == "tanhhanh":
+            self.net2 = nn.Tanh()
+            self.gateact = nn.Tanh()
         else:
             self.net2 = nn.ReLU()
-            # self.gateact = nn.ReLU()
+            self.gateact = nn.Identity()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
         self.net3 = nn.Linear(hidden_size, input_size, device=device)
@@ -106,7 +115,7 @@ class FeedForwardWithCompressionState(nn.Module):
     def forward(self, x, state):
         x = self.net1(x)
         state = self.gatenet(self.state_zero[:, -x.shape[1] :, :] + state)
-        # state = self.gateact(state)
+        state = self.gateact(state)
         x = x + state
         x = self.net2(x)
         state = x
