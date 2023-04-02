@@ -199,7 +199,66 @@ MultiHeadSelfAttention
    :undoc-members:
    :show-inheritance:
 
-   
+.. currentmodule:: pytorch_tr_compr_layers
+.. automodule:: pytorch_tr_compr_layers
+
+====================
+FeedForwardWithCompression
+====================
+.. autoclass:: FeedForwardWithCompression
+   :undoc-members:
+   :show-inheritance:
+
+====================
+FeedForwardWithCompressionState
+====================
+.. autoclass:: FeedForwardWithCompressionState
+   :undoc-members:
+   :show-inheritance:
+
+====================
+BlockWithCompression
+====================
+.. autoclass:: BlockWithCompression
+   :undoc-members:
+   :show-inheritance:
+
+====================
+BlockWithCompressionState
+====================
+.. autoclass:: BlockWithCompressionState
+   :undoc-members:
+   :show-inheritance:
+
+====================
+BlockWithCompressionNoYokeResidual
+====================
+.. autoclass:: BlockWithCompressionNoYokeResidual
+   :undoc-members:
+   :show-inheritance:
+
+====================
+BlockWithCompressionStateNoYokeResidual
+====================
+.. autoclass:: BlockWithCompressionStateNoYokeResidual
+   :undoc-members:
+   :show-inheritance:
+
+====================
+MultiHeadSelfAttentionWithCompression
+====================
+.. autoclass:: MultiHeadSelfAttentionWithCompression
+   :undoc-members:
+   :show-inheritance:
+
+====================
+MultiHeadSelfAttentionWithCompressionState
+====================
+.. autoclass:: MultiHeadSelfAttentionWithCompressionState
+   :undoc-members:
+   :show-inheritance:
+
+
 .. currentmodule:: README
 
 ===========
