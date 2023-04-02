@@ -83,12 +83,16 @@ class FeedForwardWithCompressionState(nn.Module):
         self.net1 = nn.Linear(input_size, hidden_size, device=device)
         if non_linearity == "relu":
             self.net2 = nn.ReLU()
+            # self.gateact = nn.ReLU()
         elif non_linearity == "leaky_relu":
             self.net2 = nn.LeakyReLU()
+            # self.gateact = nn.LeakyReLU()
         elif non_linearity == "tanh":
             self.net2 = nn.Tanh()
+            # self.gateact = nn.Tanh()
         else:
             self.net2 = nn.ReLU()
+            # self.gateact = nn.ReLU()
         if hidden_size is None or hidden_size == 0:
             hidden_size = input_size * 4
         self.net3 = nn.Linear(hidden_size, input_size, device=device)
@@ -97,7 +101,6 @@ class FeedForwardWithCompressionState(nn.Module):
         else:
             self.net4 = nn.Identity()
         self.gatenet = nn.Linear(hidden_size, hidden_size, device=device)
-        # self.gateact = nn.Tanh()
         self.state_zero = torch.zeros((1, input_size, hidden_size), device=device)
 
     def forward(self, x, state):
