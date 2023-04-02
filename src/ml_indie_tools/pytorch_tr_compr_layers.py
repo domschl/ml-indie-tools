@@ -105,8 +105,8 @@ class FeedForwardWithCompressionState(nn.Module):
         state = self.gatenet(self.state_zero[:, -x.shape[1] :, :] + state)
         # state = self.gateact(state)
         x = x + state
-        state = x
         x = self.net2(x)
+        state = x
         x = self.net3(x)
         x = self.net4(x)
         return x, state
