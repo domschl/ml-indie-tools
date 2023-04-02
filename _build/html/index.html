@@ -1032,29 +1032,202 @@ if not None.
 </dd></dl>
 
 </section>
-<section id="feedforwardwithcompression">
-<h2>FeedForwardWithCompression<a class="headerlink" href="#feedforwardwithcompression" title="Permalink to this headline">¶</a></h2>
+<section id="module-pytorch_tr_compr_layers">
+<span id="feedforwardwithcompression"></span><h2>FeedForwardWithCompression<a class="headerlink" href="#module-pytorch_tr_compr_layers" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.FeedForwardWithCompression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">FeedForwardWithCompression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#FeedForwardWithCompression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.FeedForwardWithCompression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Dual linear layers separated by a non-linearity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>hidden_size</strong> – the size of the ‘hidden’ linear layer in the feed-forward network,</p></li>
+</ul>
+</dd>
+</dl>
+<p>if None, use default input_size*4
+:param dropout: the dropout rate (default None, don’t use dropout layer)
+:param non_linearity: the non-linearity to use, one of “relu” (default), “leaky_relu”, “tanh”</p>
+</dd></dl>
+
 </section>
 <section id="feedforwardwithcompressionstate">
 <h2>FeedForwardWithCompressionState<a class="headerlink" href="#feedforwardwithcompressionstate" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.FeedForwardWithCompressionState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">FeedForwardWithCompressionState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#FeedForwardWithCompressionState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.FeedForwardWithCompressionState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Dual linear layers separated by a non-linearity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>hidden_size</strong> – the size of the ‘hidden’ linear layer in the feed-forward network,</p></li>
+</ul>
+</dd>
+</dl>
+<p>if None, use default input_size*4
+:param dropout: the dropout rate (default None, don’t use dropout layer)
+:param non_linearity: the non-linearity to use, one of “relu” (default), “leaky_relu”, “tanh”</p>
+</dd></dl>
+
 </section>
 <section id="blockwithcompression">
 <h2>BlockWithCompression<a class="headerlink" href="#blockwithcompression" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.BlockWithCompression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">BlockWithCompression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#BlockWithCompression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.BlockWithCompression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Transformer block: communication followed by computation</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_non_linearity</strong> – the non-linearity to use in between the dual-linear layer,</p></li>
+</ul>
+</dd>
+</dl>
+<p>one of “relu” (default), “leaky_relu”, “tanh”
+:param linear_hidden_size: the size of the ‘hidden’ linear layer in the feed-forward network, None for default 4*embedding_size</p>
+</dd></dl>
+
 </section>
 <section id="blockwithcompressionstate">
 <h2>BlockWithCompressionState<a class="headerlink" href="#blockwithcompressionstate" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.BlockWithCompressionState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">BlockWithCompressionState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tanh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#BlockWithCompressionState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.BlockWithCompressionState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Transformer block: communication followed by computation</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_non_linearity</strong> – the non-linearity to use in between the dual-linear layer,</p></li>
+</ul>
+</dd>
+</dl>
+<p>one of “relu”, “leaky_relu”, “tanh” (default)
+:param linear_hidden_size: the size of the ‘hidden’ linear layer in the feed-forward network, None for default 4*embedding_size</p>
+</dd></dl>
+
 </section>
 <section id="blockwithcompressionnoyokeresidual">
 <h2>BlockWithCompressionNoYokeResidual<a class="headerlink" href="#blockwithcompressionnoyokeresidual" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.BlockWithCompressionNoYokeResidual">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">BlockWithCompressionNoYokeResidual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#BlockWithCompressionNoYokeResidual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.BlockWithCompressionNoYokeResidual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Transformer block: communication followed by computation</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_non_linearity</strong> – the non-linearity to use in between the dual-linear layer,</p></li>
+</ul>
+</dd>
+</dl>
+<p>one of “relu” (default), “leaky_relu”, “tanh”
+:param linear_hidden_size: the size of the ‘hidden’ linear layer in the feed-forward network, None for default 4*embedding_size</p>
+</dd></dl>
+
 </section>
 <section id="blockwithcompressionstatenoyokeresidual">
 <h2>BlockWithCompressionStateNoYokeResidual<a class="headerlink" href="#blockwithcompressionstatenoyokeresidual" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.BlockWithCompressionStateNoYokeResidual">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">BlockWithCompressionStateNoYokeResidual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tanh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_hidden_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#BlockWithCompressionStateNoYokeResidual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.BlockWithCompressionStateNoYokeResidual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Transformer block: communication followed by computation</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_non_linearity</strong> – the non-linearity to use in between the dual-linear layer,</p></li>
+</ul>
+</dd>
+</dl>
+<p>one of “relu”, “leaky_relu”, “tanh” (default)
+:param linear_hidden_size: the size of the ‘hidden’ linear layer in the feed-forward network, None for default 4*embedding_size</p>
+</dd></dl>
+
 </section>
 <section id="multiheadselfattentionwithcompression">
 <h2>MultiHeadSelfAttentionWithCompression<a class="headerlink" href="#multiheadselfattentionwithcompression" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.MultiHeadSelfAttentionWithCompression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">MultiHeadSelfAttentionWithCompression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_yoke</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#MultiHeadSelfAttentionWithCompression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.MultiHeadSelfAttentionWithCompression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MultiHeadSelfAttention transformer model (Karpathy nanoGPT derivative)</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_size</strong> – the size of the vocabulary</p></li>
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>num_layers</strong> – the number of transformer blocks</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_non_linearity</strong> – the non-linearity to use in between the dual-linear layers,</p></li>
+<li><p><strong>linear_yoke</strong> – Tuple (layer_index, hidden_size, linear_yoke_residual) to yoke the linear layer, or None</p></li>
+<li><p><strong>device</strong> – the device to use for training</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="multiheadselfattentionwithcompressionstate">
 <h2>MultiHeadSelfAttentionWithCompressionState<a class="headerlink" href="#multiheadselfattentionwithcompressionstate" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tr_compr_layers.MultiHeadSelfAttentionWithCompressionState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tr_compr_layers.</span></span><span class="sig-name descname"><span class="pre">MultiHeadSelfAttentionWithCompressionState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_heads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_non_linearity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tanh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_yoke</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tr_compr_layers.html#MultiHeadSelfAttentionWithCompressionState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tr_compr_layers.MultiHeadSelfAttentionWithCompressionState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>MultiHeadSelfAttention transformer model (Karpathy nanoGPT derivative)</p>
+<p>Note: the embedding size must be divisible by the number of heads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vocab_size</strong> – the size of the vocabulary</p></li>
+<li><p><strong>embedding_size</strong> – the size of the input embedding</p></li>
+<li><p><strong>sequence_len</strong> – the length of the input sequence</p></li>
+<li><p><strong>dropout</strong> – the dropout rate</p></li>
+<li><p><strong>num_heads</strong> – the number of attention heads</p></li>
+<li><p><strong>num_layers</strong> – the number of transformer blocks</p></li>
+<li><p><strong>causal</strong> – whether to use causal masking</p></li>
+<li><p><strong>linear_non_linearity</strong> – the non-linearity to use in between the dual-linear layers,</p></li>
+<li><p><strong>linear_yoke</strong> – Tuple (layer_index, hidden_size, linear_yoke_residual) to yoke the linear layer, or None</p></li>
+<li><p><strong>yoke_residual</strong> – wether the yoke gets a residual connection, default False</p></li>
+<li><p><strong>device</strong> – the device to use for training</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="readme-file">
 <h2>Readme File<a class="headerlink" href="#readme-file" title="Permalink to this headline">¶</a></h2>
@@ -1383,7 +1556,7 @@ contain texts from Gutenberg, Calibre or a folder of text files.</p></li>
 <li><a class="reference internal" href="#feedfoward">FeedFoward</a></li>
 <li><a class="reference internal" href="#block">Block</a></li>
 <li><a class="reference internal" href="#multiheadselfattention">MultiHeadSelfAttention</a></li>
-<li><a class="reference internal" href="#feedforwardwithcompression">FeedForwardWithCompression</a></li>
+<li><a class="reference internal" href="#module-pytorch_tr_compr_layers">FeedForwardWithCompression</a></li>
 <li><a class="reference internal" href="#feedforwardwithcompressionstate">FeedForwardWithCompressionState</a></li>
 <li><a class="reference internal" href="#blockwithcompression">BlockWithCompression</a></li>
 <li><a class="reference internal" href="#blockwithcompressionstate">BlockWithCompressionState</a></li>
