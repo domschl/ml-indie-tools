@@ -1,7 +1,6 @@
 [project]
 dynamic = ["version"]
 name = "ml-indie-tools"
-# version = "0.8.170"
 license = { file = "LICENSE" }
 
 [build-system]
