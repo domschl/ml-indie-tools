@@ -1,8 +1,9 @@
 import copy
 import logging
 
-class MLTuner():
-    """ Simple hyper parameter tuner
+
+class MLTuner:
+    """Simple hyper parameter tuner
 
     Sample `search_space`:
 
@@ -10,7 +11,7 @@ class MLTuner():
 
          param_space_minimal_prm = {
             "dense_layers": [4, 8, 12],
-            "dense_neurons":[256, 512, 768], 
+            "dense_neurons":[256, 512, 768],
             "learning_rate": [0.001, 0.002],
             "regu1": [1e-8, 1e-7]
         }
@@ -18,8 +19,8 @@ class MLTuner():
     :param search_space: Dictionary defining the search space.
     :param progress_callback: Callback function that is called after each iteration with updated search space as parameter.
     """
-    def __init__(self, search_space=None, progress_callback=None):
 
+    def __init__(self, search_space=None, progress_callback=None):
         # XXX Get rid of search_space?!
 
         self.log = logging.getLogger("MLTuner")
@@ -34,7 +35,7 @@ class MLTuner():
             self.search_space["is_first"] = False
 
     def tune(self, param_space, eval_func):
-        """ Tune hyper parameters
+        """Tune hyper parameters
 
         Example parameter space:
 
@@ -42,7 +43,7 @@ class MLTuner():
 
             param_space = {
                 "dense_layers": [4, 8, 12],
-                "dense_neurons":[256, 512, 768], 
+                "dense_neurons":[256, 512, 768],
                 "learning_rate": [0.001, 0.002],
                 "regu1": [1e-8, 1e-7]
             }
@@ -53,7 +54,7 @@ class MLTuner():
 
              params={
                 "dense_layers": 8,
-                "dense_neurons": 256, 
+                "dense_neurons": 256,
                 "learning_rate": 0.001,
                 "regu1": 1e-8
             }
@@ -62,17 +63,17 @@ class MLTuner():
         :param eval_func: Function that is called to evaluate the hyper parameters.
         """
         if "best_params" not in self.search_space:
-            self.search_space["best_params"]={}
+            self.search_space["best_params"] = {}
         for key in param_space:
             if key not in self.search_space["best_params"]:
-                self.search_space["best_params"][key]=param_space[key][0]
-        p_cnt=0
+                self.search_space["best_params"][key] = param_space[key][0]
+        p_cnt = 0
         for key in param_space:
-            params=copy.deepcopy(self.search_space["best_params"])
-            vals=param_space[key]
+            params = copy.deepcopy(self.search_space["best_params"])
+            vals = param_space[key]
             for val in vals:
                 if self.search_space["is_first"] is False:
-                    if val==self.search_space["best_params"][key]:
+                    if val == self.search_space["best_params"][key]:
                         continue  # Was already tested.
                 else:
                     self.search_space["is_first"] = False
@@ -83,7 +84,7 @@ class MLTuner():
                 else:
                     p_cnt += 1
                 self.search_space["progress"] += 1
-                params[key]=val
+                params[key] = val
                 self.log.debug(f"Testing: {key}={val} with {params}")
                 ev = eval_func(params)
                 self.log.debug(f"Eval: {ev}")
@@ -93,6 +94,7 @@ class MLTuner():
                     self.log.info(f"Best parameter set with ev={ev}: {params}")
                 if self.progress_callback is not None:
                     self.progress_callback(self.search_space)
-        self.log.info(f"Best parameter set with {self.search_space['best_ev']} eval: {self.search_space['best_params']}")
+        self.log.info(
+            f"Best parameter set with {self.search_space['best_ev']} eval: {self.search_space['best_params']}"
+        )
         return self.search_space["best_params"]
-        
