@@ -4,7 +4,7 @@ import json
 from collections import Counter
 
 try:
-    from IPython.core.display import display, HTML
+    from IPython.core.display import display, HTML  # type: ignore
 except ImportError:
     pass
 
@@ -327,7 +327,7 @@ class Text_Dataset:
             return
         self.log.info("Encoding text corpora as ngrams.")
         for text in self.text_list:
-            if 'alias' in text:
+            if "alias" in text:
                 self.log.info(f"Encoding text {text['alias']}...")
             else:
                 self.log.info(f"Encoding text {text['title']}...")
@@ -781,7 +781,7 @@ class Text_Dataset:
                     if p - 1 > mxQ:
                         mxQ = p - 1
                         mxI = text["index"]
-                        if 'alias' in text:
+                        if "alias" in text:
                             mxN = f"{text['alias']}"
                         else:
                             mxN = f"{text['author']}: {text['title']}"
