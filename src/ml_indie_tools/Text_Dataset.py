@@ -47,6 +47,7 @@ class Text_Dataset:
         self.word_tokenizer_init = False
         self.char_tokenizer_init = False
         self.ngram_tokenizer_init = False
+        self.bytegram_tokenizer_init = False
         self.getitem_init = False
         self.tokenizer_type = None
         self.i2c = None
@@ -55,6 +56,8 @@ class Text_Dataset:
         self.w2i = None
         self.i2t = None
         self.t2i = None
+        self.b2i = None
+        self.i2b = None
         self.special_words = ["<unk>", "<pad>", "<sos>", "<eos>", "<wsep>", "<subst>"]
         if text_list is not None:
             self.load_texts(
@@ -189,7 +192,7 @@ class Text_Dataset:
         :param add_special_words: If True, special words ('<unk>' etc.) are added to the ngrams.
         """
         ngrams = [
-            text[i : i + j + 1]
+            tuple(text[i : i + j + 1], 'utf-8')
             for i in range(len(text))
             for j in range(0, min(len(text) - i, max_len))
         ]
@@ -245,10 +248,10 @@ class Text_Dataset:
         max_tokens should be significantly higher than the number of unique glyphs in the text_list.
         Using word_separator=None is usually significantly better than using a word_separator for ngrams.
 
-        :param tokenizer: 'word', 'char', or 'ngram' (default)
-        :param max_ngrams: (ngram only) maximum n-gram length
+        :param tokenizer: 'word', 'char', 'bytegram', or 'ngram' (default)
+        :param max_ngrams: (bytegram, ngram only) maximum n-gram length
         :param word_separator: (word, ngram) character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
-        :param max_tokens: (ngram only) maximum number of tokens to use
+        :param max_tokens: (bytegram, ngram only) maximum number of tokens to use
         """
         self.log.info(f"Starting tokenizer on {len(self.text_list)} texts...")
         if tokenizer == "word":
@@ -321,6 +324,28 @@ class Text_Dataset:
             del ngrams_list
             self.i2t = {t[1]: t[0] for t in self.t2i.items()}
             self.ngram_tokenizer_init = True
+        elif tokenizer == "bytegram":
+            self.b2i = {}
+            self.i2b = {}
+            self.tokenizer_type = "bytegram"
+            self.word_separator = None
+            self.max_ngrams = max_ngrams
+            self.log.info(
+                f"Extracting bytegrams of length 1..{max_ngrams} from text_list, selecting {max_tokens} most used ngrams."
+            )
+            corpus = []
+            for text in self.text_list:
+                corpus += bytearray(text["text"], "utf-8")
+            self.word_list = None
+            bytegrams = self._every_ngram(corpus, max_len=max_ngrams)
+            bytegrams_list = self._weight_ngrams(bytegrams)
+            if max_tokens is not None:
+                if len(bytegrams_list) > max_tokens:
+                    bytegrams_list = bytegrams_list[:max_tokens]
+            self.b2i = {t[1][0]: t[0] for t in enumerate(bytegrams_list)}
+            del bytegrams_list
+            self.i2b = {t[1]: t[0] for t in self.b2i.items()}
+            self.bytegram_tokenizer_init = True
         else:
             self.log.error(f"Unknown tokenizer {tokenizer}")
             raise ValueError(f"Unknown tokenizer {tokenizer}")
@@ -353,9 +378,12 @@ class Text_Dataset:
                     "i2c": self.i2c,
                     "t2i": self.t2i,
                     "i2t": self.i2t,
+                    "b2i": self.b2i,
+                    "i2b": self.i2b,
                     "word_tokenizer_init": self.word_tokenizer_init,
                     "char_tokenizer_init": self.char_tokenizer_init,
                     "ngram_tokenizer_init": self.ngram_tokenizer_init,
+                    "bytegram_tokenizer_init": self.bytegram_tokenizer_init,
                     "index": self.index,
                     "word_separator": self.word_separator,
                     "max_ngrams": self.max_ngrams,
@@ -391,9 +419,16 @@ class Text_Dataset:
                 self.i2t = {int(k): v for k, v in data["i2t"].items()}
             else:
                 self.i2t = None
+            self.b2i = data["b2i"]
+            i2b = data["i2b"]
+            if isinstance(i2b, dict):
+                self.i2b = {int(k): v for k, v in data["i2b"].items()}
+            else:
+                self.i2b = None
             self.word_tokenizer_init = data["word_tokenizer_init"]
             self.char_tokenizer_init = data["char_tokenizer_init"]
             self.ngram_tokenizer_init = data["ngram_tokenizer_init"]
+            self.bytegram_tokenizer_init = data["bytegram_tokenizer_init"]
             self.index = data["index"]
             self.word_separator = data["word_separator"]
             self.max_ngrams = data["max_ngrams"]
@@ -468,6 +503,34 @@ class Text_Dataset:
                         if text[0] not in self.t2i:
                             tokens.append(self.t2i["<unk>"])
                             text = text[1:]
+        elif self.tokenizer_type == "ngram":
+            if self.ngram_tokenizer_init is False:
+                self.init_tokenizer(tokenizer="bytegram")
+            byte_text = bytearray(text, "utf-8")
+            while len(byte_text) > 0:
+                is_special = False
+                for st in self.special_words:
+                    b_st = tuple(bytearray(st, "utf-8"))
+                    if b_st == byte_text[: len(b_st)]:  # text.startswith(st):
+                        tokens.append(self.b2i[b_st])
+                        byte_text = byte_text[len(b_st) :]
+                        is_special = True
+                        break
+                if is_special is True:
+                    continue
+                mx = min(self.max_ngrams, len(byte_text))
+                for si in range(mx, 0, -1):
+                    tk = byte_text[:si]
+                    if tk in self.b2i:
+                        ind = self.b2i[tk]
+                        byte_text = byte_text[si:]
+                        tokens.append(ind)
+                        break
+                if len(byte_text) > 0:
+                    if byte_text[0] not in self.b2i:
+                        st = tuple(bytearray("<unk>", "utf-8"))
+                        tokens.append(self.b2i[st])
+                        byte_text = byte_text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
@@ -490,6 +553,8 @@ class Text_Dataset:
                 for token in tokens
             ]
         elif self.tokenizer_type == "ngram":
+            encoded = tokens
+        elif self.tokenizer_type == "bytegram":
             encoded = tokens
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
@@ -519,6 +584,20 @@ class Text_Dataset:
                 if ind == "<wsep>":  # Separator
                     dec += self.word_separator
                 elif ind == "<unk>":  # Unknown token
+                    dec += "<unk>"
+                else:
+                    dec += self.i2t[ind]
+                    if mark_separator is True:
+                        dec += "_"
+            decoded_text = dec
+        elif self.tokenizer_type == "bytegram":
+            dec = ""
+            for ind in encoded:
+                if ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]:  # Separator
+                    dec += self.word_separator
+                elif (
+                    ind == self.b2i[tuple(bytearray("<unk>", "utf-8"))]
+                ):  # Unknown token
                     dec += "<unk>"
                 else:
                     dec += self.i2t[ind]
