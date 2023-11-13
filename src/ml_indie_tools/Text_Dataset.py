@@ -212,6 +212,17 @@ class Text_Dataset:
             for i in range(len(bytetext))
             for j in range(0, min(len(bytetext) - i, max_len))
         ]
+
+        # Filter out invalid UTF-8 bytegrams (inefficient!)
+        valgrams = []
+        for ngram in ngrams:
+            try:
+                _ = bytes(ngram).decode("utf-8")
+                valgrams.append(ngram)
+            except Exception as _:
+                pass
+        ngrams = valgrams
+
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
             ngrams = sng + ngrams
