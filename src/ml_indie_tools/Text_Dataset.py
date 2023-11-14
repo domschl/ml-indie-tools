@@ -397,7 +397,7 @@ class Text_Dataset:
                 if len(bytegrams_list) > max_tokens:
                     bytegrams_list = bytegrams_list[:max_tokens]
             self.b2i = {t[1][0]: t[0] for t in enumerate(bytegrams_list)}
-            # del bytegrams_list
+            del bytegrams_list
             self.i2b = {t[1]: t[0] for t in self.b2i.items()}
             self.bytegram_tokenizer_init = True
         else:
@@ -433,7 +433,7 @@ class Text_Dataset:
                     "i2c": self.i2c,
                     "t2i": self.t2i,
                     "i2t": self.i2t,
-                    "b2i": self.b2i,
+                    # "b2i": self.b2i,  can't serialize tuples, but they are redundant anyway
                     "i2b": self.i2b,
                     "word_tokenizer_init": self.word_tokenizer_init,
                     "char_tokenizer_init": self.char_tokenizer_init,
@@ -474,12 +474,14 @@ class Text_Dataset:
                 self.i2t = {int(k): v for k, v in data["i2t"].items()}
             else:
                 self.i2t = None
-            self.b2i = data["b2i"]
+            # self.b2i = data["b2i"]
             i2b = data["i2b"]
             if isinstance(i2b, dict):
-                self.i2b = {int(k): v for k, v in data["i2b"].items()}
+                self.i2b = {int(k): tuple(v) for k, v in data["i2b"].items()}
             else:
                 self.i2b = None
+            self.b2i = {t[1]: t[0] for t in self.i2b.items()}
+
             self.word_tokenizer_init = data["word_tokenizer_init"]
             self.char_tokenizer_init = data["char_tokenizer_init"]
             self.ngram_tokenizer_init = data["ngram_tokenizer_init"]
