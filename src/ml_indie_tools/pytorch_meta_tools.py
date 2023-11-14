@@ -79,10 +79,10 @@ def save_checkpoint(
         "optimizer_states": optimizer.state_dict(),
     }
 
-    # Really?
-    if hasattr(model, "_orig_mod"):
+    # Really? This fixes the fact that compiled models store their stuff in a _different_ place!
+    if hasattr(model, "_orig_mod"):  # means, model was compiled!
         state["model_states"] = model._orig_mod.state_dict()
-    else:
+    else:  # models was not compiled, 'standard' case.
         state["model_states"] = model.state_dict()
 
     torch.save(state, file_path)
