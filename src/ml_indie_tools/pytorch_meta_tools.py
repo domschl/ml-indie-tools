@@ -73,11 +73,19 @@ def save_checkpoint(
 ):
     params["current_epoch"] = current_epoch
     params["current_loss"] = current_loss
+
+    
     state = {
         "params": params,
-        "model_states": model.state_dict(),
         "optimizer_states": optimizer.state_dict(),
     }
+
+    # Really?
+    if hasattr(model, "_orig_mod"):
+        state["model_states"] = model._orig_mod.state_dict()
+    else
+        state["model_states"] = model.state_dict()
+
     torch.save(state, file_path)
     if log is not None:
         log.info(f"Saved model to {file_path}")
