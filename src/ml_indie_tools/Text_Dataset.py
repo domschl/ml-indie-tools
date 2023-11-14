@@ -478,9 +478,10 @@ class Text_Dataset:
             i2b = data["i2b"]
             if isinstance(i2b, dict):
                 self.i2b = {int(k): tuple(v) for k, v in data["i2b"].items()}
+                self.b2i = {t[1]: t[0] for t in self.i2b.items()}
             else:
                 self.i2b = None
-            self.b2i = {t[1]: t[0] for t in self.i2b.items()}
+                self.b2i = None
 
             self.word_tokenizer_init = data["word_tokenizer_init"]
             self.char_tokenizer_init = data["char_tokenizer_init"]
