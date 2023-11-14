@@ -43,6 +43,7 @@ class Text_Dataset:
     ):
         self.log = logging.getLogger("Datasets")
         self.text_list = []
+        self.tokenizer_file_version = "0.9.2"
         self.index = 1
         self.word_tokenizer_init = False
         self.char_tokenizer_init = False
@@ -427,6 +428,7 @@ class Text_Dataset:
             json.dump(
                 {
                     "tokenizer_type": self.tokenizer_type,
+                    "tokenizer_file_version": self.tokenizer_file_version,
                     "w2i": self.w2i,
                     "i2w": self.i2w,
                     "c2i": self.c2i,
@@ -455,6 +457,16 @@ class Text_Dataset:
         self.log.info(f"Loading tokenizer from {file_path}")
         with open(file_path, "r") as f:
             data = json.load(f)
+            if (
+                "tokenizer_file_version" not in data
+                or data["tokenizer_file_version"] != self.tokenizer_file_version
+            ):
+                self.log.error(
+                    f"Can't load tokenizer data, expecting tokenizer_file_version {self.tokenizer_file_version}, suitable version tag not found."
+                )
+                raise ValueError(
+                    f"Unknown tokenizer version, required version is: {self.tokenizer_file_version}"
+                )
             self.tokenizer_type = data["tokenizer_type"]
             self.w2i = data["w2i"]
             i2w = data["i2w"]
