@@ -14,8 +14,9 @@ class Folder_Dataset:
     def load_index(
         self,
         folder_path,
+        file_extensions=["txt", "md", "py", "org"],
         parse_metadata=True,
-        default_language=None,
+        default_language="English",
         default_author=None,
         use_aliases=False,
     ):
@@ -26,7 +27,8 @@ class Folder_Dataset:
         This loads the text files from a folder and creates some metadata from the filename.
         If `parse_metadata` is `True`, the filename format is expected to be: "Title - Author - Language.txt"
 
-        :param folder_path: Path to a folder containing text files (.txt)
+        :param folder_path: Path to a folder containing text files with valid extensions
+        :param file_extensions: List of file extensions that identify valid text files
         :param parse_metadata: On True, filename must adhere to `title - author - language.txt` format.
         :param default_language: If language is not given via parse_metadata, use None or "English" etc.
         :param default_author: If author is not given via parse_metadata, use None or a specific author that applies to all texts.
@@ -40,20 +42,25 @@ class Folder_Dataset:
         for root, dirs, files in os.walk(folder_path):
             for file in files:
                 # print(file)
-                if file.endswith(".txt"):
-                    components = file.split(" - ")
+                parts = os.path.splitext(file)
+                stem = parts[0]
+                ext = parts[1]
+                if ext in file_extensions:
+                    components = stem.split(" - ")
                     if len(components) == 3:
                         title = components[0]
                         author = components[1]
-                        language = components[2].replace(".txt", "")
+                        language = components[2]
                     elif len(components) == 2:
                         title = components[0]
-                        author = components[1].replace(".txt", "")
+                        author = components[1]
                         language = default_language
                     else:
                         author = default_author
                         language = default_language
                     filename = os.path.join(root, file)
+                    if ext == "py":
+                        language = "Python"
                     # get a unique ID for the book using a crc from the filename
                     ebook_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, filename))
                     rec = {
