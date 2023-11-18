@@ -56,6 +56,7 @@ class Folder_Dataset:
                         author = components[1]
                         language = default_language
                     else:
+                        title = stem
                         author = default_author
                         language = default_language
                     filename = os.path.join(root, file)
