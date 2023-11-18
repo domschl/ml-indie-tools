@@ -201,6 +201,13 @@ class Text_Dataset:
             ngrams = self.special_words + ngrams
         return ngrams
 
+    def _is_valid_utf8(self, bytetext):
+        try:
+            _ = bytes(bytetext).decode("utf-8")
+            return True
+        except Exception as _:
+            return False
+
     def _every_bytegram(self, bytetext, max_len, add_special_words=True):
         """Return all ngrams of length 1..max_len from text.
 
@@ -212,19 +219,13 @@ class Text_Dataset:
             tuple(bytetext[i : i + j + 1])
             for i in range(len(bytetext))
             for j in range(0, min(len(bytetext) - i, max_len))
+            if self._is_valid_utf8(bytetext[i : i + j + 1])
         ]
 
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
             ngrams.insert(0, sng)
-        # Filter out invalid UTF-8 bytegrams (inefficient!)
 
-        for ngram in ngrams:
-            try:
-                _ = bytes(ngram).decode("utf-8")
-            except Exception as _:
-                ngrams.remove(ngram)
-                # pass
         return ngrams
 
     def _weight_ngrams(self, ngrams, max_weight=1e12):
