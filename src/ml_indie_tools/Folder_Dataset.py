@@ -31,7 +31,7 @@ class Folder_Dataset:
         :param folder_path: Path to a folder containing text files with valid extensions
         :param file_extensions: List of file extensions that identify valid text files
         :param max_file_size: If not None, files larger than max_file_size bytes are ignored or truncated (s.b.)
-        :param truncate_large: On True, files larger than max_file_size are truncated instead of ignored
+        :param truncate_large: On True, files larger than max_file_size are truncated instead of ignored, only if max_file_size is not None
         :param default_language: If language is not given via parse_metadata, use None or "English" etc.
         :param default_author: If author is not given via parse_metadata, use None or a specific author that applies to all texts.
         :param use_aliases: If True, documents are not referenced by filename (containing title and author),

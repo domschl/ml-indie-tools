@@ -19,10 +19,12 @@ class Calibre_Dataset:
         self.verbose = verbose
         self.records = []
 
-    def load_index(self, use_aliases=False):
+    def load_index(self, use_aliases=False, max_file_size=None, truncate_large=True):
         """This function loads the Calibre library records that contain text-format books.
 
         :param use_aliases: If True, books are not referenced by title and author,
+        :param max_file_size: If not None, files larger than max_file_size bytes are ignored or truncated (s.b.)
+        :param truncate_large: On True, files larger than max_file_size are truncated instead of ignored, only if max_file_size is not None
         but by their numeric aliases, thus providing privacy.
         """
         # Enumerate all txt-format books
@@ -73,6 +75,12 @@ class Calibre_Dataset:
                             rec["alias"] = f"CL{index}"
                         with open(filename, "r", encoding="utf-8") as f:
                             rec["text"] = f.read()
+                        if max_file_size is not None:
+                            if len(rec["text"]) > max_file_size:
+                                if truncate_large is True:
+                                    rec["text"] = rec["text"][:max_file_size]
+                                else:
+                                    continue
                         self.records += [rec]
                         index += 1
         self.log.info(f"Loaded {len(self.records)} records from Calibre library.")
