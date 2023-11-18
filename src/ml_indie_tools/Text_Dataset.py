@@ -203,7 +203,7 @@ class Text_Dataset:
 
     def _is_valid_utf8(self, bytetext):
         try:
-            _ = bytetext.decode("utf-8")
+            _ = bytes(bytetext).decode("utf-8")
             return True
         except Exception as _:
             return False
@@ -219,7 +219,7 @@ class Text_Dataset:
             tuple(bytetext[i : i + j + 1])
             for i in range(len(bytetext))
             for j in range(0, min(len(bytetext) - i, max_len))
-            if self._is_valid_utf8(bytetext[i : i + j + 1])
+            if self._is_valid_utf8(tuple(bytetext[i : i + j + 1]))
         ]
 
         if add_special_words is True:
