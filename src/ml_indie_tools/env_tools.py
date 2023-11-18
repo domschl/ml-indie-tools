@@ -281,7 +281,7 @@ class MLEnv:
                 if accelerator == "gpu" or accelerator == "fastest":
                     if "darwin" in sys.platform:
                         try:
-                            if torch.has_mps:
+                            if torch.backends.mps.is_built():
                                 self.is_gpu = True
                                 self.log.debug("Pytorch MPS acceleration detected.")
                                 self.gpu_type = "MPS Metal accelerator"
