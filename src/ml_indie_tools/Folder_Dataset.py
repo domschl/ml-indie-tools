@@ -15,7 +15,7 @@ class Folder_Dataset:
         self,
         folder_path,
         file_extensions=[".txt", ".md", ".py", ".org"],
-        parse_metadata=True,
+        max_file_size=None,
         default_language="English",
         default_author=None,
         use_aliases=False,
@@ -29,7 +29,7 @@ class Folder_Dataset:
 
         :param folder_path: Path to a folder containing text files with valid extensions
         :param file_extensions: List of file extensions that identify valid text files
-        :param parse_metadata: On True, filename must adhere to `title - author - language.txt` format.
+        :param max_file_size: If not None, files larger than max_file_size bytes are ignored
         :param default_language: If language is not given via parse_metadata, use None or "English" etc.
         :param default_author: If author is not given via parse_metadata, use None or a specific author that applies to all texts.
         :param use_aliases: If True, documents are not referenced by filename (containing title and author),
@@ -79,6 +79,9 @@ class Folder_Dataset:
 
                     with open(filename, "r", encoding="utf-8") as f:
                         rec["text"] = f.read()
+                    if max_file_size is not None:
+                        if len(rec["text"]) > max_file_size:
+                            continue
                     self.records += [rec]
                     self.index = self.index + 1
                     cur_index = cur_index + 1
