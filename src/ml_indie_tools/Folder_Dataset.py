@@ -77,7 +77,7 @@ class Folder_Dataset:
                     with open(filename, "r", encoding="utf-8") as f:
                         rec["text"] = f.read()
                     self.records += [rec]
-                    index = index + 1
+                    self.index = self.index + 1
                     cur_index = cur_index + 1
         self.log.info(
             f"Loaded {cur_index} records from folder, grand total is now {len(self.records)} records."
