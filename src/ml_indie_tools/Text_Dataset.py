@@ -203,7 +203,7 @@ class Text_Dataset:
 
     def _is_valid_utf8(self, bytetext):
         try:
-            _ = bytes(bytetext).decode("utf-8")
+            _ = bytetext.decode("utf-8")
             return True
         except Exception as _:
             return False
