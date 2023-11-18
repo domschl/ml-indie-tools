@@ -40,6 +40,9 @@ class Folder_Dataset:
         if os.path.exists(folder_path) is False:
             raise FileNotFoundError("Folder not found at " + folder_path)
         for root, dirs, files in os.walk(folder_path):
+            # Skip hidden stuff:
+            files = [f for f in files if not f[0] == "."]
+            dirs[:] = [d for d in dirs if not d[0] == "."]
             for file in files:
                 # print(file)
                 parts = os.path.splitext(file)
@@ -72,7 +75,7 @@ class Folder_Dataset:
                         "filename": filename,
                     }
                     if use_aliases is True:
-                        rec["alias"] = f"FL{index}"
+                        rec["alias"] = f"FL{self.index}"
 
                     with open(filename, "r", encoding="utf-8") as f:
                         rec["text"] = f.read()
