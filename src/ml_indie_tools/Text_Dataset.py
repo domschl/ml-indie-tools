@@ -224,7 +224,7 @@ class Text_Dataset:
 
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
-            ngrams.insert(0, sng)
+            ngrams = sng + ngrams
 
         return ngrams
 
