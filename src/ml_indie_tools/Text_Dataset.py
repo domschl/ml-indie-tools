@@ -223,7 +223,7 @@ class Text_Dataset:
             try:
                 _ = bytes(ngram).decode("utf-8")
             except Exception as _:
-                ngrams.erase(ngram)
+                ngrams.remove(ngram)
                 # pass
         return ngrams
 
