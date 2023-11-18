@@ -14,7 +14,7 @@ class Folder_Dataset:
     def load_index(
         self,
         folder_path,
-        file_extensions=["txt", "md", "py", "org"],
+        file_extensions=[".txt", ".md", ".py", ".org"],
         parse_metadata=True,
         default_language="English",
         default_author=None,
@@ -59,7 +59,7 @@ class Folder_Dataset:
                         author = default_author
                         language = default_language
                     filename = os.path.join(root, file)
-                    if ext == "py":
+                    if ext == ".py":
                         language = "Python"
                     # get a unique ID for the book using a crc from the filename
                     ebook_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, filename))
