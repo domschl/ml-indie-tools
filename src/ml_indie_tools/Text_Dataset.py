@@ -214,21 +214,18 @@ class Text_Dataset:
             for j in range(0, min(len(bytetext) - i, max_len))
         ]
 
-        # Filter out invalid UTF-8 bytegrams (inefficient!)
-        valgrams = []
-
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
-            valgrams.append(sng)
+            ngrams.insert(0, sng)
+        # Filter out invalid UTF-8 bytegrams (inefficient!)
 
         for ngram in ngrams:
             try:
                 _ = bytes(ngram).decode("utf-8")
-                valgrams.append(ngram)
             except Exception as _:
-                pass
-        del ngrams
-        return valgrams
+                ngrams.erase(ngram)
+                # pass
+        return ngrams
 
     def _weight_ngrams(self, ngrams, max_weight=1e12):
         """Weight ngrams by their length and frequency. Ngrams of length==1 and special words ('<unk>' etc.) are
