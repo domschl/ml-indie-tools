@@ -617,7 +617,7 @@ class Text_Dataset:
                     b_st = tuple(bytearray(st, "utf-8"))
                     if b_st == byte_text[: len(b_st)]:  # text.startswith(st):
                         tokens.append(self.b2i[b_st])
-                        byte_text = byte_text[len(b_st) :]
+                        byte_text[:] = byte_text[len(b_st) :]
                         is_special = True
                         break
                 if is_special is True:
@@ -627,14 +627,14 @@ class Text_Dataset:
                     tk = tuple(byte_text[:si])
                     if tk in self.b2i:
                         ind = self.b2i[tk]
-                        byte_text = byte_text[si:]
+                        byte_text[:] = byte_text[si:]
                         tokens.append(ind)
                         break
                 if len(byte_text) > 0:
                     if (byte_text[0],) not in self.b2i:
                         st = tuple(bytearray("<unk>", "utf-8"))
                         tokens.append(self.b2i[st])
-                        byte_text = byte_text[1:]
+                        byte_text[:] = byte_text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
