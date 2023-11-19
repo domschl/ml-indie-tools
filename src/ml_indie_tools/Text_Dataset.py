@@ -418,9 +418,10 @@ class Text_Dataset:
                 else:
                     bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
                     eg_dict.update(bytegrams)
-                self.log.info(
-                    f"bytegrams calculated: {text['title']}: {len(bytetext)}, dict: {len(eg_dict.keys())}"
-                )
+                if len(bytetext) > 500000:
+                    self.log.info(
+                        f"Larger bytegrams calculated: {text['title']}: {len(bytetext)}, dict: {len(eg_dict.keys())}"
+                    )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
             if max_tokens is not None:
@@ -437,10 +438,11 @@ class Text_Dataset:
 
         self.log.info("Encoding text corpora")
         for text in self.text_list:
-            if "alias" in text:
-                self.log.info(f"Encoding text {text['alias']}...")
-            else:
-                self.log.info(f"Encoding text {text['title']}...")
+            if len(text["text"]) > 500000:
+                if "alias" in text:
+                    self.log.info(f"Encoding larger text {text['alias']}...")
+                else:
+                    self.log.info(f"Encoding larger text {text['title']}...")
             text["text_encoded"] = self.encode(text["text"])
         self.log.info("Encoding text corpora done.")
 
