@@ -414,7 +414,10 @@ class Text_Dataset:
                             bytetext[i : i + chunk_size], max_len=max_ngrams
                         )
                         eg_dict.update(bytegrams)
-                        # print(f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r")
+                        if i > chunk_size:  # less verbose
+                            print(
+                                f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r"
+                            )
                 else:
                     bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
                     eg_dict.update(bytegrams)
