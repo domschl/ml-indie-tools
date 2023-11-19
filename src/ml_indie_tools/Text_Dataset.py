@@ -228,16 +228,15 @@ class Text_Dataset:
 
         return ngrams
 
-    def _weight_ngrams(self, ngrams, max_weight=1e12):
+    def _weight_ngrams(self, eg_dict: Counter, max_weight=1e12):
         """Weight ngrams by their length and frequency. Ngrams of length==1 and special words ('<unk>' etc.) are
         weigted by max_weight, since we need the full character set and the special words to be
         included in the ngram collection.
 
-        :param ngrams: ngrams to weight
+        :param eg_dict: Counter of ngrams to weight
         :param max_weight: maximum weight of ngrams, used to marked 'preferred' ngrams: ngrams of length==1 and special words ('<unk>' etc.)
         :return: ngrams with weights in reverse sorted order (highest weight first)
         """
-        eg_dict = Counter(ngrams)
         return sorted(
             [
                 (
@@ -252,16 +251,15 @@ class Text_Dataset:
             reverse=True,
         )
 
-    def _weight_bytegrams(self, bytegrams, max_weight=1e12):
+    def _weight_bytegrams(self, eg_dict: Counter, max_weight=1e12):
         """Weight ngrams by their length and frequency. Ngrams of length==1 and special words ('<unk>' etc.) are
         weigted by max_weight, since we need the full character set and the special words to be
         included in the ngram collection.
 
-        :param ngrams: ngrams to weight
+        :param eg_dict: Counter of bytegrams to weight
         :param max_weight: maximum weight of ngrams, used to marked 'preferred' ngrams: ngrams of length==1 and special words ('<unk>' etc.)
         :return: ngrams with weights in reverse sorted order (highest weight first)
         """
-        eg_dict = Counter(bytegrams)
         sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
         return sorted(
             [
@@ -362,12 +360,14 @@ class Text_Dataset:
                 self.word_list = None
             if self.word_list is None:
                 ngrams = self._every_ngram(corpus, max_len=max_ngrams)
-                ngrams_list = self._weight_ngrams(ngrams)
+                eg_dict = Counter(ngrams)
+                ngrams_list = self._weight_ngrams(eg_dict)
             else:
                 ngrams = []
                 for word in self.word_list:
                     ngrams += self._every_ngram(word, max_len=max_ngrams)
-                ngrams_list = self._weight_ngrams(ngrams)
+                eg_dict = Counter(ngrams)
+                ngrams_list = self._weight_ngrams(eg_dict)
             if max_tokens is not None:
                 if len(ngrams_list) > max_tokens:
                     ngrams_list = ngrams_list[:max_tokens]
@@ -389,9 +389,12 @@ class Text_Dataset:
                 corpus += bytearray(text["text"], "utf-8")
             self.log.info("Corpus from byte texts created.")
             self.word_list = None
-            bytegrams = self._every_bytegram(corpus, max_len=max_ngrams)
-            self.log.info(f"bytegrams calculated: {len(bytegrams)}")
-            bytegrams_list = self._weight_bytegrams(bytegrams)
+            eg_dict = Counter()
+            for text in self.text_list:
+                bytegrams = self._every_bytegram(corpus, max_len=max_ngrams)
+                self.log.info(f"bytegrams calculated: {len(bytegrams)}")
+                eg_dict.update(bytegrams)
+            bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
             if max_tokens is not None:
                 if len(bytegrams_list) > max_tokens:
