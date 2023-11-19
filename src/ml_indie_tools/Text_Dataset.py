@@ -391,9 +391,12 @@ class Text_Dataset:
             self.word_list = None
             eg_dict = Counter()
             for text in self.text_list:
-                bytegrams = self._every_bytegram(corpus, max_len=max_ngrams)
-                self.log.info(f"bytegrams calculated: {len(bytegrams)}")
+                bytetext = bytearray(text["text"], "utf-8")
+                bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
                 eg_dict.update(bytegrams)
+                self.log.info(
+                    f"bytegrams calculated: {text}: {len(bytegrams)}, dict: {len(eg_dict.keys())}"
+                )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
             if max_tokens is not None:
