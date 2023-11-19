@@ -395,7 +395,7 @@ class Text_Dataset:
                 bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
                 eg_dict.update(bytegrams)
                 self.log.info(
-                    f"bytegrams calculated: {text}: {len(bytegrams)}, dict: {len(eg_dict.keys())}"
+                    f"bytegrams calculated: {text['title']}: {len(bytegrams)}, dict: {len(eg_dict.keys())}"
                 )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
