@@ -446,7 +446,14 @@ class Text_Dataset:
                     self.log.info(f"Encoding larger text {text['alias']}...")
                 else:
                     self.log.info(f"Encoding larger text {text['title']}...")
-            text["text_encoded"] = self.encode(text["text"])
+            if chunk_size is not None and len(text["text"]) > 2 * chunk_size:
+                textbody = text["text"]
+                text["text_encoded"] = []
+                for i in range(0, len(textbody), chunk_size):
+                    enc = self.encode(textbody[i, i + chunk_size])
+                    text["text_encoded"] = text["text_encoded"] + enc
+            else:
+                text["text_encoded"] = self.encode(text["text"])
         self.log.info("Encoding text corpora done.")
 
     def save_tokenizer(self, file_path):
