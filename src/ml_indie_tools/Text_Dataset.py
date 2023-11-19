@@ -450,6 +450,8 @@ class Text_Dataset:
                 textbody = text["text"]
                 text["text_encoded"] = []
                 for i in range(0, len(textbody), chunk_size):
+                    if i > chunk_size:  # less verbose
+                        print(f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r")
                     enc = self.encode(textbody[i, i + chunk_size])
                     text["text_encoded"] = text["text_encoded"] + enc
             else:
