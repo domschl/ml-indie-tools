@@ -274,7 +274,12 @@ class Text_Dataset:
         )
 
     def init_tokenizer(
-        self, tokenizer="ngram", max_ngrams=5, word_separator=None, max_tokens=5000
+        self,
+        tokenizer="ngram",
+        max_ngrams=5,
+        word_separator=None,
+        max_tokens=5000,
+        chunk_size=None,
     ):
         """Initialize the tokenizer with the text_list.
 
@@ -299,8 +304,9 @@ class Text_Dataset:
 
         :param tokenizer: 'word', 'char', 'bytegram', or 'ngram' (default)
         :param max_ngrams: (bytegram, ngram only) maximum n-gram length
-        :param word_separator: (word, ngram) character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
+        :param word_separator: (word, ngram) [deprecated!] character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
         :param max_tokens: (bytegram, ngram only) maximum number of tokens to use
+        :param chunk_size: (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts
         """
         self.log.info(f"Starting tokenizer on {len(self.text_list)} texts...")
         if tokenizer == "word":
@@ -358,9 +364,19 @@ class Text_Dataset:
                 self.word_list = corpus.split(word_separator)
             else:
                 self.word_list = None
+            eg_dict = Counter()
             if self.word_list is None:
-                ngrams = self._every_ngram(corpus, max_len=max_ngrams)
-                eg_dict = Counter(ngrams)
+                for text in self.text_list:
+                    textbody = text["text"]
+                    if chunk_size is not None:
+                        for i in range(0, len(textbody), chunk_size):
+                            ngrams = self._every_ngram(
+                                textbody[i : i + chunk_size], max_len=max_ngrams
+                            )
+                            eg_dict.update(ngrams)
+                    else:
+                        ngrams = self._every_ngram(textbody, max_len=max_ngrams)
+                        eg_dict.update(ngrams)
                 ngrams_list = self._weight_ngrams(eg_dict)
             else:
                 ngrams = []
@@ -392,8 +408,15 @@ class Text_Dataset:
             eg_dict = Counter()
             for text in self.text_list:
                 bytetext = bytearray(text["text"], "utf-8")
-                bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
-                eg_dict.update(bytegrams)
+                if chunk_size is not None:
+                    for i in range(0, len(bytetext), chunk_size):
+                        bytegrams = self._every_bytegram(
+                            bytetext[i : i + chunk_size], max_len=max_ngrams
+                        )
+                        eg_dict.update(bytegrams)
+                else:
+                    bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
+                    eg_dict.update(bytegrams)
                 self.log.info(
                     f"bytegrams calculated: {text['title']}: {len(bytegrams)}, dict: {len(eg_dict.keys())}"
                 )
