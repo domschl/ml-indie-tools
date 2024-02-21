@@ -287,7 +287,7 @@ class MLEnv:
                                 self.gpu_type = "MPS Metal accelerator"
                                 self.gpu_memory = "system memory"
                                 self.log.debug(
-                                    f"Pytorch MPS acceleration detected: MPS={torch.has_mps}"
+                                    f"Pytorch MPS acceleration detected: MPS={torch.backends.mps.is_built()}"
                                 )
                                 return
                         except:  # noqa: E722
