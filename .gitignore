@@ -5,4 +5,4 @@ gutenberg/
 *.egg-info
 .vscode/
 .DS_Store
-
+.virtual_documents/

@@ -203,24 +203,35 @@ class Text_Dataset:
 
     def _is_valid_utf8(self, bytetext):
         try:
-            _ = bytes(bytetext).decode("utf-8")
+            _ = bytes(bytetext).decode("utf-8", errors="replace")
             return True
         except Exception as _:
             return False
 
-    def _every_bytegram(self, bytetext, max_len, add_special_words=True):
+    def _every_bytegram(
+        self, bytetext, max_len, add_special_words=True, check_valid=False
+    ):
         """Return all ngrams of length 1..max_len from text.
 
         :param text: text to extract ngrams from
         :param max_len: maximum length of ngrams to extract
         :param add_special_words: If True, special words ('<unk>' etc.) are added to the ngrams.
         """
-        ngrams = [
-            tuple(bytetext[i : i + j + 1])
-            for i in range(len(bytetext))
-            for j in range(0, min(len(bytetext) - i, max_len))
-            if self._is_valid_utf8(tuple(bytetext[i : i + j + 1]))
-        ]
+        if check_valid is True:
+            ngrams = [
+                tuple(bytetext[i : i + j + 1])
+                for i in range(len(bytetext))
+                for j in range(0, min(len(bytetext) - i, max_len))
+                if self._is_valid_utf8(tuple(bytetext[i : i + j + 1]))
+            ]
+        else:
+            ngrams = [
+                tuple(bytetext[i : i + j + 1])
+                for i in range(len(bytetext))
+                # for j in range(0, min(len(bytetext) - i, max_len))
+                # Only tuples of length 2..max_len are used, since length 1 is already covered by the raw-byte tokens 0..255
+                for j in range(1, min(len(bytetext) - i, max_len))
+            ]
 
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
@@ -241,9 +252,11 @@ class Text_Dataset:
             [
                 (
                     "".join(lk),
-                    max_weight
-                    if len(lk) == 1 or lk in self.special_words
-                    else len(lk) * eg_dict[lk],
+                    (
+                        max_weight
+                        if len(lk) == 1 or lk in self.special_words
+                        else len(lk) * eg_dict[lk]
+                    ),
                 )
                 for lk in eg_dict.keys()
             ],
@@ -430,7 +443,8 @@ class Text_Dataset:
             if max_tokens is not None:
                 if len(bytegrams_list) > max_tokens:
                     bytegrams_list = bytegrams_list[:max_tokens]
-            self.b2i = {t[1][0]: t[0] for t in enumerate(bytegrams_list)}
+            # use indices 0-255 to for raw utf-8 bytes that are not in the ngram list
+            self.b2i = {t[1][0]: t[0] + 256 for t in enumerate(bytegrams_list)}
             del bytegrams_list
             self.i2b = {t[1]: t[0] for t in self.b2i.items()}
             self.bytegram_tokenizer_init = True
@@ -641,8 +655,9 @@ class Text_Dataset:
                         break
                 if len(byte_text) > 0:
                     if (byte_text[0],) not in self.b2i:
-                        st = tuple(bytearray("<unk>", "utf-8"))
-                        tokens.append(self.b2i[st])
+                        # st = tuple(bytearray("<unk>", "utf-8"))
+                        # tokens.append(self.b2i[st])
+                        tokens.append(int(byte_text[0]))
                         byte_text[:] = byte_text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
@@ -705,17 +720,31 @@ class Text_Dataset:
             decoded_text = dec
         elif self.tokenizer_type == "bytegram":
             dec = ""
+            bdec = []
             for ind in encoded:
-                if ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]:  # Separator
-                    dec += self.word_separator
-                elif (
-                    ind == self.b2i[tuple(bytearray("<unk>", "utf-8"))]
-                ):  # Unknown token
-                    dec += "<unk>"
+                if ind < 256:
+                    bdec.append(bytes([ind]))
                 else:
-                    dec += bytes(list(self.i2b[ind])).decode("utf-8")
-                    if mark_separator is True:
-                        dec += "_"
+                    if bdec != []:
+                        dec += b"".join(bdec).decode("utf-8", errors="replace")
+                        bdec = []
+                    if (
+                        ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]
+                    ):  # Separator
+                        dec += self.word_separator
+                    elif (
+                        ind == self.b2i[tuple(bytearray("<unk>", "utf-8"))]
+                    ):  # Unknown token
+                        dec += "<unk>"
+                    else:
+                        dec += bytes(list(self.i2b[ind])).decode(
+                            "utf-8", errors="replace"
+                        )
+                        if mark_separator is True:
+                            dec += "_"
+            if bdec != []:
+                dec += b"".join(bdec).decode("utf-8", errors="replace")
+                bdec = []
             decoded_text = dec
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")

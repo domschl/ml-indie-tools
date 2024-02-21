@@ -248,6 +248,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2024-02-21, 0.10.4) More tests with bytegrams.
 * (2023-11-14, 0.9.3) Fix/hack for reloading of checkpoints for compiled models (torch puts weights in some sub-object: `_orig_mod`)
 * (2023-11-13, 0.9.0) Breaking API change to `Folder_Dataset`, `load_index()` can be called multiple times additively.
 * (2023-04-2, 0.8.168) Two transformer variants: a transformer with 'yoke', [`MultiHeadSelfAttentionWithCompression`](https://domschl.github.io/ml-indie-tools/_build/html/index.html#multiheadselfattentionwithcompression) (a layer that compresses information, forcing abstraction), and version with state: [`MultiHeadSelfAttentionWithCompressionState`](https://domschl.github.io/ml-indie-tools/_build/html/index.html#multiheadselfattentionwithcompressionstate), a state is combined with the yoke-layer, allowing the most 'abstract' information of the transformer to be maintained in a recurrent manner. See [torch-transformer-poet](https://github.com/domschl/torch-transformer-poet) for examples.
