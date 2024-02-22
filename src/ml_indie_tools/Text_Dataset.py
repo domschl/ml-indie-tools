@@ -417,7 +417,7 @@ class Text_Dataset:
             self.word_separator = None
             self.max_ngrams = max_ngrams
             self.log.info(
-                f"Extracting bytegrams of length 1..{max_ngrams} from text_list, selecting {max_tokens} most used ngrams."
+                f"Extracting bytegrams of length 1..{max_ngrams} from text_list, selecting {max_tokens} (- 256 for single bytes) most used ngrams."
             )
             corpus = []
             for text in self.text_list:
@@ -446,9 +446,6 @@ class Text_Dataset:
                     )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
-            if max_tokens is not None:
-                if len(bytegrams_list) > max_tokens:
-                    bytegrams_list = bytegrams_list[:max_tokens]
 
             rem_err = 0
             for bg in bytegrams_list:
@@ -460,6 +457,10 @@ class Text_Dataset:
                 self.log.info(
                     f"Removed {rem_err} bytegrams of length 1 from bytegrams_list: they shouldn't be there. (XXX)"
                 )
+
+            if max_tokens is not None:
+                if len(bytegrams_list) > max_tokens - 256:
+                    bytegrams_list = bytegrams_list[: max_tokens - 256]
 
             # use indices 0-255 to for raw utf-8 bytes that are not in the ngram list
             self.b2i = {t[1][0]: t[0] + 256 for t in enumerate(bytegrams_list)}
@@ -781,7 +782,7 @@ class Text_Dataset:
         elif self.tokenizer_type == "ngram":
             return len(self.t2i)
         elif self.tokenizer_type == "bytegram":
-            return len(self.b2i)
+            return len(self.b2i) + 256
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
