@@ -330,7 +330,7 @@ class MLEnv:
                     self.log.error("No Pytorch CPU accelerator available.")
                     return
         if platform == "mlx":
-            if "darwin" is not sys.platform:
+            if "darwin" not in sys.platform:
                 self.log.error("MLX is only supported on MacOS.")
                 return
             try:
@@ -364,7 +364,7 @@ class MLEnv:
                     try:
                         mx.set_default_device(mx.DeviceType.cpu)
                         self.is_cpu = mx.default_device().type.name == "cpu"
-                        self.log.debug("MLX CPU detected.")
+                        self.log.debug("Using MLX with CPU.")
                     except Exception as e:
                         self.log.error(f"MLX CPU, failed to set device type: {e}")
                         self.is_cpu = False
