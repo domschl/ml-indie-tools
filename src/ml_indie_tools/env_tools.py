@@ -343,53 +343,35 @@ class MLEnv:
                 return
             if self.is_mlx is True:
                 if accelerator == "gpu" or accelerator == "fastest":
-                    if "darwin" in sys.platform:
-                        try:
-                            if torch.backends.mps.is_built():
-                                self.is_gpu = True
-                                self.log.debug("Pytorch MPS acceleration detected.")
-                                self.gpu_type = "MPS Metal accelerator"
-                                self.gpu_memory = "system memory"
-                                self.log.debug(
-                                    f"Pytorch MPS acceleration detected: MPS={torch.backends.mps.is_built()}"
-                                )
-                                return
-                        except:  # noqa: E722
-                            pass
                     try:
-                        import torch.cuda
-
-                        if torch.cuda.is_available():
-                            self.is_gpu = True
-                            self.gpu_type = torch.cuda.get_device_name(0)
-                            self.log.debug(f"Pytorch GPU {self.gpu_type} detected.")
-                            try:  # Full speed ahead, captain!
-                                card = (
-                                    subprocess.run(
-                                        ["nvidia-smi"], stdout=subprocess.PIPE
-                                    )
-                                    .stdout.decode("utf-8")
-                                    .split("\n")
-                                )
-                                if len(card) >= 8:
-                                    self.gpu_memory = card[9][33:54].strip()
-                                else:
-                                    self.log.warning(
-                                        f"Could not get GPU type, unexpected output from nvidia-smi, lines={len(card)}, content={card}"
-                                    )
-                            except Exception as e:
-                                self.log.debug(f"Failed to determine GPU memory {e}")
-                        else:
-                            self.log.debug("Pytorch GPU not available.")
-                    except:  # noqa: E722
-                        if accelerator != "fastest":
-                            self.log.error("Pytorch GPU not available.")
+                        mx.set_default_device(mx.DeviceType.gpu)
+                        self.is_gpu = mx.default_device().type.name == "gpu"
+                    except Exception as e:
+                        self.log.error(f"MLX GPU, failed to set device type: {e}")
+                        self.is_gpu = False
+                        return
+                    if self.is_gpu is True:
+                        self.log.debug("Using MLX with GPU acceleration.")
+                        self.gpu_type = "MLX GPU"
+                        self.gpu_memory = "system memory"
+                        return
+                    else:
+                        self.log.error("MLX GPU not available.")
+                        self.is_gpu = False
+                        if accelerator == "gpu":
                             return
                 if accelerator == "cpu" or accelerator == "fastest":
-                    self.is_cpu = True
-                    self.log.debug("Pytorch CPU detected.")
+                    try:
+                        mx.set_default_device(mx.DeviceType.cpu)
+                        self.is_cpu = mx.default_device().type.name == "cpu"
+                        self.log.debug("MLX CPU detected.")
+                    except Exception as e:
+                        self.log.error(f"MLX CPU, failed to set device type: {e}")
+                        self.is_cpu = False
+                        return
+                    return
                 else:
-                    self.log.error("No Pytorch CPU accelerator available.")
+                    self.log.error("No MLX-Device, possibly internal error.")
                     return
 
     def _check_osenv(self):
@@ -451,6 +433,8 @@ class MLEnv:
             desc = f"Pytorch: {self.pt_version}"
         elif self.is_jax is True:
             desc = f"JAX: {self.jax_version}"
+        elif self.is_mlx is True:
+            desc = f"MLX: {self.mlx_version}"
         else:
             desc = "(no-ml-platform) "
         if self.is_tpu is True:
