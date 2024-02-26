@@ -27,7 +27,7 @@ class MLEnv:
 
     def __init__(self, platform="tf", accelerator="fastest", old_disable_eager=False):
         self.log = logging.getLogger("MLEnv")
-        self.known_platforms = ["tf", "pt", "jax"]
+        self.known_platforms = ["tf", "pt", "jax", "mlx"]
         self.known_accelerators = ["cpu", "gpu", "tpu", "fastest"]
         if platform not in self.known_platforms:
             self.log.error(
@@ -48,6 +48,8 @@ class MLEnv:
         self.pt_version = None  #: Pytorch version, e.g. `'1.6.0'`
         self.is_jax = False  #: `True` if running on Jax
         self.jax_version = None  #: Jax version, e.g. `'0.1.0'`
+        self.is_mlx = False  #: `True` if running on MLX
+        self.mlx_version = None
         self.is_cpu = False  #: `True` if no accelerator is available
         self.is_gpu = False  #: `True` if a GPU is is available
         self.is_tpu = False  #: `True` if a TPU is is available
@@ -278,6 +280,68 @@ class MLEnv:
                             )
                             if accelerator != "fastest":
                                 return
+                if accelerator == "gpu" or accelerator == "fastest":
+                    if "darwin" in sys.platform:
+                        try:
+                            if torch.backends.mps.is_built():
+                                self.is_gpu = True
+                                self.log.debug("Pytorch MPS acceleration detected.")
+                                self.gpu_type = "MPS Metal accelerator"
+                                self.gpu_memory = "system memory"
+                                self.log.debug(
+                                    f"Pytorch MPS acceleration detected: MPS={torch.backends.mps.is_built()}"
+                                )
+                                return
+                        except:  # noqa: E722
+                            pass
+                    try:
+                        import torch.cuda
+
+                        if torch.cuda.is_available():
+                            self.is_gpu = True
+                            self.gpu_type = torch.cuda.get_device_name(0)
+                            self.log.debug(f"Pytorch GPU {self.gpu_type} detected.")
+                            try:  # Full speed ahead, captain!
+                                card = (
+                                    subprocess.run(
+                                        ["nvidia-smi"], stdout=subprocess.PIPE
+                                    )
+                                    .stdout.decode("utf-8")
+                                    .split("\n")
+                                )
+                                if len(card) >= 8:
+                                    self.gpu_memory = card[9][33:54].strip()
+                                else:
+                                    self.log.warning(
+                                        f"Could not get GPU type, unexpected output from nvidia-smi, lines={len(card)}, content={card}"
+                                    )
+                            except Exception as e:
+                                self.log.debug(f"Failed to determine GPU memory {e}")
+                        else:
+                            self.log.debug("Pytorch GPU not available.")
+                    except:  # noqa: E722
+                        if accelerator != "fastest":
+                            self.log.error("Pytorch GPU not available.")
+                            return
+                if accelerator == "cpu" or accelerator == "fastest":
+                    self.is_cpu = True
+                    self.log.debug("Pytorch CPU detected.")
+                else:
+                    self.log.error("No Pytorch CPU accelerator available.")
+                    return
+        if platform == "mlx":
+            if "darwin" is not sys.platform:
+                self.log.error("MLX is only supported on MacOS.")
+                return
+            try:
+                import mlx.core as mx
+
+                self.is_mlx = True
+                self.mlx_version = mx.__version__
+            except ImportError:
+                self.log.error("MLX not installed or not available.")
+                return
+            if self.is_mlx is True:
                 if accelerator == "gpu" or accelerator == "fastest":
                     if "darwin" in sys.platform:
                         try:
