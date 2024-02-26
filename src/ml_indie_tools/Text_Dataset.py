@@ -209,7 +209,7 @@ class Text_Dataset:
             return False
 
     def _every_bytegram(
-        self, bytetext, max_len, add_special_words=True, check_valid=False
+        self, bytetext, max_len, add_special_words=True, check_valid=True
     ):
         """Return all ngrams of length 1..max_len from text.
 
@@ -228,10 +228,15 @@ class Text_Dataset:
             ngrams = [
                 tuple(bytetext[i : i + j + 1])
                 for i in range(len(bytetext))
-                # for j in range(0, min(len(bytetext) - i, max_len))
+                for j in range(0, min(len(bytetext) - i, max_len))
                 # Only tuples of length 2..max_len are used, since length 1 is already covered by the raw-byte tokens 0..255
-                for j in range(1, min(len(bytetext) - i, max_len))
+                # for j in range(1, min(len(bytetext) - i, max_len))
             ]
+
+        for i in range(0, 256):
+            if (i,) in ngrams:
+                ngrams.remove((i,))
+                # print(f"Removed {i}")
 
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
@@ -278,7 +283,8 @@ class Text_Dataset:
             [
                 (
                     lk,
-                    max_weight if len(lk) == 1 or lk in sng else len(lk) * eg_dict[lk],
+                    # max_weight if len(lk) == 1 or lk in sng else len(lk) * eg_dict[lk],
+                    max_weight if lk in sng else len(lk) * eg_dict[lk],
                 )
                 for lk in eg_dict.keys()
             ],
@@ -411,7 +417,7 @@ class Text_Dataset:
             self.word_separator = None
             self.max_ngrams = max_ngrams
             self.log.info(
-                f"Extracting bytegrams of length 1..{max_ngrams} from text_list, selecting {max_tokens} most used ngrams."
+                f"Extracting bytegrams of length 1..{max_ngrams} from text_list, selecting {max_tokens} (- 256 for single bytes) most used ngrams."
             )
             corpus = []
             for text in self.text_list:
@@ -440,9 +446,22 @@ class Text_Dataset:
                     )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
+
+            rem_err = 0
+            for bg in bytegrams_list:
+                if len(bg[0]) == 1 and bg[0][0] < 256:
+                    # print(f"Error: {bg} in b2i")
+                    rem_err += 1
+                    bytegrams_list.remove(bg)
+            if rem_err > 0:
+                self.log.info(
+                    f"Removed {rem_err} bytegrams of length 1 from bytegrams_list: they shouldn't be there. (XXX)"
+                )
+
             if max_tokens is not None:
-                if len(bytegrams_list) > max_tokens:
-                    bytegrams_list = bytegrams_list[:max_tokens]
+                if len(bytegrams_list) > max_tokens - 256:
+                    bytegrams_list = bytegrams_list[: max_tokens - 256]
+
             # use indices 0-255 to for raw utf-8 bytes that are not in the ngram list
             self.b2i = {t[1][0]: t[0] + 256 for t in enumerate(bytegrams_list)}
             del bytegrams_list
@@ -632,6 +651,7 @@ class Text_Dataset:
                             text = text[1:]
         elif self.tokenizer_type == "bytegram":
             if self.bytegram_tokenizer_init is False:
+                print("Init bytegram")
                 self.init_tokenizer(tokenizer="bytegram")
             byte_text = bytearray(text, "utf-8")
             while len(byte_text) > 0:
@@ -657,7 +677,7 @@ class Text_Dataset:
                     if (byte_text[0],) not in self.b2i:
                         # st = tuple(bytearray("<unk>", "utf-8"))
                         # tokens.append(self.b2i[st])
-                        tokens.append(int(byte_text[0]))
+                        tokens.append(byte_text[0])
                         byte_text[:] = byte_text[1:]
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
@@ -762,7 +782,7 @@ class Text_Dataset:
         elif self.tokenizer_type == "ngram":
             return len(self.t2i)
         elif self.tokenizer_type == "bytegram":
-            return len(self.b2i)
+            return len(self.b2i) + 256
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
