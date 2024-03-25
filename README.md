@@ -19,11 +19,11 @@ persistent data- and model-storage.
 
 The usage scenarios are:
 
-| Env                      | Tensorflow TPU | Tensorflow GPU | Pytorch TPU | Pytorch GPU | Jax TPU | Jax GPU |
-| ------------------------ | :------------: | :------------: | :---------: | :---------: | :-----: | :-----: |
-| Colab                    | +              | +              | /           | +           | +       | +       |
-| Workstation with Nvidia  | /              | +              | /           | +           | /       | +       |
-| Apple Silicon            | /              | +              | /           | +           | /       | /       |
+| Env                     | MLX | Pytorch TPU | Pytorch GPU | Jax TPU | Jax GPU |
+|-------------------------|:---:|:-----------:|:-----------:|:-------:|:-------:|
+| Colab                   |  /  |      /      |      +      |    +    |    +    |
+| Workstation with Nvidia |  /  |      /      |      +      |    /    |    +    |
+| Apple Silicon           |  +  |      /      |      +      |    /    |    /    |
 
 (`+`: supported, `/`: not supported)
 
@@ -42,10 +42,10 @@ Local laptop:
 
 ```python
 from ml_indie_tools.env_tools import MLEnv
-ml_env = MLEnv(platform='tf', accelator='fastest')
-ml_env.describe()  # -> 'OS: Darwin, Python: 3.9.9 (Conda) Tensorflow: 2.7.0, GPU: METAL'
+ml_env = MLEnv(platform='pt', accelator='fastest')
+ml_env.describe()  # -> 'OS: Darwin, Python: 3.12 (Conda) Pytorch: 2.1, GPU: METAL'
 ml_env.is_gpu   # -> True
-ml_env.is_tensorflow  # -> True
+ml_env.is_mlx  # -> True
 ml_env.gpu_type  # -> 'METAL'
 ```
 
@@ -54,7 +54,7 @@ Colab instance:
 ```python
 # !pip install -U ml_indie_tools
 from ml_indie_tools.env_tools import MLEnv
-ml_env = MLEnv(platform='tf', accelerator='fastest')
+ml_env = MLEnv(platform='pt', accelerator='fastest')
 print(ml_env.describe())
 print(ml_env.gpu_type)
 ```
@@ -62,14 +62,12 @@ print(ml_env.gpu_type)
 Output: 
 
 ```
-DEBUG:MLEnv:Tensorflow version: 2.7.0
+DEBUG:MLEnv:Pytorch version: 2.1
 DEBUG:MLEnv:GPU available
 DEBUG:MLEnv:You are on a Jupyter instance.
 DEBUG:MLEnv:You are on a Colab instance.
-INFO:MLEnv:OS: Linux, Python: 3.7.12, Colab Jupyter Notebook Tensorflow: 2.7.0, GPU: Tesla K80
-The tensorboard extension is already loaded. To reload it, use:
-  %reload_ext tensorboard
-OS: Linux, Python: 3.7.12, Colab Jupyter Notebook Tensorflow: 2.7.0, GPU: Tesla K80
+INFO:MLEnv:OS: Linux, Python: 3.12, Colab Jupyter Notebook Pytorch: 2.1, GPU: Tesla K80
+OS: Linux, Python: 3.12, Colab Jupyter Notebook Pytorch: 2.1, GPU: Tesla K80
 Tesla K80
 ```
 
@@ -248,6 +246,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2024-03-25, 0.11.0) Tensorflow support completely removed, maintenance is simply too much effort due to continous API changes.
 * (2024-02-21, 0.10.4) More tests with bytegrams.
 * (2023-11-14, 0.9.3) Fix/hack for reloading of checkpoints for compiled models (torch puts weights in some sub-object: `_orig_mod`)
 * (2023-11-13, 0.9.0) Breaking API change to `Folder_Dataset`, `load_index()` can be called multiple times additively.

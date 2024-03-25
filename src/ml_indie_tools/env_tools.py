@@ -1,4 +1,4 @@
-"""Tools to configure ML environment for Tensorflow, Pytorch or JAX and
+"""Tools to configure ML environment for Pytorch, MLX, or JAX and
 optional notebook/colab environment"""
 
 import os
@@ -11,23 +11,23 @@ class MLEnv:
     """Initialize platform and accelerator.
 
     This checks initialization and available accelerator hardware for different ml platforms.
-    At return, the following variables are set: `self.is_tensorflow`, `self.is_pytorch`, `self.is_jax`,
-    indicating that the ml environment is available for Tensorflow, Pytorch or JAX respectively if `True`.
+    At return, the following variables are set: `self.is_pytorch`, `self.is_jax`, `self.is_mlx`
+    indicating that the ml environment is available for Pytorch, MLX, or JAX respectively if `True`.
     `self.is_notebook` and `self.is_colab` indicate if the environment is a notebook or colab environment.
     `self.is_gpu` indicates if the environment is a GPU environment, `self.is_tpu` indicates if the
     environment is a TPU environment, and `self.is_cpu` that no accelerator is available.
 
     The logger `MLEnv` provdides details about the hardware and ml environment.
 
-    :param platform: Known platforms are: `'tf'` (tensorflow), `'pt'` (pytorch), and `'jax'`
+    :param platform: Known platforms are: `'pt'` (pytorch), `'mlx'`, and `'jax'`
     :param accelerator: known accelerators are: `'fastest'` (pick best available hardware), `'cpu'`, `'gpu'`, `'tpu'`.
     :param old_disable_eager: default 'False', on True, old v1 compatibility layer is used to disable eager mode.
     According to rumors that might in resulting old codepaths being used?
     """
 
-    def __init__(self, platform="tf", accelerator="fastest", old_disable_eager=False):
+    def __init__(self, platform="pt", accelerator="fastest", old_disable_eager=False):
         self.log = logging.getLogger("MLEnv")
-        self.known_platforms = ["tf", "pt", "jax", "mlx"]
+        self.known_platforms = ["pt", "jax", "mlx"]
         self.known_accelerators = ["cpu", "gpu", "tpu", "fastest"]
         if platform not in self.known_platforms:
             self.log.error(
@@ -42,8 +42,6 @@ class MLEnv:
         self.os_type = None  #: Operating system type, e.g. `'Linux'`, `'Darwin'`
         self.py_version = None  #: Python version, e.g. `'3.7.3'`
         self.is_conda = False  #: `True` if running in a conda environment
-        self.is_tensorflow = False  #: `True` if running on Tensorflow
-        self.tf_version = None  #: Tensorflow version, e.g. `'2.7.0'`
         self.is_pytorch = False  #: `True` if running on Pytorch
         self.pt_version = None  #: Pytorch version, e.g. `'1.6.0'`
         self.is_jax = False  #: `True` if running on Jax
@@ -65,113 +63,6 @@ class MLEnv:
         self.flush_timeout = 180
         self._check_osenv()
         self._check_notebook_type()
-        if platform == "tf":
-            try:
-                import tensorflow as tf
-
-                self.is_tensorflow = True
-                self.tf_version = tf.__version__
-            except ImportError as e:
-                self.log.error(f"Tensorflow not available: {e}")
-                return
-            try:
-                from tensorflow.python.profiler import profiler_client
-
-                self.tf_prof = True
-            except ImportError:
-                self.tf_prof = False
-            self.log.debug(f"Tensorflow version: {tf.__version__}")
-            if accelerator == "tpu" or accelerator == "fastest":
-                try:  # XXX This fails in non-eager mode! Switch back?
-                    tpu = (
-                        tf.distribute.cluster_resolver.TPUClusterResolver()
-                    )  # TPU detection
-                    tpc = tpu.cluster_spec().as_dict()["worker"]
-                    self.log.debug(f"Running on TPU {tpc}")
-                    self.is_tpu = True
-                except ValueError:
-                    tpu = None
-                    if accelerator != "fastest":
-                        self.log.debug("No TPU available")
-                if self.is_tpu is True:
-                    # Connect_to_cluster requires eager mode, so we can't call it after having switched to non-eager mode
-                    if tf.executing_eagerly() is True:
-                        # Typically, this is the case when running for the first time, afterwards, we went to non-eager mode
-                        tf.config.experimental_connect_to_cluster(tpu)
-                    tf.tpu.experimental.initialize_tpu_system(tpu)
-                    self.tpu_strategy = tf.distribute.TPUStrategy(tpu)
-                    self.tpu_num_nodes = len(self.tpu_strategy.extended.worker_devices)
-                    tpu_profile_service_address = os.environ["COLAB_TPU_ADDR"].replace(
-                        "8470", "8466"
-                    )
-                    tpu_type = f"TPU, {self.tpu_num_nodes} nodes"
-                    if self.tf_prof is True:
-                        from tensorflow.python.profiler import profiler_client
-
-                        state = profiler_client.monitor(
-                            tpu_profile_service_address, 100, 2
-                        )
-                        if "TPU v2" in state:
-                            tpu_type = (
-                                tpu_type + " v2 (8GB)"
-                            )  # that's what you currently get on Colab
-                            self.log.info(
-                                "You got old TPU v2 which is limited to 8GB Ram."
-                            )
-                    self.tpu_type = tpu_type
-                    self.log.debug("TPU strategy available")
-                    if old_disable_eager is True:
-                        self.log.debug("Switching to non-eager mode")
-                        tf.compat.v1.disable_eager_execution()
-                        self.log.debug(
-                            "TPU: eager execution disabled using old compat.v1 API!"
-                        )
-            if self.is_tpu is False:
-                if accelerator == "gpu" or accelerator == "fastest":
-                    try:
-                        dev_list = tf.config.experimental.list_physical_devices("GPU")
-                        if dev_list is not None and len(dev_list) > 0:
-                            self.is_gpu = True
-                        else:
-                            self.log.debug("GPU not available")
-                            self.is_gpu = False
-                    except RuntimeError as e:
-                        self.log.debug(f"GPU not available: {e}")
-                        self.is_gpu = False
-                    if self.is_gpu is True:
-                        try:
-                            dev_list = tf.config.list_physical_devices("GPU")
-                            if dev_list is not None and len(dev_list) > 0:
-                                self.gpu_type = (
-                                    tf.config.experimental.get_device_details(
-                                        dev_list[0]
-                                    )["device_name"]
-                                )
-                            else:
-                                self.is_gpu = False
-                        except Exception as e:
-                            self.log.warning(f"Could not get GPU type: {e}")
-                            self.is_gpu = False
-                        if self.is_gpu is True:
-                            try:
-                                card = (
-                                    subprocess.run(
-                                        ["nvidia-smi"], stdout=subprocess.PIPE
-                                    )
-                                    .stdout.decode("utf-8")
-                                    .split("\n")
-                                )
-                                if len(card) >= 8:
-                                    self.gpu_memory = card[9][33:54].strip()
-                                else:
-                                    self.log.warning(
-                                        f"Could not get GPU type, unexpected output from nvidia-smi, lines={len(card)}, content={card}"
-                                    )
-                            except Exception as e:
-                                self.log.debug(f"Failed to determine GPU memory {e}")
-                            self.log.debug("GPU available")
-            if self.is_gpu is False:
-                self.log.info("No GPU or TPU available, this is going to be very slow!")
         if platform == "jax":
             try:
                 import jax
@@ -384,11 +275,7 @@ class MLEnv:
             self.is_conda = False
 
     def _check_notebook_type(self):
-        """Internal function, use :func:`describe` instead
-
-        Note: for colab notebooks and tensorflow environemts, this function
-        will load tensorboard.
-        """
+        """Internal function, use :func:`describe` instead"""
         try:
             if "IPKernelApp" in get_ipython().config:
                 self.is_notebook = True
@@ -401,12 +288,6 @@ class MLEnv:
                 from google.colab import drive
 
                 self.is_colab = True
-                if self.is_tensorflow is True:
-                    get_ipython().run_line_magic("load_ext", "tensorboard")
-                    try:
-                        get_ipython().run_line_magic("tensorflow_version", "2.x")
-                    except:  # noqa: E722
-                        pass
                 self.log.debug("You are on a Colab instance.")
             except:  # noqa: E722
                 self.is_colab = False
@@ -427,9 +308,7 @@ class MLEnv:
         return desc
 
     def describe_mlenv(self):
-        if self.is_tensorflow is True:
-            desc = f"Tensorflow: {self.tf_version}"
-        elif self.is_pytorch is True:
+        if self.is_pytorch is True:
             desc = f"Pytorch: {self.pt_version}"
         elif self.is_jax is True:
             desc = f"JAX: {self.jax_version}"

@@ -11,4 +11,5 @@ lib/
 include/
 share/
 lib64/
+etc/
 pyvenv.cfg
