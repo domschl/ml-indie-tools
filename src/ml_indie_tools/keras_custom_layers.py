@@ -5,12 +5,12 @@ try:
     import tensorflow.keras as keras
     from tensorflow.keras import layers
 
-    print("Using TF-Keras version:", keras.__version__)
+    print("Using TF-Keras version:", keras.version())
 except ImportError:
     import keras
     import keras.layers as layers
 
-    print("Using Keras version:", keras.__version__)
+    print("Using Keras version:", keras.version())
 import numpy as np
 import math
 
@@ -402,7 +402,7 @@ class MultiHeadSelfAttention(layers.Layer):
         mh_normalize=True,
         final_relu=False,
         join_heads_by_add=False,
-        **kwargs
+        **kwargs,
     ):
         super(MultiHeadSelfAttention, self).__init__(**kwargs)
         self.heads = heads

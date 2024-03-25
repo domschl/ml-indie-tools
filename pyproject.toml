@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name="ml-indie-tools"
 description="A collection of tools for low-resource indie machine learning development"
-version="0.10.10"
+version="0.10.11"
 authors= [{name = "Dominik Schlösser", email = "dominik.schloesser@gmail.com"}]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 classifiers=[
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
