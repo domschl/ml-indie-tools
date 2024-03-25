@@ -2,18 +2,17 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pytorch_custom_layers &#8212; ml-indie-tools 0.3.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    <title>pytorch_custom_layers &#8212; ml-indie-tools 0.11.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=532c1bf3" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,7 +30,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pytorch_custom_layers</a></li> 
       </ul>
@@ -53,7 +52,9 @@
 <span class="c1">#</span>
 
 
-<div class="viewcode-block" id="SelfAttentionHead"><a class="viewcode-back" href="../index.html#pytorch_custom_layers.SelfAttentionHead">[docs]</a><span class="k">class</span> <span class="nc">SelfAttentionHead</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SelfAttentionHead">
+<a class="viewcode-back" href="../index.html#pytorch_custom_layers.SelfAttentionHead">[docs]</a>
+<span class="k">class</span> <span class="nc">SelfAttentionHead</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Single head self-attention, optionally with causal masking.</span>
 <span class="sd">    taken from https://github.com/karpathy/ng-video-lecture,</span>
 <span class="sd">    the explanation of nano-gpt</span>
@@ -101,7 +102,10 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="MultiHeadAttention"><a class="viewcode-back" href="../index.html#pytorch_custom_layers.MultiHeadAttention">[docs]</a><span class="k">class</span> <span class="nc">MultiHeadAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MultiHeadAttention">
+<a class="viewcode-back" href="../index.html#pytorch_custom_layers.MultiHeadAttention">[docs]</a>
+<span class="k">class</span> <span class="nc">MultiHeadAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Multiple heads of self-attention in parallel</span>
 
 <span class="sd">    Note: the embedding size must be divisible by the number of heads</span>
@@ -158,7 +162,10 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="FeedFoward"><a class="viewcode-back" href="../index.html#pytorch_custom_layers.FeedFoward">[docs]</a><span class="k">class</span> <span class="nc">FeedFoward</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FeedFoward">
+<a class="viewcode-back" href="../index.html#pytorch_custom_layers.FeedFoward">[docs]</a>
+<span class="k">class</span> <span class="nc">FeedFoward</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dual linear layers separated by a non-linearity</span>
 
 <span class="sd">    :param input_size: the size of the input embedding</span>
@@ -207,7 +214,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Block"><a class="viewcode-back" href="../index.html#pytorch_custom_layers.Block">[docs]</a><span class="k">class</span> <span class="nc">Block</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Block">
+<a class="viewcode-back" href="../index.html#pytorch_custom_layers.Block">[docs]</a>
+<span class="k">class</span> <span class="nc">Block</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Transformer block: communication followed by computation</span>
 
 <span class="sd">    Note: the embedding size must be divisible by the number of heads</span>
@@ -267,7 +277,10 @@
         <span class="k">return</span> <span class="n">x</span></div>
 
 
-<div class="viewcode-block" id="MultiHeadSelfAttention"><a class="viewcode-back" href="../index.html#pytorch_custom_layers.MultiHeadSelfAttention">[docs]</a><span class="k">class</span> <span class="nc">MultiHeadSelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MultiHeadSelfAttention">
+<a class="viewcode-back" href="../index.html#pytorch_custom_layers.MultiHeadSelfAttention">[docs]</a>
+<span class="k">class</span> <span class="nc">MultiHeadSelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;MultiHeadSelfAttention transformer model (Karpathy nanoGPT derivative)</span>
 
 <span class="sd">    Note: the embedding size must be divisible by the number of heads</span>
@@ -419,6 +432,7 @@
             <span class="c1"># append sampled index to the running sequence</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx_next</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, T+1)</span>
         <span class="k">return</span> <span class="n">idx</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -436,7 +450,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -450,14 +464,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">pytorch_custom_layers</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    &#169; Copyright 2022-2024, dsc.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

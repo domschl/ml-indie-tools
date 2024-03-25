@@ -2,18 +2,17 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Text_Dataset &#8212; ml-indie-tools 0.3.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    <title>Text_Dataset &#8212; ml-indie-tools 0.11.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=532c1bf3" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,7 +30,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Text_Dataset</a></li> 
       </ul>
@@ -49,12 +48,14 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+    <span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>  <span class="c1"># type: ignore</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="Text_Dataset"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset">[docs]</a><span class="k">class</span> <span class="nc">Text_Dataset</span><span class="p">:</span>
+<div class="viewcode-block" id="Text_Dataset">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset">[docs]</a>
+<span class="k">class</span> <span class="nc">Text_Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Text_Dataset with a list of texts.</span>
 
 <span class="sd">    The Gutenberg_Dataset can be used to create such a list, by:</span>
@@ -88,10 +89,12 @@
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;Datasets&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_file_version</span> <span class="o">=</span> <span class="s2">&quot;0.9.2&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bytegram_tokenizer_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span> <span class="o">=</span> <span class="kc">None</span>
@@ -100,6 +103,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;pad&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;sos&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;eos&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;wsep&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;subst&gt;&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">text_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_texts</span><span class="p">(</span>
@@ -109,7 +114,9 @@
                 <span class="n">preserve_case</span><span class="o">=</span><span class="n">preserve_case</span><span class="p">,</span>
             <span class="p">)</span>
 
-<div class="viewcode-block" id="Text_Dataset.load_texts"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.load_texts">[docs]</a>    <span class="k">def</span> <span class="nf">load_texts</span><span class="p">(</span>
+<div class="viewcode-block" id="Text_Dataset.load_texts">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.load_texts">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_texts</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">text_list</span><span class="p">,</span>
         <span class="n">sanitize_white_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -157,6 +164,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">lt</span><span class="si">}</span><span class="s2"> texts&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_calc_probability_weights</span><span class="p">()</span></div>
 
+
     <span class="k">def</span> <span class="nf">_calc_probability_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">prs</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
@@ -189,7 +197,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tidx</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Text_Dataset.filter_text"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.filter_text">[docs]</a>    <span class="k">def</span> <span class="nf">filter_text</span><span class="p">(</span>
+<div class="viewcode-block" id="Text_Dataset.filter_text">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.filter_text">[docs]</a>
+    <span class="k">def</span> <span class="nf">filter_text</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">text</span><span class="p">,</span>
         <span class="n">sanitize_white_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -222,6 +232,7 @@
                 <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">text</span></div>
 
+
     <span class="k">def</span> <span class="nf">_word_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">):</span>
         <span class="n">tokens</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">word_separator</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tokens</span>
@@ -242,23 +253,67 @@
             <span class="n">ngrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span> <span class="o">+</span> <span class="n">ngrams</span>
         <span class="k">return</span> <span class="n">ngrams</span>
 
-    <span class="k">def</span> <span class="nf">_weight_ngrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ngrams</span><span class="p">,</span> <span class="n">max_weight</span><span class="o">=</span><span class="mf">1e12</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_is_valid_utf8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytetext</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">bytetext</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_every_bytegram</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">bytetext</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">add_special_words</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_valid</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all ngrams of length 1..max_len from text.</span>
+
+<span class="sd">        :param text: text to extract ngrams from</span>
+<span class="sd">        :param max_len: maximum length of ngrams to extract</span>
+<span class="sd">        :param add_special_words: If True, special words (&#39;&lt;unk&gt;&#39; etc.) are added to the ngrams.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">check_valid</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ngrams</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">bytetext</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">max_len</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_valid_utf8</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bytetext</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ngrams</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="n">bytetext</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">max_len</span><span class="p">))</span>
+                <span class="c1"># Only tuples of length 2..max_len are used, since length 1 is already covered by the raw-byte tokens 0..255</span>
+                <span class="c1"># for j in range(1, min(len(bytetext) - i, max_len))</span>
+            <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="p">,)</span> <span class="ow">in</span> <span class="n">ngrams</span><span class="p">:</span>
+                <span class="n">ngrams</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">i</span><span class="p">,))</span>
+                <span class="c1"># print(f&quot;Removed {i}&quot;)</span>
+
+        <span class="k">if</span> <span class="n">add_special_words</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">sng</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">sw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="p">]</span>
+            <span class="n">ngrams</span> <span class="o">=</span> <span class="n">sng</span> <span class="o">+</span> <span class="n">ngrams</span>
+
+        <span class="k">return</span> <span class="n">ngrams</span>
+
+    <span class="k">def</span> <span class="nf">_weight_ngrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eg_dict</span><span class="p">:</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">max_weight</span><span class="o">=</span><span class="mf">1e12</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Weight ngrams by their length and frequency. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are</span>
 <span class="sd">        weigted by max_weight, since we need the full character set and the special words to be</span>
 <span class="sd">        included in the ngram collection.</span>
 
-<span class="sd">        :param ngrams: ngrams to weight</span>
+<span class="sd">        :param eg_dict: Counter of ngrams to weight</span>
 <span class="sd">        :param max_weight: maximum weight of ngrams, used to marked &#39;preferred&#39; ngrams: ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.)</span>
 <span class="sd">        :return: ngrams with weights in reverse sorted order (highest weight first)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">eg_dict</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="p">(</span>
                     <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lk</span><span class="p">),</span>
-                    <span class="n">max_weight</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">lk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span>
-                    <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="p">)</span> <span class="o">*</span> <span class="n">eg_dict</span><span class="p">[</span><span class="n">lk</span><span class="p">],</span>
+                    <span class="p">(</span>
+                        <span class="n">max_weight</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">lk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span>
+                        <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="p">)</span> <span class="o">*</span> <span class="n">eg_dict</span><span class="p">[</span><span class="n">lk</span><span class="p">]</span>
+                    <span class="p">),</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">lk</span> <span class="ow">in</span> <span class="n">eg_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
             <span class="p">],</span>
@@ -266,8 +321,38 @@
             <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="Text_Dataset.init_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">init_tokenizer</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;ngram&quot;</span><span class="p">,</span> <span class="n">max_ngrams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">word_separator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5000</span>
+    <span class="k">def</span> <span class="nf">_weight_bytegrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eg_dict</span><span class="p">:</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">max_weight</span><span class="o">=</span><span class="mf">1e12</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Weight ngrams by their length and frequency. Ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.) are</span>
+<span class="sd">        weigted by max_weight, since we need the full character set and the special words to be</span>
+<span class="sd">        included in the ngram collection.</span>
+
+<span class="sd">        :param eg_dict: Counter of bytegrams to weight</span>
+<span class="sd">        :param max_weight: maximum weight of ngrams, used to marked &#39;preferred&#39; ngrams: ngrams of length==1 and special words (&#39;&lt;unk&gt;&#39; etc.)</span>
+<span class="sd">        :return: ngrams with weights in reverse sorted order (highest weight first)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sng</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">sw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="n">lk</span><span class="p">,</span>
+                    <span class="c1"># max_weight if len(lk) == 1 or lk in sng else len(lk) * eg_dict[lk],</span>
+                    <span class="n">max_weight</span> <span class="k">if</span> <span class="n">lk</span> <span class="ow">in</span> <span class="n">sng</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="p">)</span> <span class="o">*</span> <span class="n">eg_dict</span><span class="p">[</span><span class="n">lk</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">lk</span> <span class="ow">in</span> <span class="n">eg_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">],</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Text_Dataset.init_tokenizer">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_tokenizer">[docs]</a>
+    <span class="k">def</span> <span class="nf">init_tokenizer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;ngram&quot;</span><span class="p">,</span>
+        <span class="n">max_ngrams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">word_separator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
+        <span class="n">chunk_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tokenizer with the text_list.</span>
 
@@ -290,10 +375,11 @@
 <span class="sd">        max_tokens should be significantly higher than the number of unique glyphs in the text_list.</span>
 <span class="sd">        Using word_separator=None is usually significantly better than using a word_separator for ngrams.</span>
 
-<span class="sd">        :param tokenizer: &#39;word&#39;, &#39;char&#39;, or &#39;ngram&#39; (default)</span>
-<span class="sd">        :param max_ngrams: (ngram only) maximum n-gram length</span>
-<span class="sd">        :param word_separator: (word, ngram) character used to separate words, default None, which amounts to &#39; &#39; (space) for word and no word-splitting for ngram.</span>
-<span class="sd">        :param max_tokens: (ngram only) maximum number of tokens to use</span>
+<span class="sd">        :param tokenizer: &#39;word&#39;, &#39;char&#39;, &#39;bytegram&#39;, or &#39;ngram&#39; (default)</span>
+<span class="sd">        :param max_ngrams: (bytegram, ngram only) maximum n-gram length</span>
+<span class="sd">        :param word_separator: (word, ngram) [deprecated!] character used to separate words, default None, which amounts to &#39; &#39; (space) for word and no word-splitting for ngram.</span>
+<span class="sd">        :param max_tokens: (bytegram, ngram only) maximum number of tokens to use</span>
+<span class="sd">        :param chunk_size: (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting tokenizer on </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> texts...&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tokenizer</span> <span class="o">==</span> <span class="s2">&quot;word&quot;</span><span class="p">:</span>
@@ -351,14 +437,26 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">word_separator</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">eg_dict</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">ngrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_ngram</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span><span class="p">)</span>
-                <span class="n">ngrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_ngrams</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
+                    <span class="n">textbody</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">chunk_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">textbody</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
+                            <span class="n">ngrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_ngram</span><span class="p">(</span>
+                                <span class="n">textbody</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">],</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span>
+                            <span class="p">)</span>
+                            <span class="n">eg_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ngrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_ngram</span><span class="p">(</span><span class="n">textbody</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span><span class="p">)</span>
+                        <span class="n">eg_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+                <span class="n">ngrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_ngrams</span><span class="p">(</span><span class="n">eg_dict</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ngrams</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span><span class="p">:</span>
                     <span class="n">ngrams</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_ngram</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span><span class="p">)</span>
-                <span class="n">ngrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_ngrams</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+                <span class="n">eg_dict</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">ngrams</span><span class="p">)</span>
+                <span class="n">ngrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_ngrams</span><span class="p">(</span><span class="n">eg_dict</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">max_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ngrams_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_tokens</span><span class="p">:</span>
                     <span class="n">ngrams_list</span> <span class="o">=</span> <span class="n">ngrams_list</span><span class="p">[:</span><span class="n">max_tokens</span><span class="p">]</span>
@@ -366,20 +464,91 @@
             <span class="k">del</span> <span class="n">ngrams_list</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">tokenizer</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="s2">&quot;bytegram&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span> <span class="o">=</span> <span class="n">max_ngrams</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Extracting bytegrams of length 1..</span><span class="si">{</span><span class="n">max_ngrams</span><span class="si">}</span><span class="s2"> from text_list, selecting </span><span class="si">{</span><span class="n">max_tokens</span><span class="si">}</span><span class="s2"> (- 256 for single bytes) most used ngrams.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">corpus</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
+                <span class="n">corpus</span> <span class="o">+=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Corpus from byte texts created.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">word_list</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">eg_dict</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
+                <span class="n">bytetext</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">chunk_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
+                        <span class="n">bytegrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_bytegram</span><span class="p">(</span>
+                            <span class="n">bytetext</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">],</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span>
+                        <span class="p">)</span>
+                        <span class="n">eg_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bytegrams</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">chunk_size</span><span class="p">:</span>  <span class="c1"># less verbose</span>
+                            <span class="nb">print</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Chunking: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">chunk_size</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bytegrams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_every_bytegram</span><span class="p">(</span><span class="n">bytetext</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="n">max_ngrams</span><span class="p">)</span>
+                    <span class="n">eg_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bytegrams</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">500000</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Larger bytegrams calculated: </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bytetext</span><span class="p">)</span><span class="si">}</span><span class="s2">, dict: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eg_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="n">bytegrams_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_bytegrams</span><span class="p">(</span><span class="n">eg_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;weights compiled&quot;</span><span class="p">)</span>
+
+            <span class="n">rem_err</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">bg</span> <span class="ow">in</span> <span class="n">bytegrams_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">bg</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">256</span><span class="p">:</span>
+                    <span class="c1"># print(f&quot;Error: {bg} in b2i&quot;)</span>
+                    <span class="n">rem_err</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">bytegrams_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rem_err</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">rem_err</span><span class="si">}</span><span class="s2"> bytegrams of length 1 from bytegrams_list: they shouldn&#39;t be there. (XXX)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">max_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytegrams_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_tokens</span> <span class="o">-</span> <span class="mi">256</span><span class="p">:</span>
+                    <span class="n">bytegrams_list</span> <span class="o">=</span> <span class="n">bytegrams_list</span><span class="p">[:</span> <span class="n">max_tokens</span> <span class="o">-</span> <span class="mi">256</span><span class="p">]</span>
+
+            <span class="c1"># use indices 0-255 to for raw utf-8 bytes that are not in the ngram list</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">256</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bytegrams_list</span><span class="p">)}</span>
+            <span class="k">del</span> <span class="n">bytegrams_list</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bytegram_tokenizer_init</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="n">tokenizer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora as ngrams.&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;alias&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Encoding text </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;alias&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Encoding text </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-            <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text_encoded&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora as ngrams done.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.save_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.save_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">save_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">500000</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;alias&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Encoding larger text </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;alias&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Encoding larger text </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">chunk_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">chunk_size</span><span class="p">:</span>
+                <span class="n">textbody</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+                <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text_encoded&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">textbody</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">chunk_size</span><span class="p">:</span>  <span class="c1"># less verbose</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chunking: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">chunk_size</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">textbody</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">textbody</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">])</span>
+                    <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text_encoded&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text_encoded&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">enc</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">text</span><span class="p">[</span><span class="s2">&quot;text_encoded&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Encoding text corpora done.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Text_Dataset.save_tokenizer">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.save_tokenizer">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save tokenizer data and text library to JSON-file.</span>
 
 <span class="sd">        This json file can be loaded with load_tokenizer() and has all information needed</span>
@@ -392,15 +561,19 @@
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;tokenizer_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="p">,</span>
+                    <span class="s2">&quot;tokenizer_file_version&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_file_version</span><span class="p">,</span>
                     <span class="s2">&quot;w2i&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">,</span>
                     <span class="s2">&quot;i2w&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2w</span><span class="p">,</span>
                     <span class="s2">&quot;c2i&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">,</span>
                     <span class="s2">&quot;i2c&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2c</span><span class="p">,</span>
                     <span class="s2">&quot;t2i&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">,</span>
                     <span class="s2">&quot;i2t&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span><span class="p">,</span>
+                    <span class="c1"># &quot;b2i&quot;: self.b2i,  can&#39;t serialize tuples, but they are redundant anyway</span>
+                    <span class="s2">&quot;i2b&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span><span class="p">,</span>
                     <span class="s2">&quot;word_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span><span class="p">,</span>
                     <span class="s2">&quot;char_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span><span class="p">,</span>
                     <span class="s2">&quot;ngram_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span><span class="p">,</span>
+                    <span class="s2">&quot;bytegram_tokenizer_init&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bytegram_tokenizer_init</span><span class="p">,</span>
                     <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
                     <span class="s2">&quot;word_separator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span><span class="p">,</span>
                     <span class="s2">&quot;max_ngrams&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span><span class="p">,</span>
@@ -409,7 +582,10 @@
                 <span class="n">f</span><span class="p">,</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.load_tokenizer"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.load_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">load_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Text_Dataset.load_tokenizer">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.load_tokenizer">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load tokenizer data and text library from JSON-file.</span>
 
 <span class="sd">        :param file_path: path to file</span>
@@ -417,6 +593,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading tokenizer from </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="s2">&quot;tokenizer_file_version&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span>
+                <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tokenizer_file_version&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_file_version</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Can&#39;t load tokenizer data, expecting tokenizer_file_version </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_file_version</span><span class="si">}</span><span class="s2">, suitable version tag not found.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Unknown tokenizer version, required version is: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_file_version</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tokenizer_type&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">w2i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;w2i&quot;</span><span class="p">]</span>
             <span class="n">i2w</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2w&quot;</span><span class="p">]</span>
@@ -436,16 +622,29 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># self.b2i = data[&quot;b2i&quot;]</span>
+            <span class="n">i2b</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2b&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i2b</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;i2b&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">i2b</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span> <span class="o">=</span> <span class="kc">None</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;word_tokenizer_init&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">char_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;char_tokenizer_init&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ngram_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ngram_tokenizer_init&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bytegram_tokenizer_init</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;bytegram_tokenizer_init&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;word_separator&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_ngrams&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">text_list</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;text_list&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading tokenizer done.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.tokenize"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.tokenize">[docs]</a>    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Text_Dataset.tokenize">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.tokenize">[docs]</a>
+    <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tokenize a text.</span>
 
 <span class="sd">        :param text: text to tokenize</span>
@@ -513,12 +712,45 @@
                         <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">:</span>
                             <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">])</span>
                             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bytegram_tokenizer_init</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Init bytegram&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="s2">&quot;bytegram&quot;</span><span class="p">)</span>
+            <span class="n">byte_text</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">byte_text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">is_special</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_words</span><span class="p">:</span>
+                    <span class="n">b_st</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">b_st</span> <span class="o">==</span> <span class="n">byte_text</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_st</span><span class="p">)]:</span>  <span class="c1"># text.startswith(st):</span>
+                        <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">[</span><span class="n">b_st</span><span class="p">])</span>
+                        <span class="n">byte_text</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">byte_text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">b_st</span><span class="p">)</span> <span class="p">:]</span>
+                        <span class="n">is_special</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">is_special</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">mx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_ngrams</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">byte_text</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">si</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">tk</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">byte_text</span><span class="p">[:</span><span class="n">si</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">tk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">:</span>
+                        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">[</span><span class="n">tk</span><span class="p">]</span>
+                        <span class="n">byte_text</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">byte_text</span><span class="p">[</span><span class="n">si</span><span class="p">:]</span>
+                        <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">byte_text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">byte_text</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">:</span>
+                        <span class="c1"># st = tuple(bytearray(&quot;&lt;unk&gt;&quot;, &quot;utf-8&quot;))</span>
+                        <span class="c1"># tokens.append(self.b2i[st])</span>
+                        <span class="n">tokens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">byte_text</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">byte_text</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">byte_text</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tokens</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.encode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Text_Dataset.encode">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.encode">[docs]</a>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode a text.</span>
 
 <span class="sd">        :param text: text to encode</span>
@@ -536,12 +768,17 @@
             <span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;ngram&quot;</span><span class="p">:</span>
             <span class="n">encoded</span> <span class="o">=</span> <span class="n">tokens</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+            <span class="n">encoded</span> <span class="o">=</span> <span class="n">tokens</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">encoded</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.decode"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">mark_separator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Text_Dataset.decode">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.decode">[docs]</a>
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">mark_separator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode a list of encoded tokens.</span>
 
 <span class="sd">        :param encoded: list of encoded tokens</span>
@@ -561,21 +798,52 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;ngram&quot;</span><span class="p">:</span>
             <span class="n">dec</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
             <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">encoded</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="s2">&quot;&lt;wsep&gt;&quot;</span><span class="p">:</span>  <span class="c1"># Separator</span>
+                <span class="k">if</span> <span class="n">ind</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="s2">&quot;&lt;wsep&gt;&quot;</span><span class="p">]:</span>  <span class="c1"># Separator</span>
                     <span class="n">dec</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span>
-                <span class="k">elif</span> <span class="n">ind</span> <span class="o">==</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">:</span>  <span class="c1"># Unknown token</span>
+                <span class="k">elif</span> <span class="n">ind</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">]:</span>  <span class="c1"># Unknown token</span>
                     <span class="n">dec</span> <span class="o">+=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">dec</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2t</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">mark_separator</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                         <span class="n">dec</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span>
             <span class="n">decoded_text</span> <span class="o">=</span> <span class="n">dec</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+            <span class="n">dec</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">bdec</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">encoded</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ind</span> <span class="o">&lt;</span> <span class="mi">256</span><span class="p">:</span>
+                    <span class="n">bdec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">bytes</span><span class="p">([</span><span class="n">ind</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">bdec</span> <span class="o">!=</span> <span class="p">[]:</span>
+                        <span class="n">dec</span> <span class="o">+=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bdec</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+                        <span class="n">bdec</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">ind</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="s2">&quot;&lt;wsep&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))]</span>
+                    <span class="p">):</span>  <span class="c1"># Separator</span>
+                        <span class="n">dec</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_separator</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="n">ind</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))]</span>
+                    <span class="p">):</span>  <span class="c1"># Unknown token</span>
+                        <span class="n">dec</span> <span class="o">+=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dec</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i2b</span><span class="p">[</span><span class="n">ind</span><span class="p">]))</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                            <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">mark_separator</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                            <span class="n">dec</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span>
+            <span class="k">if</span> <span class="n">bdec</span> <span class="o">!=</span> <span class="p">[]:</span>
+                <span class="n">dec</span> <span class="o">+=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bdec</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+                <span class="n">bdec</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">decoded_text</span> <span class="o">=</span> <span class="n">dec</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">decoded_text</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.get_unique_token_count"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_unique_token_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_unique_token_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Text_Dataset.get_unique_token_count">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_unique_token_count">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_unique_token_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of unique tokens.</span>
 
 <span class="sd">        :return: number of unique tokens&quot;&quot;&quot;</span>
@@ -585,11 +853,16 @@
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;ngram&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">256</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Text_Dataset.init_getitem"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Text_Dataset.init_getitem">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.init_getitem">[docs]</a>
+    <span class="k">def</span> <span class="nf">init_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the __getitem__ and __len__ methods.</span>
 
 <span class="sd">        This method needs to be called before using len() or index-access of the dataset.</span>
@@ -644,6 +917,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span> <span class="o">=</span> <span class="n">rec_tot</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">getitem_init</span> <span class="o">=</span> <span class="kc">True</span></div>
 
+
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the length of the dataset.</span>
 
@@ -689,6 +963,8 @@
                             <span class="n">sample</span> <span class="o">+=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span>
                         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;word&quot;</span><span class="p">:</span>
                             <span class="n">sample</span> <span class="o">+=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="s2">&quot;&lt;unk&gt;&quot;</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -704,6 +980,8 @@
                             <span class="n">sample</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">t2i</span><span class="p">[</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">]]</span>
                         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;word&quot;</span><span class="p">:</span>
                             <span class="n">sample</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">w2i</span><span class="p">[</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">]]</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span> <span class="o">==</span> <span class="s2">&quot;bytegram&quot;</span><span class="p">:</span>
+                            <span class="n">sample</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">b2i</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="s2">&quot;&lt;unk&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))]]</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown tokenizer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -715,7 +993,9 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Internal error in __getitem__&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Text_Dataset.get_random_item"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Text_Dataset.get_random_item">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.get_random_item">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_random_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a random sample from the dataset.</span>
 
 <span class="sd">        :return:</span>
@@ -725,6 +1005,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;init_getitem must be called before get_random_item&quot;</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getitem_records</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="nf">_display_colored_html</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">textlist</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
@@ -794,7 +1075,9 @@
                 <span class="p">)</span>
         <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">pre</span> <span class="o">+</span> <span class="n">out</span> <span class="o">+</span> <span class="n">post</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Text_Dataset.source_highlight"><a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.source_highlight">[docs]</a>    <span class="k">def</span> <span class="nf">source_highlight</span><span class="p">(</span>
+<div class="viewcode-block" id="Text_Dataset.source_highlight">
+<a class="viewcode-back" href="../index.html#Text_Dataset.Text_Dataset.source_highlight">[docs]</a>
+    <span class="k">def</span> <span class="nf">source_highlight</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">ref_txt</span><span class="p">,</span> <span class="n">min_quote_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">display_ref_anchor</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyse which parts of `ref_txt` are cited from the texts in the Text_Dataset.</span>
@@ -826,7 +1109,7 @@
                     <span class="k">if</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">mxQ</span><span class="p">:</span>
                         <span class="n">mxQ</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span>
                         <span class="n">mxI</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="s1">&#39;alias&#39;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s2">&quot;alias&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
                             <span class="n">mxN</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;alias&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">mxN</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">text</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -859,7 +1142,9 @@
                 <span class="n">display_ref_anchor</span><span class="o">=</span><span class="n">display_ref_anchor</span><span class="p">,</span>
                 <span class="n">pre</span><span class="o">=</span><span class="s1">&#39;&lt;small&gt;&lt;p style=&quot;text-align:right;&quot;&gt;&#39;</span><span class="p">,</span>
                 <span class="n">post</span><span class="o">=</span><span class="s2">&quot;&lt;/p&gt;&lt;/small&gt;&quot;</span><span class="p">,</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -877,7 +1162,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -891,14 +1176,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Text_Dataset</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    &#169; Copyright 2022-2024, dsc.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

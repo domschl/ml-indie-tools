@@ -2,18 +2,17 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>env_tools &#8212; ml-indie-tools 0.3.8 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    <title>env_tools &#8212; ml-indie-tools 0.11.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=532c1bf3" />
     
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -31,7 +30,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">env_tools</a></li> 
       </ul>
@@ -43,7 +42,7 @@
           <div class="body" role="main">
             
   <h1>Source code for env_tools</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Tools to configure ML environment for Tensorflow, Pytorch or JAX and</span>
+<span></span><span class="sd">&quot;&quot;&quot;Tools to configure ML environment for Pytorch, MLX, or JAX and</span>
 <span class="sd">optional notebook/colab environment&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
@@ -52,27 +51,29 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 
 
-<div class="viewcode-block" id="MLEnv"><a class="viewcode-back" href="../index.html#env_tools.MLEnv">[docs]</a><span class="k">class</span> <span class="nc">MLEnv</span><span class="p">:</span>
+<div class="viewcode-block" id="MLEnv">
+<a class="viewcode-back" href="../index.html#env_tools.MLEnv">[docs]</a>
+<span class="k">class</span> <span class="nc">MLEnv</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize platform and accelerator.</span>
 
 <span class="sd">    This checks initialization and available accelerator hardware for different ml platforms.</span>
-<span class="sd">    At return, the following variables are set: `self.is_tensorflow`, `self.is_pytorch`, `self.is_jax`,</span>
-<span class="sd">    indicating that the ml environment is available for Tensorflow, Pytorch or JAX respectively if `True`.</span>
+<span class="sd">    At return, the following variables are set: `self.is_pytorch`, `self.is_jax`, `self.is_mlx`</span>
+<span class="sd">    indicating that the ml environment is available for Pytorch, MLX, or JAX respectively if `True`.</span>
 <span class="sd">    `self.is_notebook` and `self.is_colab` indicate if the environment is a notebook or colab environment.</span>
 <span class="sd">    `self.is_gpu` indicates if the environment is a GPU environment, `self.is_tpu` indicates if the</span>
 <span class="sd">    environment is a TPU environment, and `self.is_cpu` that no accelerator is available.</span>
 
 <span class="sd">    The logger `MLEnv` provdides details about the hardware and ml environment.</span>
 
-<span class="sd">    :param platform: Known platforms are: `&#39;tf&#39;` (tensorflow), `&#39;pt&#39;` (pytorch), and `&#39;jax&#39;`</span>
+<span class="sd">    :param platform: Known platforms are: `&#39;pt&#39;` (pytorch), `&#39;mlx&#39;`, and `&#39;jax&#39;`</span>
 <span class="sd">    :param accelerator: known accelerators are: `&#39;fastest&#39;` (pick best available hardware), `&#39;cpu&#39;`, `&#39;gpu&#39;`, `&#39;tpu&#39;`.</span>
 <span class="sd">    :param old_disable_eager: default &#39;False&#39;, on True, old v1 compatibility layer is used to disable eager mode.</span>
 <span class="sd">    According to rumors that might in resulting old codepaths being used?</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;tf&quot;</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;fastest&quot;</span><span class="p">,</span> <span class="n">old_disable_eager</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;fastest&quot;</span><span class="p">,</span> <span class="n">old_disable_eager</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;MLEnv&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">known_platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tf&quot;</span><span class="p">,</span> <span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="s2">&quot;jax&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known_platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="s2">&quot;jax&quot;</span><span class="p">,</span> <span class="s2">&quot;mlx&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">known_accelerators</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">,</span> <span class="s2">&quot;tpu&quot;</span><span class="p">,</span> <span class="s2">&quot;fastest&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">platform</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_platforms</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
@@ -87,12 +88,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">os_type</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#: Operating system type, e.g. `&#39;Linux&#39;`, `&#39;Darwin&#39;`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">py_version</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#: Python version, e.g. `&#39;3.7.3&#39;`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_conda</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if running in a conda environment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is_tensorflow</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if running on Tensorflow</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tf_version</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#: Tensorflow version, e.g. `&#39;2.7.0&#39;`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_pytorch</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if running on Pytorch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pt_version</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#: Pytorch version, e.g. `&#39;1.6.0&#39;`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_jax</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if running on Jax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">jax_version</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1">#: Jax version, e.g. `&#39;0.1.0&#39;`</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_mlx</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if running on MLX</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlx_version</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_cpu</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if no accelerator is available</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if a GPU is is available</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_tpu</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1">#: `True` if a TPU is is available</span>
@@ -108,113 +109,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">flush_timeout</span> <span class="o">=</span> <span class="mi">180</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_osenv</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_notebook_type</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;tf&quot;</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">is_tensorflow</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tf_version</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">__version__</span>
-            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tensorflow not available: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">return</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">tensorflow.python.profiler</span> <span class="kn">import</span> <span class="n">profiler_client</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">tf_prof</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tf_prof</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tensorflow version: </span><span class="si">{</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;tpu&quot;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;fastest&quot;</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>  <span class="c1"># XXX This fails in non-eager mode! Switch back?</span>
-                    <span class="n">tpu</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">tf</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">cluster_resolver</span><span class="o">.</span><span class="n">TPUClusterResolver</span><span class="p">()</span>
-                    <span class="p">)</span>  <span class="c1"># TPU detection</span>
-                    <span class="n">tpc</span> <span class="o">=</span> <span class="n">tpu</span><span class="o">.</span><span class="n">cluster_spec</span><span class="p">()</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()[</span><span class="s2">&quot;worker&quot;</span><span class="p">]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on TPU </span><span class="si">{</span><span class="n">tpc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">is_tpu</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="n">tpu</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="k">if</span> <span class="n">accelerator</span> <span class="o">!=</span> <span class="s2">&quot;fastest&quot;</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No TPU available&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tpu</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="c1"># Connect_to_cluster requires eager mode, so we can&#39;t call it after having switched to non-eager mode</span>
-                    <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">executing_eagerly</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="c1"># Typically, this is the case when running for the first time, afterwards, we went to non-eager mode</span>
-                        <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">experimental_connect_to_cluster</span><span class="p">(</span><span class="n">tpu</span><span class="p">)</span>
-                    <span class="n">tf</span><span class="o">.</span><span class="n">tpu</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">initialize_tpu_system</span><span class="p">(</span><span class="n">tpu</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">tpu_strategy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">TPUStrategy</span><span class="p">(</span><span class="n">tpu</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">tpu_num_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tpu_strategy</span><span class="o">.</span><span class="n">extended</span><span class="o">.</span><span class="n">worker_devices</span><span class="p">)</span>
-                    <span class="n">tpu_profile_service_address</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;COLAB_TPU_ADDR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                        <span class="s2">&quot;8470&quot;</span><span class="p">,</span> <span class="s2">&quot;8466&quot;</span>
-                    <span class="p">)</span>
-                    <span class="n">tpu_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;TPU, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tpu_num_nodes</span><span class="si">}</span><span class="s2"> nodes&quot;</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tf_prof</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="kn">from</span> <span class="nn">tensorflow.python.profiler</span> <span class="kn">import</span> <span class="n">profiler_client</span>
-
-                        <span class="n">state</span> <span class="o">=</span> <span class="n">profiler_client</span><span class="o">.</span><span class="n">monitor</span><span class="p">(</span>
-                            <span class="n">tpu_profile_service_address</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span>
-                        <span class="p">)</span>
-                        <span class="k">if</span> <span class="s2">&quot;TPU v2&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-                            <span class="n">tpu_type</span> <span class="o">=</span> <span class="p">(</span>
-                                <span class="n">tpu_type</span> <span class="o">+</span> <span class="s2">&quot; v2 (8GB)&quot;</span>
-                            <span class="p">)</span>  <span class="c1"># that&#39;s what you currently get on Colab</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                                <span class="s2">&quot;You got old TPU v2 which is limited to 8GB Ram.&quot;</span>
-                            <span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">tpu_type</span> <span class="o">=</span> <span class="n">tpu_type</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;TPU strategy available&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">old_disable_eager</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Switching to non-eager mode&quot;</span><span class="p">)</span>
-                        <span class="n">tf</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">disable_eager_execution</span><span class="p">()</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                            <span class="s2">&quot;TPU: eager execution disabled using old compat.v1 API!&quot;</span>
-                        <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tpu</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;gpu&quot;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;fastest&quot;</span><span class="p">:</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">dev_list</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">dev_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dev_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GPU not available&quot;</span><span class="p">)</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>
-                    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU not available: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="n">dev_list</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">dev_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dev_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">gpu_type</span> <span class="o">=</span> <span class="p">(</span>
-                                    <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">get_device_details</span><span class="p">(</span>
-                                        <span class="n">dev_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                    <span class="p">)[</span><span class="s2">&quot;device_name&quot;</span><span class="p">]</span>
-                                <span class="p">)</span>
-                            <span class="k">else</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>
-                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not get GPU type: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>
-                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                            <span class="k">try</span><span class="p">:</span>
-                                <span class="n">card</span> <span class="o">=</span> <span class="p">(</span>
-                                    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-                                        <span class="p">[</span><span class="s2">&quot;nvidia-smi&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
-                                    <span class="p">)</span>
-                                    <span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-                                    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-                                <span class="p">)</span>
-                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">card</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">:</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">gpu_memory</span> <span class="o">=</span> <span class="n">card</span><span class="p">[</span><span class="mi">9</span><span class="p">][</span><span class="mi">33</span><span class="p">:</span><span class="mi">54</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                                <span class="k">else</span><span class="p">:</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                                        <span class="sa">f</span><span class="s2">&quot;Could not get GPU type, unexpected output from nvidia-smi, lines=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">card</span><span class="p">)</span><span class="si">}</span><span class="s2">, content=</span><span class="si">{</span><span class="n">card</span><span class="si">}</span><span class="s2">&quot;</span>
-                                    <span class="p">)</span>
-                            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to determine GPU memory </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GPU available&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No GPU or TPU available, this is going to be very slow!&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;jax&quot;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">jax</span>
@@ -326,13 +220,13 @@
                 <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;gpu&quot;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;fastest&quot;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="s2">&quot;darwin&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">has_mps</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_built</span><span class="p">():</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">True</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Pytorch MPS acceleration detected.&quot;</span><span class="p">)</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">gpu_type</span> <span class="o">=</span> <span class="s2">&quot;MPS Metal accelerator&quot;</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">gpu_memory</span> <span class="o">=</span> <span class="s2">&quot;system memory&quot;</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                                    <span class="sa">f</span><span class="s2">&quot;Pytorch MPS acceleration detected: MPS=</span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">has_mps</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;Pytorch MPS acceleration detected: MPS=</span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_built</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
                                 <span class="p">)</span>
                                 <span class="k">return</span>
                         <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
@@ -372,6 +266,50 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No Pytorch CPU accelerator available.&quot;</span><span class="p">)</span>
                     <span class="k">return</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;mlx&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;darwin&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;MLX is only supported on MacOS.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">mlx.core</span> <span class="k">as</span> <span class="nn">mx</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_mlx</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mlx_version</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">__version__</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;MLX not installed or not available.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_mlx</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;gpu&quot;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;fastest&quot;</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">mx</span><span class="o">.</span><span class="n">set_default_device</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">DeviceType</span><span class="o">.</span><span class="n">gpu</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">default_device</span><span class="p">()</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;gpu&quot;</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MLX GPU, failed to set device type: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">return</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using MLX with GPU acceleration.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">gpu_type</span> <span class="o">=</span> <span class="s2">&quot;MLX GPU&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">gpu_memory</span> <span class="o">=</span> <span class="s2">&quot;system memory&quot;</span>
+                        <span class="k">return</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;MLX GPU not available.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_gpu</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;gpu&quot;</span><span class="p">:</span>
+                            <span class="k">return</span>
+                <span class="k">if</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;cpu&quot;</span> <span class="ow">or</span> <span class="n">accelerator</span> <span class="o">==</span> <span class="s2">&quot;fastest&quot;</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">mx</span><span class="o">.</span><span class="n">set_default_device</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">DeviceType</span><span class="o">.</span><span class="n">cpu</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_cpu</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">default_device</span><span class="p">()</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;cpu&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using MLX with CPU.&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MLX CPU, failed to set device type: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">is_cpu</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">return</span>
+                    <span class="k">return</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No MLX-Device, possibly internal error.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">_check_osenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">os_type</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
@@ -383,11 +321,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">is_conda</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_check_notebook_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function, use :func:`describe` instead</span>
-
-<span class="sd">        Note: for colab notebooks and tensorflow environemts, this function</span>
-<span class="sd">        will load tensorboard.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal function, use :func:`describe` instead&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;IPKernelApp&quot;</span> <span class="ow">in</span> <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">is_notebook</span> <span class="o">=</span> <span class="kc">True</span>
@@ -400,12 +334,6 @@
                 <span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">drive</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">is_colab</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tensorflow</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">&quot;load_ext&quot;</span><span class="p">,</span> <span class="s2">&quot;tensorboard&quot;</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">&quot;tensorflow_version&quot;</span><span class="p">,</span> <span class="s2">&quot;2.x&quot;</span><span class="p">)</span>
-                    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
-                        <span class="k">pass</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;You are on a Colab instance.&quot;</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">is_colab</span> <span class="o">=</span> <span class="kc">False</span>
@@ -414,7 +342,9 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_notebook</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_colab</span>
 
-<div class="viewcode-block" id="MLEnv.describe_osenv"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe_osenv">[docs]</a>    <span class="k">def</span> <span class="nf">describe_osenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MLEnv.describe_osenv">
+<a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe_osenv">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_osenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;OS: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">os_type</span><span class="si">}</span><span class="s2">, Python: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">py_version</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_conda</span><span class="p">:</span>
             <span class="n">desc</span> <span class="o">+=</span> <span class="s2">&quot; (Conda)&quot;</span>
@@ -425,13 +355,16 @@
                 <span class="n">desc</span> <span class="o">+=</span> <span class="s2">&quot;, Jupyter Notebook&quot;</span>
         <span class="k">return</span> <span class="n">desc</span></div>
 
-<div class="viewcode-block" id="MLEnv.describe_mlenv"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe_mlenv">[docs]</a>    <span class="k">def</span> <span class="nf">describe_mlenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tensorflow</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Tensorflow: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tf_version</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pytorch</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+<div class="viewcode-block" id="MLEnv.describe_mlenv">
+<a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe_mlenv">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_mlenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pytorch</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Pytorch: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pt_version</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_jax</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;JAX: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">jax_version</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_mlx</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;MLX: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mlx_version</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;(no-ml-platform) &quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_tpu</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -444,7 +377,10 @@
             <span class="n">desc</span> <span class="o">+=</span> <span class="s2">&quot;, CPU&quot;</span>
         <span class="k">return</span> <span class="n">desc</span></div>
 
-<div class="viewcode-block" id="MLEnv.describe"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MLEnv.describe">
+<a class="viewcode-back" href="../index.html#env_tools.MLEnv.describe">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints a description of the machine environment.</span>
 
 <span class="sd">        Returns:</span>
@@ -452,7 +388,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">describe_osenv</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">describe_mlenv</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MLEnv.mount_gdrive"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.mount_gdrive">[docs]</a>    <span class="k">def</span> <span class="nf">mount_gdrive</span><span class="p">(</span>
+
+<div class="viewcode-block" id="MLEnv.mount_gdrive">
+<a class="viewcode-back" href="../index.html#env_tools.MLEnv.mount_gdrive">[docs]</a>
+    <span class="k">def</span> <span class="nf">mount_gdrive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">mount_point</span><span class="o">=</span><span class="s2">&quot;/content/drive&quot;</span><span class="p">,</span> <span class="n">root_path</span><span class="o">=</span><span class="s2">&quot;/content/drive/My Drive&quot;</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_colab</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -480,7 +419,10 @@
             <span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span></div>
 
-<div class="viewcode-block" id="MLEnv.init_paths"><a class="viewcode-back" href="../index.html#env_tools.MLEnv.init_paths">[docs]</a>    <span class="k">def</span> <span class="nf">init_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MLEnv.init_paths">
+<a class="viewcode-back" href="../index.html#env_tools.MLEnv.init_paths">[docs]</a>
+    <span class="k">def</span> <span class="nf">init_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the paths for the project.</span>
 
 <span class="sd">        Depending on if this is a Colab environment or not, persistent data will be stored in either</span>
@@ -540,7 +482,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_path</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="p">)</span></div>
+</div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -558,7 +502,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -572,14 +516,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.3.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ml-indie-tools 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">env_tools</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2022, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    &#169; Copyright 2022-2024, dsc.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>
