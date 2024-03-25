@@ -1,6 +1,16 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name="ml-indie-tools"
+description="A collection of tools for low-resource indie machine learning development"
+version="0.11.0"
+authors= [{name = "Dominik Schlösser", email = "dominik.schloesser@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]

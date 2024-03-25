@@ -73,11 +73,18 @@ def save_checkpoint(
 ):
     params["current_epoch"] = current_epoch
     params["current_loss"] = current_loss
+
     state = {
         "params": params,
-        "model_states": model.state_dict(),
         "optimizer_states": optimizer.state_dict(),
     }
+
+    # Really? This fixes the fact that compiled models store their stuff in a _different_ place!
+    if hasattr(model, "_orig_mod"):  # means, model was compiled!
+        state["model_states"] = model._orig_mod.state_dict()
+    else:  # models was not compiled, 'standard' case.
+        state["model_states"] = model.state_dict()
+
     torch.save(state, file_path)
     if log is not None:
         log.info(f"Saved model to {file_path}")
