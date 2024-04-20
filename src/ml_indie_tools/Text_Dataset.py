@@ -454,8 +454,11 @@ class Text_Dataset:
             num_texts = len(self.text_list)
             for index, text in enumerate(self.text_list):
                 pbar = self.progress_bar_string(index, num_texts, 20)
+                title = text["title"]
+                if len(title) > 40:
+                    title = title[:37] + "..."
                 print(
-                    f"{index+1:4d} ⦊{pbar}⦉ {text['title'][:40]:40s}                  ",
+                    f"{index+1:4d} ⦊{pbar}⦉ [{title:40s}]                  ",
                     end="\r",
                 )
                 bytetext = bytearray(text["text"], "utf-8")
@@ -466,8 +469,11 @@ class Text_Dataset:
                         )
                         eg_dict.update(bytegrams)
                         pbar2 = self.progress_bar_string(i, len(bytetext), 10)
+                        title = text["title"]
+                        if len(title) > 30:
+                            title = title[:27] + "..."
                         print(
-                            f"{index+1:4d} ⦊{pbar}⦉ {text['title'][:30]:30s}, ⦊{pbar2}⦉",
+                            f"{index+1:4d} ⦊{pbar}⦉ [{title:30s}], ⦊{pbar2}⦉",
                             end="\r",
                         )
                         # if i > chunk_size:  # less verbose
