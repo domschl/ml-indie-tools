@@ -68,6 +68,32 @@ class Text_Dataset:
                 preserve_case=preserve_case,
             )
 
+    @staticmethod
+    def progress_bar_string(progress, max_progress, bar_length=20):
+        """Create a Unicode progress bar string
+
+        This creates a string of length bar_length with a Unicode progress bar using
+        fractional Unicode block characters. The returned string is always of constant
+        length and is suitable for printing to a terminal or notebook.
+
+        This pretty much obsoletes the `tqdm` or similar package for simple progress bars.
+
+        :param progress: current progress
+        :param max_progress: maximum progress
+        :param bar_length: length of the progress bar
+        :return: Unicode progress bar string of length `bar_length`
+        """
+        progress_frac = progress / max_progress
+        num_blocks = int(bar_length * progress_frac)
+        rem = bar_length * progress_frac - num_blocks
+        blocks = " ▏▎▍▌▋▊▉█"
+        remainder_index = int(rem * len(blocks))
+        bar = blocks[-1] * num_blocks
+        if remainder_index > 0:
+            bar += blocks[remainder_index]
+        bar += " " * (bar_length - len(bar))
+        return bar
+
     def load_texts(
         self,
         text_list,
@@ -425,7 +451,10 @@ class Text_Dataset:
             self.log.info("Corpus from byte texts created.")
             self.word_list = None
             eg_dict = Counter()
-            for text in self.text_list:
+            num_texts = len(self.text_list)
+            for index, text in enumerate(self.text_list):
+                pbar = self.progress_bar_string(index, num_texts, 20)
+                print(f"{index+1:4d} {pbar} {text['title'][:40]:40s}", end="\r")
                 bytetext = bytearray(text["text"], "utf-8")
                 if chunk_size is not None:
                     for i in range(0, len(bytetext), chunk_size):
@@ -433,17 +462,22 @@ class Text_Dataset:
                             bytetext[i : i + chunk_size], max_len=max_ngrams
                         )
                         eg_dict.update(bytegrams)
-                        if i > chunk_size:  # less verbose
-                            print(
-                                f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r"
-                            )
+                        pbar2 = self.progress_bar_string(i, len(bytetext), 10)
+                        print(
+                            f"{index+1:4d} {pbar} {text['title'][:30]:30s} {pbar2}",
+                            end="\r",
+                        )
+                        # if i > chunk_size:  # less verbose
+                        #     print(
+                        #         f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r"
+                        #     )
                 else:
                     bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
                     eg_dict.update(bytegrams)
-                if len(bytetext) > 500000:
-                    self.log.info(
-                        f"Larger bytegrams calculated: {text['title']}: {len(bytetext)}, dict: {len(eg_dict.keys())}"
-                    )
+                # if len(bytetext) > 500000:
+                # self.log.info(
+                #     f"Larger bytegrams calculated: {text['title']}: {len(bytetext)}, dict: {len(eg_dict.keys())}"
+                # )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
 
