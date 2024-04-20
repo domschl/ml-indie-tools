@@ -454,7 +454,10 @@ class Text_Dataset:
             num_texts = len(self.text_list)
             for index, text in enumerate(self.text_list):
                 pbar = self.progress_bar_string(index, num_texts, 20)
-                title = text["title"]
+                if "alias" in text:
+                    title = text["alias"]
+                else:
+                    title = text["title"]
                 if len(title) > 40:
                     title = title[:37] + "..."
                 print(
@@ -466,7 +469,10 @@ class Text_Dataset:
                     for i in range(0, len(bytetext), chunk_size):
                         if len(bytetext) > chunk_size:
                             pbar2 = self.progress_bar_string(i, len(bytetext), 10)
-                            title = text["title"]
+                            if "alias" in text:
+                                title = text["alias"]
+                            else:
+                                title = text["title"]
                             if len(title) > 30:
                                 title = title[:27] + "..."
                             print(
@@ -517,18 +523,29 @@ class Text_Dataset:
             return
 
         self.log.info("Encoding text corpora")
-        for text in self.text_list:
-            if len(text["text"]) > 500000:
-                if "alias" in text:
-                    self.log.info(f"Encoding larger text {text['alias']}...")
-                else:
-                    self.log.info(f"Encoding larger text {text['title']}...")
+        for index, text in enumerate(self.text_list):
+            pbar = self.progress_bar_string(index, num_texts, 20)
+            if "alias" in text:
+                title = text["alias"]
+            else:
+                title = text["title"]
+            if len(title) > 40:
+                title = title[:37] + "..."
+            print(
+                f"{index+1:4d} ⦊{pbar}⦉ [{title:40s}]                  ",
+                end="\r",
+            )
+            # if len(text["text"]) > 500000:
+            #     if "alias" in text:
+            #         self.log.info(f"Encoding larger text {text['alias']}...")
+            #     else:
+            #         self.log.info(f"Encoding larger text {text['title']}...")
             if chunk_size is not None and len(text["text"]) > 2 * chunk_size:
                 textbody = text["text"]
                 text["text_encoded"] = []
                 for i in range(0, len(textbody), chunk_size):
-                    if i > chunk_size:  # less verbose
-                        print(f"Chunking: {i}/{chunk_size}/{len(textbody)}", end="\r")
+                    # if i > chunk_size:  # less verbose
+                    #    print(f"Chunking: {i}/{chunk_size}/{len(textbody)}", end="\r")
                     enc = self.encode(textbody[i : i + chunk_size])
                     text["text_encoded"] = text["text_encoded"] + enc
             else:
