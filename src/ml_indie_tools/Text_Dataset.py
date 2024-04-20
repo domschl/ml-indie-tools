@@ -729,7 +729,9 @@ class Text_Dataset:
         elif self.tokenizer_type == "ngram":
             dec = ""
             for ind in encoded:
-                if ind == self.t2i["<wsep>"]:  # Separator
+                if (
+                    ind == self.t2i["<wsep>"] and self.word_separator is not None
+                ):  # Separator
                     dec += self.word_separator
                 elif ind == self.t2i["<unk>"]:  # Unknown token
                     dec += "<unk>"
@@ -750,6 +752,7 @@ class Text_Dataset:
                         bdec = []
                     if (
                         ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]
+                        and self.word_separator is not None
                     ):  # Separator
                         dec += self.word_separator
                     elif (
