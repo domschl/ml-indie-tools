@@ -464,10 +464,6 @@ class Text_Dataset:
                 bytetext = bytearray(text["text"], "utf-8")
                 if chunk_size is not None:
                     for i in range(0, len(bytetext), chunk_size):
-                        bytegrams = self._every_bytegram(
-                            bytetext[i : i + chunk_size], max_len=max_ngrams
-                        )
-                        eg_dict.update(bytegrams)
                         pbar2 = self.progress_bar_string(i, len(bytetext), 10)
                         title = text["title"]
                         if len(title) > 30:
@@ -476,6 +472,10 @@ class Text_Dataset:
                             f"{index+1:4d} ⦊{pbar}⦉ [{title:30s}], ⦊{pbar2}⦉",
                             end="\r",
                         )
+                        bytegrams = self._every_bytegram(
+                            bytetext[i : i + chunk_size], max_len=max_ngrams
+                        )
+                        eg_dict.update(bytegrams)
                         # if i > chunk_size:  # less verbose
                         #     print(
                         #         f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r"
