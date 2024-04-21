@@ -383,7 +383,7 @@ class MultiHeadSelfAttention(nn.Module):
 
         return logits, loss
 
-    def context(self, idx, depth):
+    def context(self, idx):
         B, T = idx.shape
         # idx is (B,T) tensor of integers
         tok_emb = self.token_embedding_table(idx)  # (B,T,C)
