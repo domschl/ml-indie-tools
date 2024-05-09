@@ -29,17 +29,19 @@ class TrainUtils:
                     f"indralib is required to use the indraserver_profile: {e}"
                 )
                 self.indraserver_profile = None
+        else:
+            self.log.error("No indraserver_profile provided")
+            return False
         if self.indraserver_profile is not None:
             self.icl = IndraClient(verbose=False, profile="default")
         if self.icl is None:
             logging.error("Could not create Indrajala client")
-        if self.icl is None:
-            logging.error("No Indrajala client")
-            return
+            return False
         ws = await self.icl.init_connection(verbose=False)
         if ws is None:
             logging.error("Could not connect to Indrajala")
             self.indraserver_profile = None
+            return False
         else:
             self.indra_active = True
             self.log.info(f"Connected to Indrajala server {indraserver_profile}")
@@ -48,10 +50,15 @@ class TrainUtils:
                 if self.session_id is None:
                     self.log.error("Could not log in to Indrajala")
                     self.indra_active = False
+                    return False
                 else:
                     self.log.info(
                         f"Logged in to Indrajala as {username}, session {self.session_id}"
                     )
+                    return True
+            else:
+                self.log.error("No username and password provided")
+                return False
 
     @staticmethod
     def progress_bar_string(progress, max_progress, bar_length=20):
