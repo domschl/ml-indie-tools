@@ -1,5 +1,4 @@
 import logging
-import asyncio
 import math
 from datetime import datetime
 from datetime import timezone
@@ -27,7 +26,7 @@ class TrainUtils:
                 from indralib.indra_client import IndraClient  # type: ignore
             except Exception as e:
                 self.log.error(
-                    "indralib is required to use the indraserver_profile: {e}"
+                    f"indralib is required to use the indraserver_profile: {e}"
                 )
                 self.indraserver_profile = None
         if self.indraserver_profile is not None:
@@ -43,7 +42,7 @@ class TrainUtils:
             self.indraserver_profile = None
         else:
             self.indra_active = True
-            self.log.info("Connected to Indrajala server {indraserver_profile}")
+            self.log.info(f"Connected to Indrajala server {indraserver_profile}")
 
     @staticmethod
     def progress_bar_string(progress, max_progress, bar_length=20):
@@ -133,11 +132,11 @@ class TrainUtils:
         val_loss=None,
         mean_loss_window=20,
     ):
-        if not self.train_session_active:
+        if self.train_session_active is False:
             self.log.error(
-                "No active training session: use train_session_start() first"
+                "No active training session at train_state(): use train_session_start() first"
             )
-            return
+            return "n/a"
         # Calculate perplexity, accuracy from loss:
         perplexity = math.exp(loss)
         if val_loss is not None:
@@ -165,10 +164,7 @@ class TrainUtils:
         self.model_loss_history.append(record)
 
         if self.indra_active:
-            if self.indra_domain is None:
-                self.log.error("No Indrajala domain set")
-            else:
-                await self.indra_report(record)
+            await self.indra_report(record)
 
         pbar = self.progress_bar_string(current_batch, num_batches)
 
