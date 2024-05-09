@@ -14,7 +14,7 @@ class TrainUtils:
         self.icl = None
         self.train_session_active = False
 
-    async def init_indra(self, indraserver_profile):
+    async def init_indra(self, indraserver_profile, username=None, password=None):
         self.indraserver_profile = None
         self.indra_active = False
         self.icl = None
@@ -41,6 +41,15 @@ class TrainUtils:
         else:
             self.indra_active = True
             self.log.info(f"Connected to Indrajala server {indraserver_profile}")
+            if username is not None and password is not None:
+                indra_session = await self.icl.login_wait(username, password)
+                if indra_session is None:
+                    self.log.error("Could not log in to Indrajala")
+                    self.indra_active = False
+                else:
+                    self.log.info(
+                        f"Logged in to Indrajala as {username}, session {indra_session}"
+                    )
 
     @staticmethod
     def progress_bar_string(progress, max_progress, bar_length=20):
