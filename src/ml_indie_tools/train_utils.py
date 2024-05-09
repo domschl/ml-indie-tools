@@ -13,11 +13,13 @@ class TrainUtils:
         self.indra_active = False
         self.icl = None
         self.train_session_active = False
+        self.session_id = None
 
     async def init_indra(self, indraserver_profile, username=None, password=None):
         self.indraserver_profile = None
         self.indra_active = False
         self.icl = None
+        self.session_id = None
         if indraserver_profile is not None:
             self.indraserver_profile = indraserver_profile
             try:
@@ -42,13 +44,13 @@ class TrainUtils:
             self.indra_active = True
             self.log.info(f"Connected to Indrajala server {indraserver_profile}")
             if username is not None and password is not None:
-                indra_session = await self.icl.login_wait(username, password)
-                if indra_session is None:
+                self.session_id = await self.icl.login_wait(username, password)
+                if self.session_id is None:
                     self.log.error("Could not log in to Indrajala")
                     self.indra_active = False
                 else:
                     self.log.info(
-                        f"Logged in to Indrajala as {username}, session {indra_session}"
+                        f"Logged in to Indrajala as {username}, session {self.session_id}"
                     )
 
     @staticmethod
@@ -122,6 +124,7 @@ class TrainUtils:
         event.to_scope = "public"
         event.data_type = "json/ml/trainrecord"
         event.data = json.dumps(record)
+        event.auth_hash = self.session_id
         await self.icl.send_event(event)
 
         event = IndraEvent()
@@ -130,6 +133,7 @@ class TrainUtils:
         event.to_scope = "public"
         event.data_type = "number/float"
         event.data = json.dumps(record["mean_loss"])
+        event.auth_hash = self.session_id
         await self.icl.send_event(event)
 
     async def train_state(
