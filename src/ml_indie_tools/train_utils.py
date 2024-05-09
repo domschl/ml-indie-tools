@@ -18,12 +18,10 @@ class TrainUtils:
         self.indraserver_profile = None
         self.indra_active = False
         self.icl = None
-        self.train_session_active = False
         if indraserver_profile is not None:
             self.indraserver_profile = indraserver_profile
             try:
-                from indralib.indra_event import IndraEvent  # type: ignore
-                from indralib.indra_client import IndraClient  # type: ignore
+                from indralib.indra_client import IndraClient
             except Exception as e:
                 self.log.error(
                     f"indralib is required to use the indraserver_profile: {e}"
@@ -107,6 +105,8 @@ class TrainUtils:
         if not self.indra_active:
             self.log.error("Indrajala not active")
             return
+        from indralib.indra_event import IndraEvent
+
         event = IndraEvent()
         event.domain = f"$event/ml/model/train/{self.indra_subdomain}/record"
         event.from_id = "python/ml_indie_tools"
