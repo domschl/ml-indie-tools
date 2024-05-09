@@ -149,7 +149,6 @@ class TrainUtils:
             val_accuracy = 1 - val_loss
         else:
             val_accuracy = None
-        self.model_loss_history.append(record)
         self.losses = np.append(self.losses, loss)
         mean_loss = np.mean(self.losses[-mean_loss_window:])
         record = {
@@ -163,6 +162,7 @@ class TrainUtils:
             "val_accuracy": val_accuracy,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+        self.model_loss_history.append(record)
 
         if self.indra_active:
             if self.indra_domain is None:
