@@ -8,11 +8,18 @@ import json
 
 
 class TrainUtils:
-    def __init__(self, indraserver_profile=None):
+    def __init__(self):
         self.log = logging.getLogger(__name__)
         self.indraserver_profile = None
         self.indra_active = False
         self.icl = None
+        self.train_session_active = False
+
+    async def init_indra(self, indraserver_profile):
+        self.indraserver_profile = None
+        self.indra_active = False
+        self.icl = None
+        self.train_session_active = False
         if indraserver_profile is not None:
             self.indraserver_profile = indraserver_profile
             try:
@@ -27,8 +34,6 @@ class TrainUtils:
             self.icl = IndraClient(verbose=False, profile="default")
         if self.icl is None:
             logging.error("Could not create Indrajala client")
-
-    async def init_indra(self):
         if self.icl is None:
             logging.error("No Indrajala client")
             return
