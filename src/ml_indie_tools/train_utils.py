@@ -27,10 +27,11 @@ class TrainUtils:
             self.icl = IndraClient(verbose=False, profile="default")
         if self.icl is None:
             logging.error("Could not create Indrajala client")
-        else:
-            asyncio.run(self.init_indra())
 
     async def init_indra(self):
+        if self.icl is None:
+            logging.error("No Indrajala client")
+            return
         ws = await self.icl.init_connection(verbose=False)
         if ws is None:
             logging.error("Could not connect to Indrajala")
@@ -118,7 +119,7 @@ class TrainUtils:
         event.data = json.dumps(record["mean_loss"])
         await self.icl.send_event(event)
 
-    def train_state(
+    async def train_state(
         self,
         current_epoch,
         current_batch,
@@ -162,7 +163,7 @@ class TrainUtils:
             if self.indra_domain is None:
                 self.log.error("No Indrajala domain set")
             else:
-                asyncio.run(self.indra_report(record))
+                await self.indra_report(record)
 
         pbar = self.progress_bar_string(current_batch, num_batches)
 
