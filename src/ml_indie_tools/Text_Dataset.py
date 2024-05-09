@@ -8,6 +8,8 @@ try:
 except ImportError:
     pass
 
+from ml_indie_tools.train_utils import TrainUtils
+
 
 class Text_Dataset:
     """Initialize the Text_Dataset with a list of texts.
@@ -67,32 +69,6 @@ class Text_Dataset:
                 separate_punctuation=separate_punctuation,
                 preserve_case=preserve_case,
             )
-
-    @staticmethod
-    def progress_bar_string(progress, max_progress, bar_length=20):
-        """Create a Unicode progress bar string
-
-        This creates a string of length bar_length with a Unicode progress bar using
-        fractional Unicode block characters. The returned string is always of constant
-        length and is suitable for printing to a terminal or notebook.
-
-        This pretty much obsoletes the `tqdm` or similar package for simple progress bars.
-
-        :param progress: current progress
-        :param max_progress: maximum progress
-        :param bar_length: length of the progress bar
-        :return: Unicode progress bar string of length `bar_length`
-        """
-        progress_frac = progress / max_progress
-        num_blocks = int(bar_length * progress_frac)
-        rem = bar_length * progress_frac - num_blocks
-        blocks = " ▏▎▍▌▋▊▉█"
-        remainder_index = int(rem * len(blocks))
-        bar = blocks[-1] * num_blocks
-        if remainder_index > 0:
-            bar += blocks[remainder_index]
-        bar += " " * (bar_length - len(bar))
-        return bar
 
     def load_texts(
         self,
@@ -453,7 +429,7 @@ class Text_Dataset:
             eg_dict = Counter()
             num_texts = len(self.text_list)
             for index, text in enumerate(self.text_list):
-                pbar = self.progress_bar_string(index, num_texts, 20)
+                pbar = TrainUtils.progress_bar_string(index, num_texts, 20)
                 if "alias" in text:
                     title = text["alias"]
                 else:
@@ -468,7 +444,7 @@ class Text_Dataset:
                 if chunk_size is not None:
                     for i in range(0, len(bytetext), chunk_size):
                         if len(bytetext) > chunk_size:
-                            pbar2 = self.progress_bar_string(i, len(bytetext), 10)
+                            pbar2 = TrainUtils.progress_bar_string(i, len(bytetext), 10)
                             if "alias" in text:
                                 title = text["alias"]
                             else:
@@ -524,7 +500,7 @@ class Text_Dataset:
 
         self.log.info("Encoding text corpora")
         for index, text in enumerate(self.text_list):
-            pbar = self.progress_bar_string(index, num_texts, 20)
+            pbar = TrainUtils.progress_bar_string(index, num_texts, 20)
             if "alias" in text:
                 title = text["alias"]
             else:
