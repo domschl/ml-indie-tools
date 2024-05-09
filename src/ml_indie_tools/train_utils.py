@@ -12,13 +12,16 @@ class TrainUtils:
         self.log = logging.getLogger(__name__)
         self.indraserver_profile = None
         self.indra_active = False
+        self.icl = None
         if indraserver_profile is not None:
             self.indraserver_profile = indraserver_profile
             try:
                 from indralib.indra_event import IndraEvent  # type: ignore
                 from indralib.indra_client import IndraClient  # type: ignore
-            except ImportError:
-                self.log.error("indralib is required to use the indraserver_profile")
+            except Exception as e:
+                self.log.error(
+                    "indralib is required to use the indraserver_profile: {e}"
+                )
                 self.indraserver_profile = None
         if self.indraserver_profile is not None:
             self.icl = IndraClient(verbose=False, profile="default")
