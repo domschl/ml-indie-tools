@@ -115,7 +115,7 @@ class TrainUtils:
 
         self.indra_queue = queue.Queue()
         self.indra_thread_running = True
-        sync_indra = threading.Thread(
+        self.sync_indra = threading.Thread(
             target=self.sync_logger_worker,
             name="_sync_logger_worker",
             args=[],
