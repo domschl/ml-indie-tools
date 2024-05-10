@@ -143,7 +143,7 @@ class TrainUtils:
         event.auth_hash = self.session_id
         await self.icl.send_event(event)
 
-    async def train_state(
+    def train_state(
         self,
         current_epoch,
         current_batch,
@@ -183,10 +183,12 @@ class TrainUtils:
         }
         self.model_loss_history.append(record)
 
-        if self.indra_active:
-            await self.indra_report(record)
-
         pbar = self.progress_bar_string(current_batch, num_batches)
 
         status_string = f"{current_batch:6d} ⦊{pbar}⦉ loss: {mean_loss:.4f}    "
-        return status_string
+        return status_string, record
+
+
+async def register_train_state(record):
+    if self.indra_active:
+        await self.indra_report(record)
