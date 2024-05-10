@@ -188,7 +188,6 @@ class TrainUtils:
         status_string = f"{current_batch:6d} ⦊{pbar}⦉ loss: {mean_loss:.4f}    "
         return status_string, record
 
-
-async def register_train_state(record):
-    if self.indra_active:
-        await self.indra_report(record)
+    async def register_train_state(self, record):
+        if self.indra_active:
+            await self.indra_report(record)
