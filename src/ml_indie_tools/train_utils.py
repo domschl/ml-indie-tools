@@ -4,6 +4,9 @@ from datetime import datetime
 from datetime import timezone
 import numpy as np
 import json
+import queue
+import threading
+import asyncio
 
 
 class TrainUtils:
@@ -109,9 +112,32 @@ class TrainUtils:
         self.indra_subdomain = indra_subdomain
         self.model_loss_history = []
         self.losses = np.array([])
+
+        self.indra_queue = queue.Queue()
+        self.indra_thread_running = True
+        sync_indra = threading.Thread(
+            target=self.sync_logger_worker,
+            name="_sync_logger_worker",
+            args=[],
+            daemon=True,
+        )
+        self.sync_indra.start()
+
         self.train_session_active = True
 
+    def sync_logger_worker(self):
+        self.log.info("Starting indra thread")
+        while self.indra_thread_running is True:
+            try:
+                rec = self.indra_queue.get(timeout=0.01)
+            except queue.Empty:
+                continue
+            asyncio.run(self.register_train_state(rec))
+            self.indra_queue.task_done()
+        self.log.info("Stopped indra thread")
+
     def train_session_end(self):
+        self.indra_thread_running = False
         if not self.train_session_active:
             self.log.error(
                 "No active training session: use train_session_start() first"
@@ -182,6 +208,9 @@ class TrainUtils:
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.model_loss_history.append(record)
+
+        if self.indra_active:
+            self.indra_queue.put(record)
 
         pbar = self.progress_bar_string(current_batch, num_batches)
 
