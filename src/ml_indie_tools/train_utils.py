@@ -10,21 +10,21 @@ import asyncio
 
 
 class TrainUtils:
-    def __init__(self):
+    def __init__(self, indra_server_profile=None, username=None, password=None):
         self.log = logging.getLogger(__name__)
-        self.indraserver_profile = None
+        self.indraserver_profile = indra_server_profile
+        self.username = username
+        self.password = password
         self.indra_active = False
         self.icl = None
         self.train_session_active = False
         self.session_id = None
 
-    async def init_indra(self, indraserver_profile, username=None, password=None):
-        self.indraserver_profile = None
+    async def init_indra(self):
         self.indra_active = False
         self.icl = None
         self.session_id = None
-        if indraserver_profile is not None:
-            self.indraserver_profile = indraserver_profile
+        if self.indraserver_profile is not None:
             try:
                 from indralib.indra_client import IndraClient
             except Exception as e:
@@ -33,34 +33,44 @@ class TrainUtils:
                 )
                 self.indraserver_profile = None
         else:
-            self.log.error("No indraserver_profile provided")
+            self.log.debug("No indraserver_profile provided")
             return False
         if self.indraserver_profile is not None:
-            self.icl = IndraClient(verbose=False, profile="default")
+            self.icl = IndraClient(verbose=False, profile=self.indra_server_profile)
         if self.icl is None:
-            logging.error("Could not create Indrajala client")
+            logging.error(
+                f"Could not create Indrajala client with profile {self.indraserver_profile}"
+            )
             return False
         ws = await self.icl.init_connection(verbose=False)
         if ws is None:
-            logging.error("Could not connect to Indrajala")
+            logging.error(
+                f"Could not connect to Indrajala with profile {self.indraserver_profile}"
+            )
             self.indraserver_profile = None
             return False
         else:
             self.indra_active = True
-            self.log.info(f"Connected to Indrajala server {indraserver_profile}")
-            if username is not None and password is not None:
-                self.session_id = await self.icl.login_wait(username, password)
+            self.log.info(f"Connected to Indrajala server {self.indraserver_profile}")
+            if self.username is not None and self.password is not None:
+                self.session_id = await self.icl.login_wait(
+                    self.username, self.password
+                )
                 if self.session_id is None:
-                    self.log.error("Could not log in to Indrajala")
+                    self.log.error(
+                        f"Could not log in to Indrajala with {self.username}"
+                    )
                     self.indra_active = False
                     return False
                 else:
                     self.log.info(
-                        f"Logged in to Indrajala as {username}, session {self.session_id}"
+                        f"Logged in to Indrajala as {self.username}, session {self.session_id}"
                     )
                     return True
             else:
-                self.log.error("No username and password provided")
+                self.log.error(
+                    f"No username and/or password provided, cannot log in to Indrajala profile {self.indraserver_profile}"
+                )
                 return False
 
     @staticmethod
@@ -102,6 +112,7 @@ class TrainUtils:
                 "Training session already active, closing existing session"
             )
             self.train_session_end()
+
         self.model_name = model_name
         self.model_description = model_description
         self.model_version = model_version
@@ -113,20 +124,27 @@ class TrainUtils:
         self.model_loss_history = []
         self.losses = np.array([])
 
-        self.indra_queue = queue.Queue()
-        self.indra_thread_running = True
-        self.sync_indra = threading.Thread(
-            target=self.sync_logger_worker,
-            name="_sync_logger_worker",
-            args=[],
-            daemon=True,
-        )
-        self.sync_indra.start()
+        if self.indraserver_profile is not None:
+            self.indra_queue = queue.Queue()
+            self.indra_thread_running = True
+            self.sync_indra = threading.Thread(
+                target=self.sync_logger_worker,
+                name="_sync_logger_worker",
+                args=[],
+                daemon=True,
+            )
+            self.sync_indra.start()
 
         self.train_session_active = True
 
     def sync_logger_worker(self):
         self.log.info("Starting indra thread")
+        if self.indra_active is False:
+            indra_inited = asyncio.run(self.init_indra())
+            if indra_inited is False:
+                self.log.error("Could not initialize Indrajala, stopping indra thread")
+                self.indra_thread_running = False
+                return
         while self.indra_thread_running is True:
             try:
                 rec = self.indra_queue.get(timeout=0.01)
