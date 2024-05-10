@@ -141,21 +141,28 @@ class TrainUtils:
 
     def sync_logger_worker(self):
         self.log.info("Starting indra thread")
+        asyncio.run(self.async_logger_worker())
+        self.log.info("Stopped indra thread, async_logger_worker() returned")
+
+    async def async_logger_worker(self):
         if self.indra_active is False:
-            indra_inited = asyncio.run(self.init_indra())
+            indra_inited = await self.init_indra()
             if indra_inited is False:
-                self.log.error("Could not initialize Indrajala, stopping indra thread")
+                self.log.error(
+                    "Could not initialize Indrajala, stopping indra async thread"
+                )
                 self.indra_thread_running = False
                 return
         while self.indra_thread_running is True:
             try:
-                rec = self.indra_queue.get(timeout=0.01)
+                rec = self.indra_queue.get_nowait()
             except queue.Empty:
+                await asyncio.sleep(0.01)
                 continue
-            asyncio.run(self.register_train_state(rec))
+            await self.register_train_state(rec)
             self.indra_queue.task_done()
-        self.icl.close_connection()
-        self.log.info("Stopped indra thread")
+        await self.icl.close_connection()
+        self.log.info("Stopped indra thread (async_logger_worker)")
 
     def train_session_end(self):
         self.indra_thread_running = False
