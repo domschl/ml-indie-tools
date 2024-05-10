@@ -125,6 +125,7 @@ class TrainUtils:
         self.indra_subdomain = indra_subdomain
         self.model_loss_history = []
         self.losses = np.array([])
+        self.train_session_active = True
 
         if self.indra_server_profile is not None:
             self.indra_queue = queue.Queue()
@@ -136,8 +137,6 @@ class TrainUtils:
                 daemon=True,
             )
             self.sync_indra.start()
-
-        self.train_session_active = True
 
     def sync_logger_worker(self):
         self.log.info("Starting indra thread")
@@ -210,7 +209,7 @@ class TrainUtils:
             self.log.error(
                 "No active training session at train_state(): use train_session_start() first"
             )
-            return "n/a"
+            return "n/a", None
         # Calculate perplexity, accuracy from loss:
         perplexity = math.exp(loss)
         if val_loss is not None:
