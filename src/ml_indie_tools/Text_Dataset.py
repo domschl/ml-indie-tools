@@ -211,7 +211,7 @@ class Text_Dataset:
             return False
 
     def _every_bytegram(
-        self, bytetext, max_len, add_special_words=True, check_valid=True
+        self, bytetext, max_len, min_len=2, add_special_words=True, check_valid=True
     ):
         """Return all ngrams of length 1..max_len from text.
 
@@ -221,24 +221,21 @@ class Text_Dataset:
         """
         if check_valid is True:
             ngrams = [
-                tuple(bytetext[i : i + j + 1])
-                for i in range(len(bytetext))
-                for j in range(0, min(len(bytetext) - i, max_len))
-                if self._is_valid_utf8(tuple(bytetext[i : i + j + 1]))
+                tuple(bytetext[i:j])
+                for i in range(len(bytetext) - min_len + 1)
+                for j in range(i + min_len, i + max_len + 1)
+                if self._is_valid_utf8(tuple(bytetext[i:j]))
             ]
         else:
             ngrams = [
-                tuple(bytetext[i : i + j + 1])
-                for i in range(len(bytetext))
-                for j in range(0, min(len(bytetext) - i, max_len))
-                # Only tuples of length 2..max_len are used, since length 1 is already covered by the raw-byte tokens 0..255
-                # for j in range(1, min(len(bytetext) - i, max_len))
+                tuple(bytetext[i:j])
+                for i in range(len(bytetext) - min_len + 1)
+                for j in range(i + min_len, i + max_len + 1)
             ]
-
-        for i in range(0, 256):
-            if (i,) in ngrams:
-                ngrams.remove((i,))
-                # print(f"Removed {i}")
+        # for i in range(0, 256):
+        #     if (i,) in ngrams:
+        #         ngrams.remove((i,))
+        #         # print(f"Removed {i}")
 
         if add_special_words is True:
             sng = [tuple(bytearray(sw, "utf-8")) for sw in self.special_words]
