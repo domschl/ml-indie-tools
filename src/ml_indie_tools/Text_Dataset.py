@@ -618,7 +618,7 @@ class Text_Dataset:
             self.text_list = data["text_list"]
         self.log.info("Loading tokenizer done.")
 
-    def tokenize(self, text):
+    def tokenize(self, text: str):
         """Tokenize a text.
 
         :param text: text to tokenize
@@ -721,7 +721,7 @@ class Text_Dataset:
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return tokens
 
-    def encode(self, text):
+    def encode(self, text: str):
         """Encode a text.
 
         :param text: text to encode

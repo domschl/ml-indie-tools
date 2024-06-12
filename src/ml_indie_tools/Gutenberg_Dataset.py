@@ -683,11 +683,14 @@ class Gutenberg_Dataset:
         :returns: list of records including filtered book text-based in the `text` field.
         """
         dls = 0
+        delete_ids = []
         for i in range(0, len(search_dict)):
             if search_dict[i]["ebook_id"] in skip_ids:
                 self.log.debug(
                     f"Skipping id={search_dict[i]['ebook_id']}, {search_dict[i]['title']}"
                 )
+                # delete entry from search_dict
+                delete_ids.append(i)
                 continue
             self.log.debug(
                 f"Getting id={search_dict[i]['ebook_id']}, {search_dict[i]['title']}"
@@ -711,6 +714,10 @@ class Gutenberg_Dataset:
                         f"Download limit reached ({download_count_limit}), stopping download..."
                     )
                     break
+        # reverse delete_ids to avoid index shifting
+        for i in reversed(delete_ids):
+            del search_dict[i]
+
         return search_dict
 
     def get_book(self, ebook_id: str):
