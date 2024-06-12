@@ -778,7 +778,7 @@ class Text_Dataset:
                         dec += "_"
             decoded_text = dec
         elif self.tokenizer_type == "bytegram":
-            dec_bytes = []
+            dec_bytes = b""
             bdec = []
             for ind in encoded:
                 if ind < 256:
