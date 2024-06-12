@@ -666,7 +666,7 @@ class Gutenberg_Dataset:
                 frecs += [rec]
         return frecs
 
-    def insert_book_texts(self, search_dict, download_count_limit=20):
+    def insert_book_texts(self, search_dict, download_count_limit=20, skip_ids=[]):
         """Inserts book texts into the records returned by :func:`~Gutenberg_Dataset.Gutenberg_Dataset.search`.
 
         In order to prevent the download of too many books, the download count limit is set to `download_count_limit`.
@@ -676,10 +676,19 @@ class Gutenberg_Dataset:
 
         :param search_dict: search array of dictionaries that at least contain the key `ebook_id`.
         :param download_count_limit: maximum number of books to download, if no local mirror is used. No limits apply for local mirrors.
+        :param skip_ids: list of ebook_ids (string format!) to skip downloading.
         :returns: list of records including filtered book text-based in the `text` field.
         """
         dls = 0
+        delete_ids = []
         for i in range(0, len(search_dict)):
+            if search_dict[i]["ebook_id"] in skip_ids:
+                self.log.debug(
+                    f"Skipping id={search_dict[i]['ebook_id']}, {search_dict[i]['title']}"
+                )
+                # delete entry from search_dict
+                delete_ids.append(i)
+                continue
             self.log.debug(
                 f"Getting id={search_dict[i]['ebook_id']}, {search_dict[i]['title']}"
             )
@@ -702,6 +711,10 @@ class Gutenberg_Dataset:
                         f"Download limit reached ({download_count_limit}), stopping download..."
                     )
                     break
+        # reverse delete_ids to avoid index shifting
+        for i in reversed(delete_ids):
+            del search_dict[i]
+
         return search_dict
 
     def get_book(self, ebook_id: str):

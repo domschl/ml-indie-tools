@@ -239,6 +239,7 @@ class MultiHeadSelfAttention(nn.Module):
     if not None.
     :param linear_non_linearity: the non-linearity to use in between the dual-linear layers,
     :param linear_residual: whether to use linear residual connection, default True (False is only active, if hidden_sizes[i] != embedding_size*4)
+    :param sub_block_index: the index of the block to split the model into two parts, for retrieval of context. If None, use all blocks, if zero, context is only the token embedding
     :param device: the device to use for training
     """
 
@@ -254,6 +255,7 @@ class MultiHeadSelfAttention(nn.Module):
         linear_hidden_sizes=None,
         linear_non_linearity="relu",
         linear_residual=True,
+        sub_block_index=None,
         device=None,
     ):
         super().__init__()
@@ -268,24 +270,63 @@ class MultiHeadSelfAttention(nn.Module):
         self.position_embedding_table = nn.Embedding(
             sequence_len, embedding_size, device=device
         )
+        self.sub_block_index = sub_block_index
         if linear_hidden_sizes is None:
             linear_hidden_sizes = []
         if len(linear_hidden_sizes) != num_layers:
-            self.blocks = nn.Sequential(
-                *[
-                    Block(
-                        embedding_size=embedding_size,
-                        sequence_len=sequence_len,
-                        dropout=dropout,
-                        num_heads=num_heads,
-                        causal=causal,
-                        linear_hidden_size=embedding_size * 4,
-                        linear_non_linearity=linear_non_linearity,
-                        device=device,
-                    )
-                    for _ in range(num_layers)
-                ]
-            )
+            if (
+                sub_block_index is not None
+                and sub_block_index > 0
+                and sub_block_index < num_layers
+            ):
+                self.blocks = nn.Sequential(
+                    *[
+                        Block(
+                            embedding_size=embedding_size,
+                            sequence_len=sequence_len,
+                            dropout=dropout,
+                            num_heads=num_heads,
+                            causal=causal,
+                            linear_hidden_size=embedding_size * 4,
+                            linear_non_linearity=linear_non_linearity,
+                            device=device,
+                        )
+                        for _ in range(sub_block_index)
+                    ]
+                )
+                self.blocks2 = nn.Sequential(
+                    *[
+                        Block(
+                            embedding_size=embedding_size,
+                            sequence_len=sequence_len,
+                            dropout=dropout,
+                            num_heads=num_heads,
+                            causal=causal,
+                            linear_hidden_size=embedding_size * 4,
+                            linear_non_linearity=linear_non_linearity,
+                            device=device,
+                        )
+                        for _ in range(num_layers - sub_block_index)
+                    ]
+                )
+
+            else:
+                self.blocks = nn.Sequential(
+                    *[
+                        Block(
+                            embedding_size=embedding_size,
+                            sequence_len=sequence_len,
+                            dropout=dropout,
+                            num_heads=num_heads,
+                            causal=causal,
+                            linear_hidden_size=embedding_size * 4,
+                            linear_non_linearity=linear_non_linearity,
+                            device=device,
+                        )
+                        for _ in range(num_layers)
+                    ]
+                )
+                self.blocks2 = None
         else:
             blks = []
             for i in range(num_layers):
@@ -327,6 +368,8 @@ class MultiHeadSelfAttention(nn.Module):
 
         x = tok_emb + pos_emb  # (B,T,C)
         x = self.blocks(x)  # (B,T,C)
+        if self.blocks2 is not None:
+            x = self.blocks2(x)
         x = self.ln_f(x)  # (B,T,C)
         logits = self.lm_head(x)  # (B,T,vocab_size)
 
@@ -339,6 +382,30 @@ class MultiHeadSelfAttention(nn.Module):
             loss = F.cross_entropy(logits, targets)
 
         return logits, loss
+
+    def context(self, idx):
+        B, T = idx.shape
+        # idx is (B,T) tensor of integers
+        tok_emb = self.token_embedding_table(idx)  # (B,T,C)
+
+        # XXX: move to init, make not trainable:
+        if self.sub_block_index != 0:
+            if self.device is None:
+                pos_emb = self.position_embedding_table(torch.arange(T))
+            else:
+                pos_emb = self.position_embedding_table(
+                    torch.arange(T, device=self.device)
+                )  # (T,C)
+            x = tok_emb + pos_emb  # (B,T,C)
+            x = self.blocks(x)  # (B,T,C)
+        else:
+            x = tok_emb
+        return x
+
+    def embedding(self, idx):
+        # idx is (B,T) tensor of integers
+        tok_emb = self.token_embedding_table(idx)
+        return tok_emb
 
     def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
         """Generate new tokens given a context

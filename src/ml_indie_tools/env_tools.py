@@ -88,7 +88,13 @@ class MLEnv:
                 if accelerator == "gpu" or accelerator == "fastest":
                     try:
                         jd = jax.devices()[0]
-                        gpu_device_names = ["Tesla", "GTX", "Nvidia"]  # who knows?
+                        gpu_device_names = [
+                            "Tesla",
+                            "GTX",
+                            "RTX",
+                            "Nvidia",
+                            "Metal",
+                        ]  # who knows?
                         for gpu_device_name in gpu_device_names:
                             if gpu_device_name in jd.device_kind:
                                 self.is_gpu = True

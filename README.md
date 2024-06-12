@@ -23,9 +23,9 @@ The usage scenarios are:
 |-------------------------|:---:|:-----------:|:-----------:|:-------:|:-------:|
 | Colab                   |  /  |      /      |      +      |    +    |    +    |
 | Workstation with Nvidia |  /  |      /      |      +      |    /    |    +    |
-| Apple Silicon           |  +  |      /      |      +      |    /    |    /    |
+| Apple Silicon           |  +  |      /      |      +      |    /    |   +e    |
 
-(`+`: supported, `/`: not supported)
+(`+`: supported, `/`: not supported, `+e`: experimental)
 
 `Gutenberg_Dataset` and `Text_Dataset` are NLP libraries that provide text data and can be used in conjuction
 with Huggingface [Datasets](https://huggingface.co/docs/datasets/) or directly with ML libraries.
@@ -246,6 +246,8 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2024-06-12, 0.12.28) Nasty bytegram decoder bug fixed for Unicode boundary cases.
+* (2024-04-28, 0.12.0) JAX support for Apple Silicon via `jax-metal` added (experimental).
 * (2024-03-25, 0.11.0) Tensorflow support completely removed, maintenance is simply too much effort due to continous API changes.
 * (2024-02-21, 0.10.4) More tests with bytegrams.
 * (2023-11-14, 0.9.3) Fix/hack for reloading of checkpoints for compiled models (torch puts weights in some sub-object: `_orig_mod`)

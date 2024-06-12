@@ -8,6 +8,8 @@ try:
 except ImportError:
     pass
 
+from ml_indie_tools.train_utils import TrainUtils
+
 
 class Text_Dataset:
     """Initialize the Text_Dataset with a list of texts.
@@ -21,7 +23,7 @@ class Text_Dataset:
         gd = Gutenberg_Dataset()
         gd.load_index()
         ls = gd.search({'author': 'kant', 'title': 'kritik', 'language': 'german'})  # returns a list of texts
-        ls = gd.insert_texts(ls)  # this inserts the actual text of the books into field 'text'.
+        ls = gd.insert_book_texts(ls)  # this inserts the actual text of the books into field 'text'.
         # Now ls contains a valid list of text records:
         td = Text_Dataset(ls)
 
@@ -294,11 +296,11 @@ class Text_Dataset:
 
     def init_tokenizer(
         self,
-        tokenizer="ngram",
+        tokenizer="bytegram",
         max_ngrams=5,
         word_separator=None,
-        max_tokens=5000,
-        chunk_size=None,
+        max_tokens=32768,
+        chunk_size=500000,
     ):
         """Initialize the tokenizer with the text_list.
 
@@ -321,11 +323,11 @@ class Text_Dataset:
         max_tokens should be significantly higher than the number of unique glyphs in the text_list.
         Using word_separator=None is usually significantly better than using a word_separator for ngrams.
 
-        :param tokenizer: 'word', 'char', 'bytegram', or 'ngram' (default)
-        :param max_ngrams: (bytegram, ngram only) maximum n-gram length
+        :param tokenizer: 'word', 'char', 'bytegram' (default), or 'ngram'
+        :param max_ngrams: (bytegram, ngram only) maximum n-gram length, default=5
         :param word_separator: (word, ngram) [deprecated!] character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
-        :param max_tokens: (bytegram, ngram only) maximum number of tokens to use
-        :param chunk_size: (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts
+        :param max_tokens: (bytegram, ngram only) maximum number of tokens to use, default 32768
+        :param chunk_size: (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts, default 500000
         """
         self.log.info(f"Starting tokenizer on {len(self.text_list)} texts...")
         if tokenizer == "word":
@@ -425,25 +427,49 @@ class Text_Dataset:
             self.log.info("Corpus from byte texts created.")
             self.word_list = None
             eg_dict = Counter()
-            for text in self.text_list:
+            num_texts = len(self.text_list)
+            for index, text in enumerate(self.text_list):
+                pbar = TrainUtils.progress_bar_string(index, num_texts, 20)
+                if "alias" in text:
+                    title = text["alias"]
+                else:
+                    title = text["title"]
+                if len(title) > 40:
+                    title = title[:37] + "..."
+                print(
+                    f"{index+1:4d} ⦊{pbar}⦉ [{title:40s}]                  ",
+                    end="\r",
+                )
                 bytetext = bytearray(text["text"], "utf-8")
                 if chunk_size is not None:
                     for i in range(0, len(bytetext), chunk_size):
+                        if len(bytetext) > chunk_size:
+                            pbar2 = TrainUtils.progress_bar_string(i, len(bytetext), 10)
+                            if "alias" in text:
+                                title = text["alias"]
+                            else:
+                                title = text["title"]
+                            if len(title) > 30:
+                                title = title[:27] + "..."
+                            print(
+                                f"{index+1:4d} ⦊{pbar}⦉ [{title:30s}], ⦊{pbar2}⦉",
+                                end="\r",
+                            )
                         bytegrams = self._every_bytegram(
                             bytetext[i : i + chunk_size], max_len=max_ngrams
                         )
                         eg_dict.update(bytegrams)
-                        if i > chunk_size:  # less verbose
-                            print(
-                                f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r"
-                            )
+                        # if i > chunk_size:  # less verbose
+                        #     print(
+                        #         f"Chunking: {i}/{chunk_size}/{len(bytetext)}", end="\r"
+                        #     )
                 else:
                     bytegrams = self._every_bytegram(bytetext, max_len=max_ngrams)
                     eg_dict.update(bytegrams)
-                if len(bytetext) > 500000:
-                    self.log.info(
-                        f"Larger bytegrams calculated: {text['title']}: {len(bytetext)}, dict: {len(eg_dict.keys())}"
-                    )
+                # if len(bytetext) > 500000:
+                # self.log.info(
+                #     f"Larger bytegrams calculated: {text['title']}: {len(bytetext)}, dict: {len(eg_dict.keys())}"
+                # )
             bytegrams_list = self._weight_bytegrams(eg_dict)
             self.log.info("weights compiled")
 
@@ -473,18 +499,29 @@ class Text_Dataset:
             return
 
         self.log.info("Encoding text corpora")
-        for text in self.text_list:
-            if len(text["text"]) > 500000:
-                if "alias" in text:
-                    self.log.info(f"Encoding larger text {text['alias']}...")
-                else:
-                    self.log.info(f"Encoding larger text {text['title']}...")
+        for index, text in enumerate(self.text_list):
+            pbar = TrainUtils.progress_bar_string(index, num_texts, 20)
+            if "alias" in text:
+                title = text["alias"]
+            else:
+                title = text["title"]
+            if len(title) > 40:
+                title = title[:37] + "..."
+            print(
+                f"{index+1:4d} ⦊{pbar}⦉ [{title:40s}]                  ",
+                end="\r",
+            )
+            # if len(text["text"]) > 500000:
+            #     if "alias" in text:
+            #         self.log.info(f"Encoding larger text {text['alias']}...")
+            #     else:
+            #         self.log.info(f"Encoding larger text {text['title']}...")
             if chunk_size is not None and len(text["text"]) > 2 * chunk_size:
                 textbody = text["text"]
                 text["text_encoded"] = []
                 for i in range(0, len(textbody), chunk_size):
-                    if i > chunk_size:  # less verbose
-                        print(f"Chunking: {i}/{chunk_size}/{len(textbody)}", end="\r")
+                    # if i > chunk_size:  # less verbose
+                    #    print(f"Chunking: {i}/{chunk_size}/{len(textbody)}", end="\r")
                     enc = self.encode(textbody[i : i + chunk_size])
                     text["text_encoded"] = text["text_encoded"] + enc
             else:
@@ -581,7 +618,7 @@ class Text_Dataset:
             self.text_list = data["text_list"]
         self.log.info("Loading tokenizer done.")
 
-    def tokenize(self, text):
+    def tokenize(self, text: str):
         """Tokenize a text.
 
         :param text: text to tokenize
@@ -684,7 +721,7 @@ class Text_Dataset:
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return tokens
 
-    def encode(self, text):
+    def encode(self, text: str):
         """Encode a text.
 
         :param text: text to encode
@@ -709,7 +746,7 @@ class Text_Dataset:
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return encoded
 
-    def decode(self, encoded, mark_separator=False):
+    def decode(self, encoded, mark_separator=False, decode=True):
         """Decode a list of encoded tokens.
 
         :param encoded: list of encoded tokens
@@ -729,7 +766,9 @@ class Text_Dataset:
         elif self.tokenizer_type == "ngram":
             dec = ""
             for ind in encoded:
-                if ind == self.t2i["<wsep>"]:  # Separator
+                if (
+                    ind == self.t2i["<wsep>"] and self.word_separator is not None
+                ):  # Separator
                     dec += self.word_separator
                 elif ind == self.t2i["<unk>"]:  # Unknown token
                     dec += "<unk>"
@@ -739,32 +778,35 @@ class Text_Dataset:
                         dec += "_"
             decoded_text = dec
         elif self.tokenizer_type == "bytegram":
-            dec = ""
+            dec_bytes = b""
             bdec = []
             for ind in encoded:
                 if ind < 256:
                     bdec.append(bytes([ind]))
                 else:
                     if bdec != []:
-                        dec += b"".join(bdec).decode("utf-8", errors="replace")
+                        dec_bytes += b"".join(bdec)
+                        # bdec   += b"".join(bdec).decode("utf-8", errors="replace")
                         bdec = []
                     if (
                         ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]
+                        and self.word_separator is not None
                     ):  # Separator
-                        dec += self.word_separator
+                        dec_bytes += self.word_separator.encode("utf-8")
                     elif (
                         ind == self.b2i[tuple(bytearray("<unk>", "utf-8"))]
                     ):  # Unknown token
-                        dec += "<unk>"
+                        dec_bytes += "<unk>".encode("utf-8")
                     else:
-                        dec += bytes(list(self.i2b[ind])).decode(
-                            "utf-8", errors="replace"
-                        )
+                        dec_bytes += bytes(
+                            list(self.i2b[ind])
+                        )  # .decode("utf-8", errors="replace")
                         if mark_separator is True:
-                            dec += "_"
+                            dec_bytes += "·".encode("utf-8")
             if bdec != []:
-                dec += b"".join(bdec).decode("utf-8", errors="replace")
+                dec_bytes += b"".join(bdec)  # ).decode("utf-8", errors="replace")
                 bdec = []
+            dec = dec_bytes.decode("utf-8", errors="replace")
             decoded_text = dec
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
