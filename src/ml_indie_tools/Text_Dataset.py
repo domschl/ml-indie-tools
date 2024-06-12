@@ -805,7 +805,7 @@ class Text_Dataset:
                         if mark_separator is True:
                             dec_bytes += "·".encode("utf-8")
             if bdec != []:
-                dec += bdec  # ).decode("utf-8", errors="replace")
+                dec_bytes += bdec  # ).decode("utf-8", errors="replace")
                 bdec = []
             dec = b"".join(dec_bytes).decode("utf-8", errors="replace")
             decoded_text = dec
