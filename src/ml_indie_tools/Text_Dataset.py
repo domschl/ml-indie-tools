@@ -23,7 +23,7 @@ class Text_Dataset:
         gd = Gutenberg_Dataset()
         gd.load_index()
         ls = gd.search({'author': 'kant', 'title': 'kritik', 'language': 'german'})  # returns a list of texts
-        ls = gd.insert_texts(ls)  # this inserts the actual text of the books into field 'text'.
+        ls = gd.insert_book_texts(ls)  # this inserts the actual text of the books into field 'text'.
         # Now ls contains a valid list of text records:
         td = Text_Dataset(ls)
 
