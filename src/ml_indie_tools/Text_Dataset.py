@@ -785,9 +785,8 @@ class Text_Dataset:
                     bdec.append(bytes([ind]))
                 else:
                     if bdec != []:
-                        dec_bytes += (
-                            bdec  # += b"".join(bdec).decode("utf-8", errors="replace")
-                        )
+                        dec_bytes += b"".join(bdec)
+                        # bdec   += b"".join(bdec).decode("utf-8", errors="replace")
                         bdec = []
                     if (
                         ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]
@@ -805,9 +804,9 @@ class Text_Dataset:
                         if mark_separator is True:
                             dec_bytes += "·".encode("utf-8")
             if bdec != []:
-                dec_bytes += bdec  # ).decode("utf-8", errors="replace")
+                dec_bytes += b"".join(bdec)  # ).decode("utf-8", errors="replace")
                 bdec = []
-            dec = b"".join(dec_bytes).decode("utf-8", errors="replace")
+            dec = dec_bytes.decode("utf-8", errors="replace")
             decoded_text = dec
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
