@@ -296,11 +296,11 @@ class Text_Dataset:
 
     def init_tokenizer(
         self,
-        tokenizer="ngram",
+        tokenizer="bytegram",
         max_ngrams=5,
         word_separator=None,
-        max_tokens=5000,
-        chunk_size=None,
+        max_tokens=32768,
+        chunk_size=500000,
     ):
         """Initialize the tokenizer with the text_list.
 
@@ -323,11 +323,11 @@ class Text_Dataset:
         max_tokens should be significantly higher than the number of unique glyphs in the text_list.
         Using word_separator=None is usually significantly better than using a word_separator for ngrams.
 
-        :param tokenizer: 'word', 'char', 'bytegram', or 'ngram' (default)
-        :param max_ngrams: (bytegram, ngram only) maximum n-gram length
+        :param tokenizer: 'word', 'char', 'bytegram' (default), or 'ngram'
+        :param max_ngrams: (bytegram, ngram only) maximum n-gram length, default=5
         :param word_separator: (word, ngram) [deprecated!] character used to separate words, default None, which amounts to ' ' (space) for word and no word-splitting for ngram.
-        :param max_tokens: (bytegram, ngram only) maximum number of tokens to use
-        :param chunk_size: (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts
+        :param max_tokens: (bytegram, ngram only) maximum number of tokens to use, default 32768
+        :param chunk_size: (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts, default 500000
         """
         self.log.info(f"Starting tokenizer on {len(self.text_list)} texts...")
         if tokenizer == "word":
