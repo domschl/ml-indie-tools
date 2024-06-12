@@ -1,6 +1,5 @@
 
-
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en" data-content_root="./">
   <head>
@@ -9,10 +8,10 @@
 
     <title>Welcome to ml-indie-tools’s documentation! &#8212; ml-indie-tools 0.11.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=532c1bf3" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=658d757c" />
     
     <script src="_static/documentation_options.js?v=f3b36f1a"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -390,7 +389,7 @@ Standard keys are: <cite>ebook_id</cite>, <cite>author</cite>, <cite>language</c
 
 <dl class="py method">
 <dt class="sig sig-object py" id="Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts">
-<span class="sig-name descname"><span class="pre">insert_book_texts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_count_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset.insert_book_texts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">insert_book_texts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_count_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Gutenberg_Dataset.html#Gutenberg_Dataset.insert_book_texts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts" title="Link to this definition">¶</a></dt>
 <dd><p>Inserts book texts into the records returned by <a class="reference internal" href="#Gutenberg_Dataset.Gutenberg_Dataset.search" title="Gutenberg_Dataset.Gutenberg_Dataset.search"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a>.</p>
 <p>In order to prevent the download of too many books, the download count limit is set to <cite>download_count_limit</cite>.
 Downloaded books are cached and cached books are not counted towards the download count limit. Calling this
@@ -401,6 +400,7 @@ into the dictionary with the key <cite>text</cite>.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>search_dict</strong> – search array of dictionaries that at least contain the key <cite>ebook_id</cite>.</p></li>
 <li><p><strong>download_count_limit</strong> – maximum number of books to download, if no local mirror is used. No limits apply for local mirrors.</p></li>
+<li><p><strong>skip_ids</strong> – list of ebook_ids (string format!) to skip downloading.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -564,241 +564,8 @@ search for a single keyword (e.g. english), or an array of keywords.</p>
 </dd></dl>
 
 </section>
-<section id="module-Text_Dataset">
-<span id="text-dataset-object"></span><h2>Text_Dataset object<a class="headerlink" href="#module-Text_Dataset" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Text_Dataset.</span></span><span class="sig-name descname"><span class="pre">Text_Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Initialize the Text_Dataset with a list of texts.</p>
-<p>The Gutenberg_Dataset can be used to create such a list, by:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ml_indie_tools.Gutenberg_Dataset</span> <span class="kn">import</span> <span class="n">Gutenberg_Dataset</span>
-<span class="kn">from</span> <span class="nn">ml_indie_tools.Text_Dataset</span> <span class="kn">import</span> <span class="n">Text_Dataset</span>
-<span class="n">gd</span> <span class="o">=</span> <span class="n">Gutenberg_Dataset</span><span class="p">()</span>
-<span class="n">gd</span><span class="o">.</span><span class="n">load_index</span><span class="p">()</span>
-<span class="n">ls</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">search</span><span class="p">({</span><span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="s1">&#39;kant&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;kritik&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="s1">&#39;german&#39;</span><span class="p">})</span>  <span class="c1"># returns a list of texts</span>
-<span class="n">ls</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">insert_texts</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>  <span class="c1"># this inserts the actual text of the books into field &#39;text&#39;.</span>
-<span class="c1"># Now ls contains a valid list of text records:</span>
-<span class="n">td</span> <span class="o">=</span> <span class="n">Text_Dataset</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If text_list at initialization is None, texts can be added later with the load_texts() method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text_list</strong> – optional list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
-</dd>
-</dl>
-<p>‘text’: ‘the-long-text’}. Optional parameters: ‘weight’: 1.0
-:param sanitize_white_space: If True, white space is replaced by a single space.
-:param separate_punctuation: If True, punctuation is separated from words.
-:param preserve_case: If True, the case of the text is preserved.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.decode" title="Link to this definition">¶</a></dt>
-<dd><p>Decode a list of encoded tokens.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>encoded</strong> – list of encoded tokens</p></li>
-<li><p><strong>mark_separator</strong> – (ngram only) if True, add a separator between tokens for debug</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>text</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.encode" title="Link to this definition">¶</a></dt>
-<dd><p>Encode a text.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text</strong> – text to encode</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of encoded tokens</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.filter_text">
-<span class="sig-name descname"><span class="pre">filter_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.filter_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.filter_text" title="Link to this definition">¶</a></dt>
-<dd><p>Filter a text.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> – text to filter</p></li>
-<li><p><strong>sanitize_white_space</strong> – If True, white space is replaced by a single space.</p></li>
-<li><p><strong>separate_punctuation</strong> – If True, punctuation is separated from words.</p></li>
-<li><p><strong>preserve_case</strong> – If True, the case of the text is preserved.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>filtered text</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.get_random_item">
-<span class="sig-name descname"><span class="pre">get_random_item</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_random_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_random_item" title="Link to this definition">¶</a></dt>
-<dd><p>Get a random sample from the dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.get_unique_token_count">
-<span class="sig-name descname"><span class="pre">get_unique_token_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.get_unique_token_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.get_unique_token_count" title="Link to this definition">¶</a></dt>
-<dd><p>Get the number of unique tokens.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>number of unique tokens</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.init_getitem">
-<span class="sig-name descname"><span class="pre">init_getitem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_stepping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_getitem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_getitem" title="Link to this definition">¶</a></dt>
-<dd><p>Initialize the __getitem__ and __len__ methods.</p>
-<p>This method needs to be called before using len() or index-access of the dataset.</p>
-<p>This method determines how the dataset is partitioned into records, and what kind
-of encoding is returned on index-access.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ml_indie_tools.Text_Dataset</span> <span class="kn">import</span> <span class="n">TextDataset</span>
-<span class="n">tl</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;author&#39;</span><span class="p">:</span><span class="s1">&#39;nobody&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;some title&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span><span class="s1">&#39;some text&#39;</span><span class="p">},</span>
-      <span class="p">{</span><span class="s1">&#39;author&#39;</span><span class="p">:</span><span class="s1">&#39;nobody&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;some title 2&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span><span class="s1">&#39;english&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span><span class="s1">&#39;some more text&#39;</span><span class="p">}]</span>
-<span class="n">td</span> <span class="o">=</span> <span class="n">Text_Dataset</span><span class="p">(</span><span class="n">tl</span><span class="p">)</span>
-<span class="n">td</span><span class="o">.</span><span class="n">init_getitem</span><span class="p">(</span><span class="n">sample_type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">sample_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">content_stepping</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">td</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">td</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="c1"># Output: 12 and (&#39;some&#39;, &#39;ome &#39;)</span>
-</pre></div>
-</div>
-<p>The method of tokenization (char, word, ngram) for ‘encoded’ sample_type is determined by
-the tokenizer_type in call to init_tokenizer().</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_type</strong> – ‘text’ (text-string of length sample_length), ‘encoded’ (encoded sample_length tokens)</p></li>
-<li><p><strong>sample_length</strong> – length of a sample (either character count (type text) or token count (type encoded))</p></li>
-<li><p><strong>content_stepping</strong> – number of characters/tokens to skip between each sample</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.init_tokenizer">
-<span class="sig-name descname"><span class="pre">init_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ngram'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ngrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">word_separator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.init_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.init_tokenizer" title="Link to this definition">¶</a></dt>
-<dd><p>Initialize the tokenizer with the text_list.</p>
-<p>The character tokenizer simply splits any language text into glyphs.</p>
-<p>A word tokenizer works for languages that have the concept of word separators (as in English,
-‘ ‘ space). Word tokenizers are English-centric algorithms, since many other languages either
-can compose words into larger words with no separators, words being more similar to English
-syllables in that case, or have no word separators at all (as in Chinese), or have syllable
-separators (as in Tibetan, which has also a second kind of separators for sentence-fragments). For multi-language applications, use ngram tokenizers or character
-tokenizers.</p>
-<p>The ngram tokenizer can either first split text into words using a word_speparator
-and then extracting all possible ngrams, or it can extract all possible ngrams directly
-without any word-splitting, which is the default behavior with word_separator=None since it
-works for all languages classes.</p>
-<p>For ngrams, the tokenizer can extract ngrams of length 1..max_ngrams, and selects the top most
-used ngrams with upper limit max_tokens. The optimum for max_ngrams is usually around 3-6, and
-max_tokens should be significantly higher than the number of unique glyphs in the text_list.
-Using word_separator=None is usually significantly better than using a word_separator for ngrams.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> – ‘word’, ‘char’, ‘bytegram’, or ‘ngram’ (default)</p></li>
-<li><p><strong>max_ngrams</strong> – (bytegram, ngram only) maximum n-gram length</p></li>
-<li><p><strong>word_separator</strong> – (word, ngram) [deprecated!] character used to separate words, default None, which amounts to ‘ ‘ (space) for word and no word-splitting for ngram.</p></li>
-<li><p><strong>max_tokens</strong> – (bytegram, ngram only) maximum number of tokens to use</p></li>
-<li><p><strong>chunk_size</strong> – (bytegram, ngram only) if not None: if input texts are larger than chunk_size, they are split in chunk_size parts</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.load_texts">
-<span class="sig-name descname"><span class="pre">load_texts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize_white_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate_punctuation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.load_texts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.load_texts" title="Link to this definition">¶</a></dt>
-<dd><p>Load a list of texts into the Text_Dataset.</p>
-<p>Note: if there are already texts in the Text_Dataset, the new texts are appended.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text_list</strong> – list of text-records of the form: {‘author’: ‘author’, ‘title’: ‘title’, ‘language’: ‘some-language’,</p>
-</dd>
-</dl>
-<p>‘text’: ‘the-long-text’}. Optional parameters: ‘weight’: 1.0
-:param sanitize_white_space: If True, white space is replaced by a single space.
-:param separate_punctuation: If True, punctuation is separated from words.
-:param preserve_case: If True, the case of the text is preserved.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.load_tokenizer">
-<span class="sig-name descname"><span class="pre">load_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.load_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.load_tokenizer" title="Link to this definition">¶</a></dt>
-<dd><p>Load tokenizer data and text library from JSON-file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_path</strong> – path to file</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.save_tokenizer">
-<span class="sig-name descname"><span class="pre">save_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.save_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.save_tokenizer" title="Link to this definition">¶</a></dt>
-<dd><p>Save tokenizer data and text library to JSON-file.</p>
-<p>This json file can be loaded with load_tokenizer() and has all information needed
-to use the tokenizer with trained models and new text.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_path</strong> – path to file</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.source_highlight">
-<span class="sig-name descname"><span class="pre">source_highlight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_quote_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_ref_anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.source_highlight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.source_highlight" title="Link to this definition">¶</a></dt>
-<dd><p>Analyse which parts of <cite>ref_txt</cite> are cited from the texts in the Text_Dataset.</p>
-<p>Note: this function requires a jupyter notebook in order to display HTML with markup.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ref_txt</strong> – the reference text to be analysed for plagiarised parts</p></li>
-<li><p><strong>min_quote_size</strong> – minimum size of a quote to be considered plagiarised</p></li>
-<li><p><strong>dark_mode</strong> – if True, the background colors will be dark, otherwise white</p></li>
-<li><p><strong>display_ref_anchor</strong> – if True, the reference text will be displayed with a reference anchor</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="Text_Dataset.Text_Dataset.tokenize">
-<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Text_Dataset.html#Text_Dataset.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Text_Dataset.Text_Dataset.tokenize" title="Link to this definition">¶</a></dt>
-<dd><p>Tokenize a text.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text</strong> – text to tokenize</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>list of tokens</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<section id="text-dataset-object">
+<h2>Text_Dataset object<a class="headerlink" href="#text-dataset-object" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-ALU_Dataset">
 <span id="alu-dataset-object"></span><h2>ALU_Dataset object<a class="headerlink" href="#module-ALU_Dataset" title="Link to this heading">¶</a></h2>
@@ -999,24 +766,7 @@ the twelve supported ops:
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-Text_Dataset">Text_Dataset object</a><ul>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset"><code class="docutils literal notranslate"><span class="pre">Text_Dataset</span></code></a><ul>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.decode"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.decode()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.encode"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.encode()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.filter_text"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.filter_text()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.get_random_item"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.get_random_item()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.get_unique_token_count"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.get_unique_token_count()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.init_getitem"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.init_getitem()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.init_tokenizer"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.init_tokenizer()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.load_texts"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.load_texts()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.load_tokenizer"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.load_tokenizer()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.save_tokenizer"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.save_tokenizer()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.source_highlight"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.source_highlight()</span></code></a></li>
-<li><a class="reference internal" href="#Text_Dataset.Text_Dataset.tokenize"><code class="docutils literal notranslate"><span class="pre">Text_Dataset.tokenize()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#text-dataset-object">Text_Dataset object</a></li>
 <li><a class="reference internal" href="#module-ALU_Dataset">ALU_Dataset object</a><ul>
 <li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset</span></code></a><ul>
 <li><a class="reference internal" href="#ALU_Dataset.ALU_Dataset.check_results"><code class="docutils literal notranslate"><span class="pre">ALU_Dataset.check_results()</span></code></a></li>
@@ -1052,7 +802,7 @@ the twelve supported ops:
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
@@ -1060,7 +810,7 @@ the twelve supported ops:
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -1081,7 +831,7 @@ the twelve supported ops:
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2022-2024, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

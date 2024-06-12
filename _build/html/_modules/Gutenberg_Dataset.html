@@ -1,6 +1,5 @@
 
-
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en" data-content_root="../">
   <head>
@@ -8,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gutenberg_Dataset &#8212; ml-indie-tools 0.11.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=532c1bf3" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=658d757c" />
     
     <script src="../_static/documentation_options.js?v=f3b36f1a"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -729,7 +728,7 @@
 
 <div class="viewcode-block" id="Gutenberg_Dataset.insert_book_texts">
 <a class="viewcode-back" href="../index.html#Gutenberg_Dataset.Gutenberg_Dataset.insert_book_texts">[docs]</a>
-    <span class="k">def</span> <span class="nf">insert_book_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_dict</span><span class="p">,</span> <span class="n">download_count_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">insert_book_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_dict</span><span class="p">,</span> <span class="n">download_count_limit</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">skip_ids</span><span class="o">=</span><span class="p">[]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Inserts book texts into the records returned by :func:`~Gutenberg_Dataset.Gutenberg_Dataset.search`.</span>
 
 <span class="sd">        In order to prevent the download of too many books, the download count limit is set to `download_count_limit`.</span>
@@ -739,10 +738,19 @@
 
 <span class="sd">        :param search_dict: search array of dictionaries that at least contain the key `ebook_id`.</span>
 <span class="sd">        :param download_count_limit: maximum number of books to download, if no local mirror is used. No limits apply for local mirrors.</span>
+<span class="sd">        :param skip_ids: list of ebook_ids (string format!) to skip downloading.</span>
 <span class="sd">        :returns: list of records including filtered book text-based in the `text` field.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dls</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">delete_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">search_dict</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;ebook_id&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">skip_ids</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Skipping id=</span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># delete entry from search_dict</span>
+                <span class="n">delete_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Getting id=</span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;ebook_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -765,6 +773,10 @@
                         <span class="sa">f</span><span class="s2">&quot;Download limit reached (</span><span class="si">{</span><span class="n">download_count_limit</span><span class="si">}</span><span class="s2">), stopping download...&quot;</span>
                     <span class="p">)</span>
                     <span class="k">break</span>
+        <span class="c1"># reverse delete_ids to avoid index shifting</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">delete_ids</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">search_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">search_dict</span></div>
 
 
@@ -838,7 +850,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
+<search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
@@ -846,7 +858,7 @@
       <input type="submit" value="Go" />
     </form>
     </div>
-</div>
+</search>
 <script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
@@ -868,7 +880,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2022-2024, dsc.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>
