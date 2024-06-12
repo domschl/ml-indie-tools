@@ -746,7 +746,7 @@ class Text_Dataset:
             raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
         return encoded
 
-    def decode(self, encoded, mark_separator=False):
+    def decode(self, encoded, mark_separator=False, decode=True):
         """Decode a list of encoded tokens.
 
         :param encoded: list of encoded tokens
@@ -778,33 +778,36 @@ class Text_Dataset:
                         dec += "_"
             decoded_text = dec
         elif self.tokenizer_type == "bytegram":
-            dec = ""
+            dec_bytes = []
             bdec = []
             for ind in encoded:
                 if ind < 256:
                     bdec.append(bytes([ind]))
                 else:
                     if bdec != []:
-                        dec += b"".join(bdec).decode("utf-8", errors="replace")
+                        dec_bytes += (
+                            bdec  # += b"".join(bdec).decode("utf-8", errors="replace")
+                        )
                         bdec = []
                     if (
                         ind == self.b2i[tuple(bytearray("<wsep>", "utf-8"))]
                         and self.word_separator is not None
                     ):  # Separator
-                        dec += self.word_separator
+                        dec_bytes += self.word_separator.encode("utf-8")
                     elif (
                         ind == self.b2i[tuple(bytearray("<unk>", "utf-8"))]
                     ):  # Unknown token
-                        dec += "<unk>"
+                        dec_bytes += "<unk>".encode("utf-8")
                     else:
-                        dec += bytes(list(self.i2b[ind])).decode(
-                            "utf-8", errors="replace"
-                        )
+                        dec_bytes += bytes(
+                            list(self.i2b[ind])
+                        )  # .decode("utf-8", errors="replace")
                         if mark_separator is True:
-                            dec += "_"
+                            dec_bytes += "·".encode("utf-8")
             if bdec != []:
-                dec += b"".join(bdec).decode("utf-8", errors="replace")
+                dec += bdec  # ).decode("utf-8", errors="replace")
                 bdec = []
+            dec = b"".join(dec_bytes).decode("utf-8", errors="replace")
             decoded_text = dec
         else:
             self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
