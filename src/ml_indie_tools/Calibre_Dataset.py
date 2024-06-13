@@ -30,6 +30,11 @@ class Calibre_Dataset:
         # Enumerate all txt-format books
         self.records = []
         index = 1
+        # Namespace map
+        ns = {
+            "opf": "http://www.idpf.org/2007/opf",
+            "dc": "http://purl.org/dc/elements/1.1/",
+        }
         for root, dirs, files in os.walk(self.library_path):
             for file in files:
                 if file.endswith(".txt"):
@@ -46,6 +51,12 @@ class Calibre_Dataset:
                             language = tree.find(
                                 ".//{http://purl.org/dc/elements/1.1/}language"
                             ).text
+
+                            # Dupe from Ebooks project, resolve at some point
+                            metadata = tree.find("opf:metadata", ns)
+                            subjects = metadata.findall("dc:subject", ns)
+                            tags = [subject.text for subject in subjects]
+
                             uuid_element = tree.find(
                                 './/dc:identifier[@opf:scheme="uuid"]',
                                 namespaces={
@@ -70,6 +81,7 @@ class Calibre_Dataset:
                             "language": language,
                             "title": title,
                             "filename": filename,
+                            "tags": tags,
                         }
                         if use_aliases is True:
                             rec["alias"] = f"CL{index}"
@@ -89,7 +101,7 @@ class Calibre_Dataset:
     def search(self, search_dict):
         """Search for book record with key specific key values
         For a list of valid keys, use `get_record_keys()`
-        Standard keys are: `ebook_id`, `author`, `language`, `title`
+        Standard keys are: `ebook_id`, `author`, `language`, `title`, `tags`
 
         *Note:* :func:`~Calibre_Dataset.Calibre_Dataset.load_index` needs to be called once before this function can be used.
 
