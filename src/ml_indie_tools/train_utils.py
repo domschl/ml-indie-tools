@@ -226,10 +226,10 @@ class TrainUtils:
             record["val_accuracy"] = 1 - record["val_loss"]
 
         self.losses = np.append(self.losses, record["loss"])
-        record["mean_loss"] = np.mean(self.losses[-self.mean_loss_window :])
+        record["mean_loss"] = np.mean(self.losses[-self.mean_window :])
         if "gradient_norm" in record:
             self.norms = np.append(self.norms, record["gradient_norm"])
-            record["mean_gradient_norm"] = np.mean(self.norms[-self.mean_loss_window :])
+            record["mean_gradient_norm"] = np.mean(self.norms[-self.mean_window :])
         t = time.time()
         if self.last_tick is not None:
             dt = t - self.last_tick
