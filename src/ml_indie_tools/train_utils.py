@@ -257,7 +257,7 @@ class TrainUtils:
         if "gradient_norm" in record:
             status_string += f" grad_norm: {record['gradient_norm']:.3f}"
         if "Sec/It" in record:
-            status_string += f" It/sec: {record['Sec/It']:.3f}"
+            status_string += f" Sec/It: {record['Sec/It']:.3f}"
         if len(status_string) > self.status_string_size:
             status_string = status_string[: self.status_string_size]
         if len(status_string) < self.status_string_size:
