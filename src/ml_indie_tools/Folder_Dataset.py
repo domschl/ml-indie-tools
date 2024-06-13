@@ -16,7 +16,7 @@ class Folder_Dataset:
         folder_path,
         file_extensions=[".txt", ".md", ".py", ".org"],
         max_file_size=None,
-        truncate_large=True,
+        min_file_size=None,
         default_language="English",
         default_author=None,
         use_aliases=False,
@@ -30,8 +30,8 @@ class Folder_Dataset:
 
         :param folder_path: Path to a folder containing text files with valid extensions
         :param file_extensions: List of file extensions that identify valid text files
-        :param max_file_size: If not None, files larger than max_file_size bytes are ignored or truncated (s.b.)
-        :param truncate_large: On True, files larger than max_file_size are truncated instead of ignored, only if max_file_size is not None
+        :param max_file_size: If not None, files larger than max_file_size bytes are ignored
+        :param min_file_size: If not None, files smaller than min_file_size bytes are ignored
         :param default_language: If language is not given via parse_metadata, use None or "English" etc.
         :param default_author: If author is not given via parse_metadata, use None or a specific author that applies to all texts.
         :param use_aliases: If True, documents are not referenced by filename (containing title and author),
@@ -50,7 +50,6 @@ class Folder_Dataset:
                 parts = os.path.splitext(file)
                 stem = parts[0]
                 ext = parts[1]
-                if ext in file_extensions:
                     components = stem.split(" - ")
                     if len(components) == 3:
                         title = components[0]
@@ -83,10 +82,10 @@ class Folder_Dataset:
                         rec["text"] = f.read()
                     if max_file_size is not None:
                         if len(rec["text"]) > max_file_size:
-                            if truncate_large is True:
-                                rec["text"] = rec["text"][:max_file_size]
-                            else:
-                                continue
+                            continue
+                    if min_file_size is not None:
+                        if len(rec["text"]) < min_file_size:
+                            continue
                     self.records += [rec]
                     self.index = self.index + 1
                     cur_index = cur_index + 1
