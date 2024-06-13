@@ -133,6 +133,7 @@ class TrainUtils:
         self.mean_window = mean_window
         self.status_string_size = status_string_size
         self.last_tick = None
+        self.last_iter = None
         self.train_session_active = True
 
         if self.indra_server_profile_name is not None:
@@ -232,10 +233,14 @@ class TrainUtils:
             self.norms = np.append(self.norms, record["gradient_norm"])
             record["mean_gradient_norm"] = np.mean(self.norms[-self.mean_window :])
         t = time.time()
-        if self.last_tick is not None:
+        if self.last_tick is not None and self.last_iter is not None:
             dt = t - self.last_tick
-            record["Sec/It"] = dt
+            di = record["batch"] - self.last_iter
+            if di > 0:
+                dt = dt / di
+                record["Sec/It"] = dt
         self.last_tick = t
+        self.last_iter = record["batch"]
 
         record["timestamp"] = (datetime.now(timezone.utc).isoformat(),)
 
