@@ -110,7 +110,11 @@ class Calibre_Dataset:
         search for a single keyword (e.g. english), or an array of keywords.
 
         :returns: list of records"""
-        if not hasattr(self, "records") or self.records is None:
+        if (
+            not hasattr(self, "records")
+            or self.records is None
+            or len(self.records) == 0
+        ):
             self.log.debug("Index not loaded, trying to load...")
             self.load_index()
         frecs = []
@@ -127,7 +131,7 @@ class Calibre_Dataset:
                     nf = 0
                     for skli in skl:
                         skt = rec[sk]
-                        if not isinstance(skt, str):
+                        if not isinstance(skt, list):
                             skt = [skt]
                         for sktj in skt:
                             if skli.lower() in sktj.lower():

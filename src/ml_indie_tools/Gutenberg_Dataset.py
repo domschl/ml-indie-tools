@@ -731,6 +731,9 @@ class Gutenberg_Dataset:
         :param ebook_id: ebook_id (String, since some IDs contain letters) of the book to be retrieved
         :returns: book record (dictionary with metadata and filtered text)
         """
+        if self.records is None or len(self.records) == 0:
+            self.log.error("No records loaded, call load_index() first!")
+            return None
         for rec in self.records:
             if rec["ebook_id"] == ebook_id:
                 text, _, valid = self._load_book_ex(ebook_id)
