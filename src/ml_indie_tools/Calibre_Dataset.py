@@ -126,8 +126,12 @@ class Calibre_Dataset:
                         skl = [skl]
                     nf = 0
                     for skli in skl:
-                        if skli.lower() in rec[sk].lower():
-                            nf = nf + 1
+                        skt = rec[sk]
+                        if not isinstance(skt, str):
+                            skt = [skt]
+                        for sktj in skt:
+                            if skli.lower() in sktj.lower():
+                                nf = nf + 1
                     if nf == 0:
                         found = False
                         break
