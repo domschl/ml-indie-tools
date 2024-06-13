@@ -50,6 +50,7 @@ class Folder_Dataset:
                 parts = os.path.splitext(file)
                 stem = parts[0]
                 ext = parts[1]
+                if ext in file_extensions:
                     components = stem.split(" - ")
                     if len(components) == 3:
                         title = components[0]
