@@ -2,6 +2,7 @@ import logging
 import math
 from datetime import datetime
 from datetime import timezone
+import time
 import numpy as np
 import json
 import queue
@@ -108,6 +109,8 @@ class TrainUtils:
         model_version,
         model_params,
         indra_subdomain=None,
+        mean_window=20,
+        status_string_size=80,
     ):
         if self.train_session_active is True:
             self.log.warning(
@@ -125,6 +128,10 @@ class TrainUtils:
         self.indra_subdomain = indra_subdomain
         self.model_loss_history = []
         self.losses = np.array([])
+        self.norms = np.array([])
+        self.mean_window = mean_window
+        self.status_string_size = status_string_size
+        self.last_tick = None
         self.train_session_active = True
 
         if self.indra_server_profile is not None:
@@ -196,52 +203,68 @@ class TrainUtils:
         event.auth_hash = self.session_id
         await self.icl.send_event(event)
 
-    def train_state(
-        self,
-        current_epoch,
-        current_batch,
-        num_batches,
-        loss,
-        val_loss=None,
-        mean_loss_window=20,
-    ):
+    def train_state(self, record):
+
+        mandatory_fields = ["epoch", "batch", "num_batches", "loss"]
+        # optional_fields = ["val_loss", "learning_rate", "gradient_norm"]
+
         if self.train_session_active is False:
             self.log.error(
                 "No active training session at train_state(): use train_session_start() first"
             )
             return "n/a", None
+        for field in mandatory_fields:
+            if field not in record:
+                self.log.error(f"Missing mandatory field '{field}' in record")
+                return "n/a", None
+
         # Calculate perplexity, accuracy from loss:
-        perplexity = math.exp(loss)
-        if val_loss is not None:
-            val_perplexity = math.exp(val_loss)
-        else:
-            val_perplexity = None
-        accuracy = 1 - loss
-        if val_loss is not None:
-            val_accuracy = 1 - val_loss
-        else:
-            val_accuracy = None
-        self.losses = np.append(self.losses, loss)
-        mean_loss = np.mean(self.losses[-mean_loss_window:])
-        record = {
-            "epoch": current_epoch,
-            "loss": loss,
-            "mean_loss": mean_loss,
-            "perplexity": perplexity,
-            "accuracy": accuracy,
-            "val_loss": val_loss,
-            "val_perplexity": val_perplexity,
-            "val_accuracy": val_accuracy,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
+        record["perplexity"] = math.exp(record["loss"])
+        record["accuracy"] = 1 - record["loss"]
+        if "val_loss" in record:
+            record["val_perplexity"] = math.exp(record["val_loss"])
+            record["val_accuracy"] = 1 - record["val_loss"]
+
+        self.losses = np.append(self.losses, record["loss"])
+        record["mean_loss"] = np.mean(self.losses[-self.mean_loss_window :])
+        if "gradient_norm" in record:
+            self.norms = np.append(self.norms, record["gradient_norm"])
+            record["mean_gradient_norm"] = np.mean(self.norms[-self.mean_loss_window :])
+        t = time.time()
+        if self.last_tick is not None:
+            dt = t - self.last_tick
+            record["Sec/It"] = dt
+        self.last_tick = t
+
+        record["timestamp"] = (datetime.now(timezone.utc).isoformat(),)
+
         self.model_loss_history.append(record)
 
         if self.indra_active:
             self.indra_queue.put(record)
 
-        pbar = self.progress_bar_string(current_batch, num_batches)
+        pbar = self.progress_bar_string(record["batch"], record["num_batches"])
 
-        status_string = f"{current_batch:6d} ⦊{pbar}⦉ loss: {mean_loss:.4f}    "
+        batch_state = (
+            f"Ep: {record['epoch']:.02f} Bat: {record['batch']}/{record['num_batches']}"
+        )
+        len_bs = 28
+        if len(batch_state) < len_bs:
+            batch_state = batch_state + " " * (len_bs - len(batch_state))
+        status_string = f"{batch_state} ⦊{pbar}⦉ loss: {record['mean_loss']:.4f}"
+        if "learning_rate" in record:
+            status_string += f" lr: {record['learning_rate']:.6f}"
+        if "gradient_norm" in record:
+            status_string += f" grad_norm: {record['gradient_norm']:.3f}"
+        if "Sec/It" in record:
+            status_string += f" It/sec: {record['Sec/It']:.3f}"
+        if len(status_string) > self.status_string_size:
+            status_string = status_string[: self.status_string_size]
+        if len(status_string) < self.status_string_size:
+            status_string = status_string + " " * (
+                self.status_string_size - len(status_string)
+            )
+
         return status_string, record
 
     async def register_train_state(self, record):
