@@ -929,8 +929,10 @@ class Text_Dataset:
                         elif self.tokenizer_type == "bytegram":
                             sample += "<unk>"
                         else:
-                            self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
-                            raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
+                            # self.log.error(f"Unknown tokenizer {self.tokenizer_type}")
+                            # raise ValueError(f"Unknown tokenizer {self.tokenizer_type}")
+                            # Don't pad with unknowns, just return the sample
+                            sample = sample
                     return sample
                 elif self.getitem_sample_type == "encoded":
                     sample = text["text_encoded"][
