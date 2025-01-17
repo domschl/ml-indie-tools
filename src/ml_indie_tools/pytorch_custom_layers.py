@@ -410,7 +410,7 @@ class MultiHeadSelfAttention(nn.Module):
     def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
         """Generate new tokens given a context
 
-        Note: for apple MPS, top_k is limited max 16 vor older torchs! ((01/2023) implementation limitation)
+        Note: for apple MPS, top_k is limited max 16 for older torchs! ((01/2023) implementation limitation)
         See: https://github.com/pytorch/pytorch/issues/78915
         Solved in: https://github.com/pytorch/pytorch/pull/94639 (03/2023)
 
@@ -422,7 +422,7 @@ class MultiHeadSelfAttention(nn.Module):
         # idx is (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
             # crop idx to the last sequence_len tokens
-            idx_cond = idx[:, -self.sequence_len :]
+            idx_cond = idx[:, -self.sequence_len:]
             # print(idx_cond.shape)
             # get the predictions
             logits, loss = self(idx_cond)
