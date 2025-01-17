@@ -1,2 +1,17 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
-*
+dist/
+__pycache__/
+.pynb_checkpoints/
+gutenberg/
+*.egg-info
+.vscode/
+.DS_Store
+.virtual_documents/
+bin/
+lib/
+lib64
+include/
+share/
+etc/
+pyvenv.cfg
+
