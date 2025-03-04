@@ -1035,7 +1035,7 @@ class Text_Dataset:
                     + "</span>"
                     + anchor
                 )
-        display.HTML(pre + out + post)
+        display.display(display.HTML(pre + out + post))
 
     def source_highlight(
         self, ref_txt, min_quote_size=10, dark_mode=False, display_ref_anchor=True
