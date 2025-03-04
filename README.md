@@ -246,6 +246,7 @@ Checkout the following jupyter notebook based projects for example-usage:
 
 ## History
 
+* (2025-03-02, 0.13.0) Breaking API change in IPython.HTML handled (IPython 9 changed module imports for display HTML, breaking old way).
 * (2024-06-12, 0.12.28) Nasty bytegram decoder bug fixed for Unicode boundary cases.
 * (2024-04-28, 0.12.0) JAX support for Apple Silicon via `jax-metal` added (experimental).
 * (2024-03-25, 0.11.0) Tensorflow support completely removed, maintenance is simply too much effort due to continous API changes.

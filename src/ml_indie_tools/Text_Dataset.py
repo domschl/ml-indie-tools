@@ -4,7 +4,7 @@ import json
 from collections import Counter
 
 try:
-    from IPython.core.display import display, HTML  # type: ignore
+    from IPython import display
 except ImportError:
     pass
 
@@ -1035,7 +1035,7 @@ class Text_Dataset:
                     + "</span>"
                     + anchor
                 )
-        display(HTML(pre + out + post))
+        display.HTML(pre + out + post)
 
     def source_highlight(
         self, ref_txt, min_quote_size=10, dark_mode=False, display_ref_anchor=True
